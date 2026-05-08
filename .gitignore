@@ -22,3 +22,4 @@ pnpm-debug.log*
 
 # plugin source — cloned at build (CI) or symlinked (local dev)
 plugin-source
+.claude/research/
