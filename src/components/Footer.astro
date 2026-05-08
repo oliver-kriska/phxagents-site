@@ -5,14 +5,41 @@ import { stats } from '../data/stats';
 
 <Default><slot /></Default>
 
-<div class="disclaimer">
-  <p>
-    phxagents · v{stats.version} ·
-    <a href="https://github.com/oliver-kriska/claude-elixir-phoenix">GitHub</a>
-    · <a href="/llms.txt">llms.txt</a> · <a href="/llms-full.txt">llms-full.txt</a>
-  </p>
-  <p>
-    Community plugin. Not affiliated with Phoenix Framework or
-    <a href="https://phoenix.new">phoenix.new</a>.
-  </p>
-</div>
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h4>Plugin</h4>
+      <ul>
+        <li><a href="/install/">Install</a></li>
+        <li><a href="/skills/">Skills</a></li>
+        <li><a href="/agents/">Agents</a></li>
+        <li><a href="/iron-laws/">Iron Laws</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="/changelog/">Changelog</a></li>
+        <li><a href="https://github.com/oliver-kriska/claude-elixir-phoenix">GitHub</a></li>
+        <li><a href="/llms.txt">llms.txt</a></li>
+        <li><a href="/llms-full.txt">llms-full.txt</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>phxagents</h4>
+      <p class="footer-blurb">
+        {stats.description}
+      </p>
+      <p class="footer-version">
+        v{stats.version} · <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/releases">all releases</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <p>
+      Community plugin. Not affiliated with Phoenix Framework or
+      <a href="https://phoenix.new">phoenix.new</a>.
+    </p>
+  </div>
+</footer>

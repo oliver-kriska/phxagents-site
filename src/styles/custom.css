@@ -39,6 +39,31 @@
   );
 }
 
+/* Type ramp tokens — modular scale roughly 1.25 ratio.
+   --text-display reserved for hero only via .hero h1.
+   :where() in selectors keeps specificity 0 so component rules win. */
+:root {
+  --text-display: clamp(2.5rem, 5vw, 3.75rem);
+  --text-h1: 2.25rem;
+  --text-h2: 1.625rem;
+  --text-h3: 1.25rem;
+  --text-h4: 1rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+
+  --tracking-display: -0.035em;
+  --tracking-h1: -0.025em;
+  --tracking-h2: -0.02em;
+  --tracking-h3: -0.015em;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.7;
+
+  --rhythm: 1.5rem; /* 24px baseline for vertical spacing */
+}
+
 /* Tighter typography defaults */
 body {
   font-feature-settings: 'cv11', 'ss01', 'ss03';
@@ -51,6 +76,48 @@ h2,
 h3,
 h4 {
   letter-spacing: -0.02em;
+}
+
+/* Apply type ramp inside Starlight's content area only — keeps hero,
+   sidebar, footer overrides untouched. :where() = specificity 0. */
+:where(.sl-markdown-content h1) {
+  font-size: var(--text-h1);
+  letter-spacing: var(--tracking-h1);
+  line-height: var(--leading-tight);
+  margin-block: calc(var(--rhythm) * 1.5) var(--rhythm);
+}
+
+:where(.sl-markdown-content h2) {
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-h2);
+  line-height: var(--leading-snug);
+  margin-block: calc(var(--rhythm) * 1.25) calc(var(--rhythm) * 0.5);
+}
+
+:where(.sl-markdown-content h3) {
+  font-size: var(--text-h3);
+  letter-spacing: var(--tracking-h3);
+  line-height: var(--leading-snug);
+  margin-block: var(--rhythm) calc(var(--rhythm) * 0.5);
+}
+
+:where(.sl-markdown-content h4) {
+  font-size: var(--text-h4);
+  font-weight: 600;
+  margin-block: var(--rhythm) calc(var(--rhythm) * 0.25);
+}
+
+:where(.sl-markdown-content p),
+:where(.sl-markdown-content ul),
+:where(.sl-markdown-content ol) {
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+:where(.sl-markdown-content small),
+:where(.sl-markdown-content figcaption) {
+  font-size: var(--text-small);
+  line-height: var(--leading-snug);
 }
 
 /* Display flourish — Instrument Serif for hero only */
@@ -142,6 +209,152 @@ h4 {
 
 .intro a:hover {
   text-decoration-color: var(--sl-color-accent);
+}
+
+/* Hero terminal — three-frame mock cycling on 12s loop */
+.hero-terminal {
+  max-width: 56rem;
+  margin: 1rem auto 3rem;
+  border: 1px solid color-mix(in oklch, var(--sl-color-accent), transparent 70%);
+  border-radius: 0.85rem;
+  overflow: hidden;
+  background: #060b0d;
+  box-shadow: 0 24px 60px -24px rgba(1, 105, 111, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  font-family: var(--sl-font-mono);
+}
+
+:root[data-theme='light'] .hero-terminal {
+  background: #0b1517;
+  color: #f1f7f9;
+}
+
+.hero-terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.85rem;
+  background: linear-gradient(180deg, #122024, #0c1517);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero-terminal-titlebar .dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+}
+
+.dot-r { background: #ff5f57; }
+.dot-y { background: #febc2e; }
+.dot-g { background: #28c840; }
+
+.hero-terminal-title {
+  margin-left: 0.75rem;
+  font-size: 0.78rem;
+  color: rgba(241, 247, 249, 0.55);
+  letter-spacing: 0.02em;
+}
+
+.hero-terminal-body {
+  position: relative;
+  min-height: 11rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.hero-terminal-frame {
+  position: absolute;
+  inset: 1.1rem 1.2rem 1.2rem;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+
+.hero-terminal-frame .line {
+  white-space: pre-wrap;
+}
+
+.line-cmd {
+  color: #f1f7f9;
+}
+
+.prompt {
+  color: var(--sl-color-accent);
+  margin-right: 0.55rem;
+  font-weight: 700;
+}
+
+.cmd {
+  color: #f1f7f9;
+  font-weight: 500;
+}
+
+.line-meta {
+  color: rgba(241, 247, 249, 0.6);
+  margin-top: 0.25rem;
+}
+
+.line-ok {
+  color: #6ddbab;
+  margin-top: 0.4rem;
+  font-weight: 500;
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.55rem;
+  height: 1.05rem;
+  background: var(--sl-color-accent);
+  margin-left: 0.3rem;
+  vertical-align: text-bottom;
+  animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 12s loop · 3 frames · each visible 4s */
+@keyframes hero-frame-1 {
+  0%, 30% { opacity: 1; transform: translateY(0); }
+  33%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes hero-frame-2 {
+  0%, 33% { opacity: 0; transform: translateY(4px); }
+  36%, 63% { opacity: 1; transform: translateY(0); }
+  66%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes hero-frame-3 {
+  0%, 66% { opacity: 0; transform: translateY(4px); }
+  69%, 96% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+.hero-terminal-frame.frame-1 {
+  animation: hero-frame-1 12s ease-in-out infinite;
+}
+.hero-terminal-frame.frame-2 {
+  animation: hero-frame-2 12s ease-in-out infinite;
+}
+.hero-terminal-frame.frame-3 {
+  animation: hero-frame-3 12s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-terminal-frame {
+    animation: none !important;
+    opacity: 0;
+    transform: none;
+  }
+  .hero-terminal-frame.frame-3 {
+    opacity: 1;
+  }
+  .cursor {
+    animation: none;
+  }
 }
 
 /* Latest release widget */
@@ -303,6 +516,24 @@ h4 {
   gap: 1.25rem !important;
 }
 
+/* Sidebar — subtle vertical gradient (Fumadocs-style depth signal).
+   Uses color-mix so it auto-tints with theme. */
+:where(starlight-toc, .sidebar-pane, nav.sidebar) {
+  background: linear-gradient(
+    180deg,
+    var(--sl-color-bg-nav) 0%,
+    color-mix(in oklch, var(--sl-color-bg-nav), black 8%) 100%
+  );
+}
+
+:root[data-theme='light'] :where(starlight-toc, .sidebar-pane, nav.sidebar) {
+  background: linear-gradient(
+    180deg,
+    var(--sl-color-bg-nav) 0%,
+    color-mix(in oklch, var(--sl-color-bg-nav), black 3%) 100%
+  );
+}
+
 /* Code block treatment — terminal-like for splash pages */
 .expressive-code {
   border-radius: 0.75rem !important;
@@ -310,14 +541,299 @@ h4 {
   border: 1px solid var(--sl-color-gray-5);
 }
 
-/* Footer disclaimer */
+/* Brand-tint Expressive Code's auto-detected terminal frame.
+   Selector targets the existing .frame.is-terminal class — no config flip. */
+.expressive-code .frame.is-terminal .header {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--sl-color-bg-nav), white 4%),
+    var(--sl-color-bg-nav)
+  ) !important;
+  border-bottom: 1px solid color-mix(in oklch, var(--sl-color-accent), transparent 70%) !important;
+}
+
+.expressive-code .frame.is-terminal .title {
+  font-family: var(--sl-font-mono) !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.02em !important;
+  color: var(--sl-color-gray-2) !important;
+}
+
+/* Slightly brighter traffic-light dots; preserves Expressive Code defaults */
+.expressive-code .frame.is-terminal::before {
+  filter: saturate(1.15);
+}
+
+/* First-fence preview wrapper on skill/agent detail pages */
+.first-fence {
+  margin-block: var(--rhythm) calc(var(--rhythm) * 1.5);
+}
+
+/* Compatibility matrix */
+.compat-matrix {
+  max-width: 64rem;
+  margin: 3rem auto;
+}
+
+.compat-matrix h2 {
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-h2);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.compat-matrix table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--sl-color-bg-nav);
+  table-layout: fixed;
+}
+
+.compat-matrix col.col-tool { width: 28%; }
+.compat-matrix col.col-status { width: 28%; }
+.compat-matrix col.col-notes { width: 44%; }
+
+.compat-matrix th,
+.compat-matrix td {
+  padding: 0.85rem 1.1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+.compat-matrix tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.compat-matrix th {
+  font-family: var(--sl-font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+  background: color-mix(in oklch, var(--sl-color-bg-nav), black 4%);
+}
+
+.compat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--sl-font-mono);
+  font-size: 0.85rem;
+}
+
+.compat-glyph {
+  display: inline-flex;
+  width: 1.4rem;
+  height: 1.4rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.compat-shipped .compat-glyph {
+  background: var(--gradient-accent);
+  color: #fff;
+}
+
+.compat-in-dev .compat-glyph {
+  background: color-mix(in oklch, var(--sl-color-accent), transparent 70%);
+  color: var(--sl-color-accent-high);
+}
+
+.compat-shipped {
+  color: var(--sl-color-white);
+}
+
+/* Featured grid */
+.featured-section {
+  max-width: 64rem;
+  margin: 4rem auto 3rem;
+}
+
+.featured-section > h2 {
+  font-size: var(--text-h2);
+  letter-spacing: var(--tracking-h2);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.featured-sub {
+  text-align: center;
+  color: var(--sl-color-gray-3);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.featured-sub a {
+  color: var(--sl-color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--sl-color-accent), transparent 60%);
+  transition: border-color 150ms ease;
+}
+
+.featured-sub a:hover {
+  border-bottom-color: var(--sl-color-accent);
+}
+
+.featured-group-label {
+  font-family: var(--sl-font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sl-color-accent-high);
+  margin: 2rem 0 0.85rem;
+  font-weight: 700;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+
+.featured-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: var(--sl-color-bg-nav);
+  text-decoration: none;
+  transition: transform 200ms ease, border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.featured-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--sl-color-accent), transparent 30%);
+  box-shadow: 0 12px 28px -16px rgba(1, 105, 111, 0.45);
+}
+
+.featured-card-name {
+  font-family: var(--sl-font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--sl-color-accent-high);
+  letter-spacing: -0.01em;
+}
+
+.featured-card-desc {
+  font-size: 0.88rem;
+  color: var(--sl-color-gray-2);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featured-card-arrow {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: var(--sl-color-gray-4);
+  font-size: 1rem;
+  transition: transform 200ms ease, color 200ms ease;
+}
+
+.featured-card:hover .featured-card-arrow {
+  color: var(--sl-color-accent);
+  transform: translateX(2px);
+}
+
+/* Site footer — 3-col structured.
+   No section background or border-top: lets the footer sit flush with the
+   page above, so the centered max-width grid doesn't look like it's
+   "floating" inside an empty wider container. */
+.site-footer {
+  margin-top: 4rem;
+  padding: 2.5rem 1rem 1rem;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2.5rem;
+  max-width: 64rem;
+  margin: 0 auto 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+}
+
+.footer-grid h4 {
+  font-family: var(--sl-font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sl-color-accent-high);
+  margin: 0 0 0.85rem;
+  font-weight: 700;
+}
+
+.footer-grid ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-grid li a {
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+  font-size: 0.92rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.footer-grid li a:hover {
+  color: var(--sl-color-accent);
+  border-bottom-color: var(--sl-color-accent);
+}
+
+.footer-blurb {
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-2);
+  margin: 0 0 0.75rem;
+  line-height: 1.55;
+  max-width: 32ch;
+}
+
+.footer-version {
+  font-family: var(--sl-font-mono);
+  font-size: 0.82rem;
+  color: var(--sl-color-gray-3);
+  margin: 0;
+}
+
+.footer-version a {
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.footer-version a:hover {
+  color: var(--sl-color-accent);
+  border-bottom-color: var(--sl-color-accent);
+}
+
+/* Footer disclaimer (now under the structured grid) */
 .disclaimer {
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--sl-color-gray-3);
-  padding: 2rem 1rem 1rem;
-  border-top: 1px solid var(--sl-color-gray-5);
-  margin-top: 4rem;
+  padding: 0;
+  max-width: 64rem;
+  margin: 0 auto;
 }
 
 .disclaimer a {
@@ -330,6 +846,76 @@ h4 {
 .disclaimer a:hover {
   color: var(--sl-color-accent);
   border-bottom-color: var(--sl-color-accent);
+}
+
+/* Pagefind search modal — brand polish (no JS, no React).
+   Targets Starlight's wrapper around the default Pagefind UI. */
+:where(dialog[data-search]) {
+  border: 1px solid color-mix(in oklch, var(--sl-color-accent), transparent 60%);
+  border-radius: 0.85rem;
+  box-shadow: 0 24px 64px -24px rgba(1, 105, 111, 0.5);
+  overflow: hidden;
+}
+
+.pagefind-ui {
+  --pagefind-ui-primary: var(--sl-color-accent);
+  --pagefind-ui-text: var(--sl-color-white);
+  --pagefind-ui-background: var(--sl-color-bg-nav);
+  --pagefind-ui-border: var(--sl-color-gray-5);
+  --pagefind-ui-border-radius: 0.65rem;
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-font: var(--sl-font);
+}
+
+.pagefind-ui__search-input {
+  font-family: var(--sl-font) !important;
+  font-size: 1rem !important;
+  border-color: color-mix(in oklch, var(--sl-color-accent), transparent 70%) !important;
+  background: color-mix(in oklch, var(--sl-color-bg-nav), black 4%) !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.pagefind-ui__search-input:focus {
+  border-color: var(--sl-color-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--sl-color-accent), transparent 80%) !important;
+  outline: none;
+}
+
+.pagefind-ui__result-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pagefind-ui__result-link {
+  color: var(--sl-color-accent-high) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid transparent;
+  transition: border-color 150ms ease;
+}
+
+.pagefind-ui__result-link:hover {
+  border-bottom-color: var(--sl-color-accent);
+}
+
+.pagefind-ui__result-tags,
+.pagefind-ui__result-excerpt mark {
+  font-family: var(--sl-font-mono);
+  font-size: 0.85rem;
+}
+
+.pagefind-ui__result-excerpt mark {
+  background: color-mix(in oklch, var(--sl-color-accent), transparent 75%) !important;
+  color: var(--sl-color-accent-high) !important;
+  padding: 0 0.15em;
+  border-radius: 2px;
+}
+
+.pagefind-ui__message {
+  font-family: var(--sl-font-mono) !important;
+  font-size: 0.78rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sl-color-gray-3) !important;
 }
 
 /* Reduced motion respect */

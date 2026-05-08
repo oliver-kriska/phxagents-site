@@ -1,0 +1,44 @@
+---
+const rows = [
+  { agent: 'Claude Code', status: 'shipped', detail: 'v2.x — full plugin' },
+  { agent: 'Codex CLI', status: 'in-dev', detail: 'landing v3.0.0' },
+  { agent: 'OpenCode', status: 'in-dev', detail: 'landing v3.0.0' },
+  { agent: 'Pi', status: 'in-dev', detail: 'landing v3.0.0' },
+];
+
+const symbol = (s: string) => (s === 'shipped' ? '✓' : '◔');
+---
+
+<section class="compat-matrix not-content">
+  <h2>Where it runs</h2>
+  <table>
+    <colgroup>
+      <col class="col-tool" />
+      <col class="col-status" />
+      <col class="col-notes" />
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">AI coding tool</th>
+        <th scope="col">Status</th>
+        <th scope="col">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((r) => (
+          <tr class={`compat-row compat-${r.status}`}>
+            <td><strong>{r.agent}</strong></td>
+            <td>
+              <span class="compat-badge">
+                <span class="compat-glyph">{symbol(r.status)}</span>
+                {r.status === 'shipped' ? 'shipped' : 'in development'}
+              </span>
+            </td>
+            <td>{r.detail}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</section>

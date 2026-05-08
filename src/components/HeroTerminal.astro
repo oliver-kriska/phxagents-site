@@ -1,0 +1,51 @@
+---
+const frames = [
+  {
+    cmd: '/phx:plan Add real-time comments',
+    lines: [
+      { type: 'meta', text: '→ 4 research agents started · 3 codebases · 12 sources' },
+      { type: 'meta', text: '→ synthesising structured plan…' },
+      { type: 'ok', text: '✓ plan written: plans/2026-05-08-comments.md' },
+    ],
+  },
+  {
+    cmd: '/phx:work plans/2026-05-08-comments.md',
+    lines: [
+      { type: 'meta', text: '→ implementing 6 tasks · Iron Laws active · 3 specialists' },
+      { type: 'meta', text: '→ ecto schema · liveview component · oban worker…' },
+      { type: 'ok', text: '✓ all tests pass · mix compile clean · zero warnings' },
+    ],
+  },
+  {
+    cmd: '/phx:review',
+    lines: [
+      { type: 'meta', text: '→ 4 review agents (security · ecto · liveview · oban)' },
+      { type: 'meta', text: '→ checking 23 files against 22 Iron Laws…' },
+      { type: 'ok', text: '✓ 0 findings · ready to ship' },
+    ],
+  },
+];
+---
+
+<div class="hero-terminal" role="img" aria-label="phxagents workflow demo">
+  <div class="hero-terminal-titlebar">
+    <span class="dot dot-r"></span>
+    <span class="dot dot-y"></span>
+    <span class="dot dot-g"></span>
+    <span class="hero-terminal-title">phxagents · workflow</span>
+  </div>
+  <div class="hero-terminal-body">
+    {frames.map((frame, i) => (
+      <div class={`hero-terminal-frame frame-${i + 1}`} aria-hidden={i !== 0}>
+        <div class="line line-cmd">
+          <span class="prompt">$</span>
+          <span class="cmd">{frame.cmd}</span>
+          <span class="cursor"></span>
+        </div>
+        {frame.lines.map((l) => (
+          <div class={`line line-${l.type}`}>{l.text}</div>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>

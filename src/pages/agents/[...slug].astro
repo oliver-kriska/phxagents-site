@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import FirstFence from '../../components/FirstFence.astro';
 
 export async function getStaticPaths() {
   const agents = await getCollection('agents');
@@ -41,5 +42,6 @@ const { name, description, model, effort, tools, skills } = entry.data;
       </li>
     )}
   </ul>
+  {entry.body && <FirstFence body={entry.body} title={`example · ${name}`} />}
   <Content />
 </StarlightPage>

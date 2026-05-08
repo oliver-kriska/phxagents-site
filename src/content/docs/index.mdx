@@ -21,6 +21,10 @@ hero:
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import { stats } from '../../data/stats';
 import LatestRelease from '../../components/LatestRelease.astro';
+import HeroTerminal from '../../components/HeroTerminal.astro';
+import CompatibilityMatrix from '../../components/CompatibilityMatrix.astro';
+import FeaturedGrid from '../../components/FeaturedGrid.astro';
+import StatCounters from '../../components/StatCounters.astro';
 
 <div class="intro">
 
@@ -30,26 +34,13 @@ This plugin does. It coordinates **{stats.agents} specialist agents** that plan,
 
 </div>
 
+<HeroTerminal />
+
 <LatestRelease />
 
-<div class="stat-grid">
-  <div class="stat-card">
-    <div class="stat-num">{stats.skills}</div>
-    <div class="stat-label">skills auto-loaded for the file you're editing</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num">{stats.agents}</div>
-    <div class="stat-label">specialist agents — planners, reviewers, investigators</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num">{stats.ironLaws}</div>
-    <div class="stat-label">Iron Laws — production-tested rules that catch bugs before they ship</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num">{stats.references}</div>
-    <div class="stat-label">deep-dive references for Phoenix, Ecto, LiveView, Oban, OTP</div>
-  </div>
-</div>
+<StatCounters />
+
+<CompatibilityMatrix />
 
 ## How it works
 
@@ -68,11 +59,17 @@ This plugin does. It coordinates **{stats.agents} specialist agents** that plan,
   </Card>
 </CardGrid>
 
+<FeaturedGrid />
+
 ## Get started
 
-```bash
-# Add as a Claude Code marketplace
+Run these in Claude Code, one at a time. Each block has its own copy button.
+
+```text frame="none" title="1. Add the marketplace"
 /plugin marketplace add oliver-kriska/claude-elixir-phoenix
+```
+
+```text frame="none" title="2. Install the plugin"
 /plugin install elixir-phoenix
 ```
 
