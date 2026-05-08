@@ -1,67 +1,118 @@
 /* phxagents — design tokens.
    Teal accent (signals functional/Elixir energy, avoids AI-purple cliché).
-   Typography: system fonts for now; add Geist + Instrument Serif via @fontsource later. */
+   Typography: Inter Variable for body, JetBrains Mono for code,
+   Instrument Serif italic for display heading flourish (used sparingly). */
+
+@import '@fontsource-variable/inter/index.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/instrument-serif/400-italic.css';
 
 :root {
   --sl-color-accent-low: #052f33;
   --sl-color-accent: #4f98a3;
   --sl-color-accent-high: #b3dde4;
 
-  --sl-font: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, sans-serif;
-  --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, monospace;
+  --sl-font: 'Inter Variable', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
+
+  --gradient-accent: linear-gradient(135deg, #01696f 0%, #4f98a3 100%);
+  --gradient-glow: radial-gradient(
+    ellipse at top,
+    rgba(79, 152, 163, 0.18),
+    transparent 60%
+  );
 }
 
 :root[data-theme='light'] {
   --sl-color-accent-low: #b3dde4;
   --sl-color-accent: #01696f;
   --sl-color-accent-high: #052f33;
+
+  --gradient-glow: radial-gradient(
+    ellipse at top,
+    rgba(1, 105, 111, 0.08),
+    transparent 60%
+  );
 }
 
-/* Hero polish */
+/* Tighter typography defaults */
+body {
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.02em;
+}
+
+/* Display flourish — Instrument Serif for hero only */
 .hero h1 {
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  background: linear-gradient(
+    135deg,
+    var(--sl-color-white) 0%,
+    var(--sl-color-accent-high) 60%,
+    var(--sl-color-accent) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hero ambient glow background */
+.hero {
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -10% -20% auto -20%;
+  height: 80%;
+  background: var(--gradient-glow);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .hero .tagline {
   font-size: 1.25rem;
-  line-height: 1.4;
+  line-height: 1.5;
+  color: var(--sl-color-gray-2);
+  max-width: 38ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Stat cards */
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
+/* Action button accent */
+.hero a.action.primary {
+  background: var(--gradient-accent);
+  border: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 8px 24px -8px rgba(1, 105, 111, 0.5);
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-.stat-card {
-  padding: 1.25rem;
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 0.5rem;
-  background: var(--sl-color-bg-nav);
-}
-
-.stat-card .stat-num {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--sl-color-accent-high);
-  line-height: 1;
-}
-
-.stat-card .stat-label {
-  font-size: 0.9rem;
-  color: var(--sl-color-gray-3);
-  margin-top: 0.25rem;
+.hero a.action.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 12px 32px -8px rgba(1, 105, 111, 0.6);
 }
 
 /* Intro paragraph below hero */
 .intro {
   max-width: 60ch;
-  margin: 0 auto 2rem;
+  margin: 0 auto 3rem;
   font-size: 1.05rem;
   line-height: 1.6;
   color: var(--sl-color-gray-2);
@@ -69,24 +120,54 @@
 
 .intro strong:first-of-type {
   display: block;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--sl-color-white);
   margin-bottom: 1rem;
   line-height: 1.4;
+  font-weight: 600;
 }
 
 .intro p {
-  margin: 0;
+  margin: 0 0 1rem;
+}
+
+.intro a {
+  color: var(--sl-color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(79, 152, 163, 0.4);
+  transition: text-decoration-color 150ms ease;
+}
+
+.intro a:hover {
+  text-decoration-color: var(--sl-color-accent);
 }
 
 /* Latest release widget */
 .release-widget {
+  position: relative;
   border: 1px solid var(--sl-color-accent-low);
-  border-left: 3px solid var(--sl-color-accent);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   padding: 1rem 1.25rem;
-  background: var(--sl-color-bg-nav);
-  margin: 1.5rem 0 2rem;
+  background: linear-gradient(
+    180deg,
+    rgba(79, 152, 163, 0.04) 0%,
+    transparent 100%
+  );
+  margin: 0 auto 2.5rem;
+  max-width: 60ch;
+  overflow: hidden;
+}
+
+.release-widget::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--gradient-accent);
 }
 
 .release-meta {
@@ -98,18 +179,23 @@
 }
 
 .release-tag {
+  font-family: var(--sl-font-mono);
   font-weight: 700;
+  font-size: 0.85rem;
   color: var(--sl-color-accent-high);
+  letter-spacing: -0.01em;
 }
 
 .release-date {
   color: var(--sl-color-gray-3);
+  font-size: 0.8rem;
 }
 
 .release-name {
   margin: 0.25rem 0 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 .release-summary {
@@ -126,11 +212,102 @@
   color: var(--sl-color-accent);
   text-decoration: none;
   font-weight: 500;
+  transition: color 150ms ease;
 }
 
 .release-link:hover {
   color: var(--sl-color-accent-high);
-  text-decoration: underline;
+}
+
+.release-link::after {
+  content: ' →';
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+
+.release-link:hover::after {
+  transform: translateX(2px);
+}
+
+/* Stat cards — modernised */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 2.5rem 0 3rem;
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stat-card {
+  position: relative;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: var(--sl-color-bg-nav);
+  overflow: hidden;
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 152, 163, 0) 0%,
+    rgba(79, 152, 163, 0.06) 100%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--sl-color-accent-low);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card .stat-num {
+  font-family: var(--sl-font-mono);
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: var(--sl-color-accent-high);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(
+    135deg,
+    var(--sl-color-accent) 0%,
+    var(--sl-color-accent-high) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-card .stat-label {
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-2);
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Better card grid spacing inside Starlight CardGrid */
+.card-grid {
+  margin-top: 2rem !important;
+  gap: 1.25rem !important;
+}
+
+/* Code block treatment — terminal-like for splash pages */
+.expressive-code {
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+  border: 1px solid var(--sl-color-gray-5);
 }
 
 /* Footer disclaimer */
@@ -140,5 +317,27 @@
   color: var(--sl-color-gray-3);
   padding: 2rem 1rem 1rem;
   border-top: 1px solid var(--sl-color-gray-5);
-  margin-top: 3rem;
+  margin-top: 4rem;
+}
+
+.disclaimer a {
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.disclaimer a:hover {
+  color: var(--sl-color-accent);
+  border-bottom-color: var(--sl-color-accent);
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

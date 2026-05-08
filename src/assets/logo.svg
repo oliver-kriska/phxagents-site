@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 36" fill="none">
+  <defs>
+    <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f98a3"/>
+      <stop offset="100%" stop-color="#01696f"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="2" width="32" height="32" rx="7" fill="url(#logo-g)"/>
+  <path d="M11 11 L11 25 M11 11 L17 11 Q21 11 21 15 Q21 19 17 19 L11 19"
+        stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="23" cy="25" r="2.5" fill="#b3dde4"/>
+  <text x="42" y="25" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700" fill="currentColor" letter-spacing="-0.02em">phxagents</text>
+</svg>

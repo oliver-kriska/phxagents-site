@@ -11,6 +11,8 @@ export default defineConfig({
       title: 'phxagents',
       description:
         'Iron Laws and specialist agents for Elixir/Phoenix in Claude Code, Codex, OpenCode, and Pi.',
+      logo: { src: './src/assets/logo.svg', replacesTitle: true },
+      favicon: '/favicon.svg',
       social: [
         {
           icon: 'github',
