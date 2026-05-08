@@ -44,6 +44,13 @@ export default defineConfig({
           content:
             'window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()',
         },
+        {
+          // "/" key opens the search modal (Cmd+K is bound by Starlight already).
+          // Skip when user is typing in an input, textarea, or contenteditable.
+          tag: 'script',
+          content:
+            'document.addEventListener("keydown",function(e){if(e.key!=="/"||e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.isContentEditable))return;var b=document.querySelector("button[data-open-modal]");if(b){e.preventDefault();b.click()}});',
+        },
       ],
       components: {
         Footer: './src/components/Footer.astro',

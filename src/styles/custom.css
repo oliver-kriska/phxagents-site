@@ -58,6 +58,60 @@
   margin-top: 0.25rem;
 }
 
+/* Latest release widget */
+.release-widget {
+  border: 1px solid var(--sl-color-accent-low);
+  border-left: 3px solid var(--sl-color-accent);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--sl-color-bg-nav);
+  margin: 1.5rem 0 2rem;
+}
+
+.release-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.release-tag {
+  font-weight: 700;
+  color: var(--sl-color-accent-high);
+}
+
+.release-date {
+  color: var(--sl-color-gray-3);
+}
+
+.release-name {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.release-summary {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: var(--sl-color-gray-2);
+  line-height: 1.5;
+}
+
+.release-link {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--sl-color-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.release-link:hover {
+  color: var(--sl-color-accent-high);
+  text-decoration: underline;
+}
+
 /* Footer disclaimer */
 .disclaimer {
   text-align: center;
