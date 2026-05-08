@@ -1,0 +1,74 @@
+---
+title: phxagents
+description: Iron Laws and specialist agents for Elixir/Phoenix in Claude Code, Codex, OpenCode, and Pi.
+template: splash
+hero:
+  tagline: Iron Laws and specialist agents for Elixir/Phoenix in your AI coding tool.
+  actions:
+    - text: Install
+      link: /install/
+      icon: right-arrow
+      variant: primary
+    - text: Browse skills
+      link: /skills/
+      icon: open-book
+    - text: GitHub
+      link: https://github.com/oliver-kriska/claude-elixir-phoenix
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { stats } from '../../data/stats';
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-num">{stats.skills}</div>
+    <div class="stat-label">skills auto-loaded for the file you're editing</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{stats.agents}</div>
+    <div class="stat-label">specialist agents — planners, reviewers, investigators</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{stats.ironLaws}</div>
+    <div class="stat-label">Iron Laws — production-tested rules that catch bugs before they ship</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{stats.references}</div>
+    <div class="stat-label">deep-dive references for Phoenix, Ecto, LiveView, Oban, OTP</div>
+  </div>
+</div>
+
+## What this is
+
+{stats.description}
+
+Currently shipping for **Claude Code** at v{stats.version}. Codex, OpenCode, and Pi support landing in v3.0.0 — see the [GitHub repo](https://github.com/oliver-kriska/claude-elixir-phoenix) for the latest status.
+
+## How it works
+
+<CardGrid>
+  <Card title="Auto-loaded skills" icon="seti:plan">
+    Open a `*_live.ex` file → LiveView patterns load. Editing a migration → Ecto patterns. Auth code → Security Iron Laws. No `/load` commands. No prompt engineering.
+  </Card>
+  <Card title="Specialist agents" icon="seti:bot">
+    `/phx:plan` runs 4 research agents in parallel. `/phx:review` runs 4 review agents. Each has fresh context and domain expertise. The orchestrator synthesises.
+  </Card>
+  <Card title="Iron Laws enforcement" icon="seti:shield">
+    {stats.ironLaws} non-negotiable rules: no `:float` for money, always `assign_async` in mount, never `String.to_atom` with user input. Verified at edit time and at review.
+  </Card>
+  <Card title="Plan → Work → Review → Compound" icon="rocket">
+    Filesystem is the state machine. Plans live as checkbox markdown. Reviews produce findings, not source edits. Solved problems become reusable knowledge.
+  </Card>
+</CardGrid>
+
+## Get started
+
+```bash
+# Add as a Claude Code marketplace
+/plugin marketplace add oliver-kriska/claude-elixir-phoenix
+/plugin install elixir-phoenix
+```
+
+[Full install guide →](/install/)

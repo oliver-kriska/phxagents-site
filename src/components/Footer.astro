@@ -1,0 +1,18 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+import { stats } from '../data/stats';
+---
+
+<Default><slot /></Default>
+
+<div class="disclaimer">
+  <p>
+    phxagents · v{stats.version} ·
+    <a href="https://github.com/oliver-kriska/claude-elixir-phoenix">GitHub</a>
+    · <a href="/llms.txt">llms.txt</a> · <a href="/llms-full.txt">llms-full.txt</a>
+  </p>
+  <p>
+    Community plugin. Not affiliated with Phoenix Framework or
+    <a href="https://phoenix.new">phoenix.new</a>.
+  </p>
+</div>

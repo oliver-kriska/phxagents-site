@@ -1,0 +1,44 @@
+---
+title: Iron Laws
+description: Non-negotiable rules that prevent the bugs Elixir tests don't catch.
+---
+
+import { stats } from '../../data/stats';
+
+The phxagents plugin enforces **{stats.ironLaws} Iron Laws** — non-negotiable
+patterns extracted from production Phoenix codebases. Each rule prevents a class
+of bugs that tests rarely catch.
+
+When code would violate a law, the plugin **stops and explains** before
+proceeding.
+
+## Where they live
+
+Iron Laws are defined in
+[`CLAUDE.md`](https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CLAUDE.md)
+and inlined into every relevant skill so agents see them at decision time.
+
+After multi-agent port Phase 2D, they migrate to
+`plugins/elixir-phoenix/iron-laws/laws.yaml` as the single source of truth across
+Claude Code, Codex, OpenCode, and Pi.
+
+## Categories
+
+- **LiveView** — mount lifecycle, async data, streams, PubSub subscription guards
+- **Ecto** — money types, query interpolation, joins, preloads, deduplication
+- **Oban** — idempotency, arg shapes, struct hygiene
+- **Security** — atom exhaustion, authorization, raw HTML
+- **OTP** — process discipline, supervision
+- **Verification** — never claim done without proof
+
+## Auto-derived enforcement
+
+Each Iron Law has:
+
+1. A **detection pattern** (regex or AST match) hooked into PostToolUse
+2. A **fix template** showing the correct pattern
+3. A **stop directive** that interrupts the agent before the violation lands
+
+The full list is the canonical [`CLAUDE.md`](https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CLAUDE.md#iron-laws-enforcement-non-negotiable)
+section. A site-rendered aggregator with each law's source skill and detection
+pattern lands in the next site update.

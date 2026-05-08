@@ -1,0 +1,69 @@
+/* phxagents — design tokens.
+   Teal accent (signals functional/Elixir energy, avoids AI-purple cliché).
+   Typography: system fonts for now; add Geist + Instrument Serif via @fontsource later. */
+
+:root {
+  --sl-color-accent-low: #052f33;
+  --sl-color-accent: #4f98a3;
+  --sl-color-accent-high: #b3dde4;
+
+  --sl-font: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, monospace;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #b3dde4;
+  --sl-color-accent: #01696f;
+  --sl-color-accent-high: #052f33;
+}
+
+/* Hero polish */
+.hero h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero .tagline {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* Stat cards */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.stat-card {
+  padding: 1.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: var(--sl-color-bg-nav);
+}
+
+.stat-card .stat-num {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--sl-color-accent-high);
+  line-height: 1;
+}
+
+.stat-card .stat-label {
+  font-size: 0.9rem;
+  color: var(--sl-color-gray-3);
+  margin-top: 0.25rem;
+}
+
+/* Footer disclaimer */
+.disclaimer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--sl-color-gray-3);
+  padding: 2rem 1rem 1rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+  margin-top: 3rem;
+}

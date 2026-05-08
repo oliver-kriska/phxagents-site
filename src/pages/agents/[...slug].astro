@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+
+export async function getStaticPaths() {
+  const agents = await getCollection('agents');
+  return agents.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { name, description, model, effort, tools, skills } = entry.data;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: name,
+    description,
+    tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
+  }}
+>
+  <p style="opacity: 0.85; font-size: 0.95rem;">
+    {description}
+  </p>
+  <ul style="font-size: 0.9rem; opacity: 0.85;">
+    {model && <li><strong>Model:</strong> {model}</li>}
+    {effort && <li><strong>Effort:</strong> {effort}</li>}
+    {tools && <li><strong>Tools:</strong> <code>{tools}</code></li>}
+    {skills && skills.length > 0 && (
+      <li>
+        <strong>Preloaded skills:</strong>{' '}
+        {skills.map((s, i) => (
+          <span>
+            <code>{s}</code>
+            {i < skills.length - 1 ? ', ' : ''}
+          </span>
+        ))}
+      </li>
+    )}
+  </ul>
+  <Content />
+</StarlightPage>

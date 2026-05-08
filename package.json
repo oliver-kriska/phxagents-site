@@ -1,0 +1,25 @@
+{
+  "name": "phxagents-site",
+  "description": "Documentation site for the phxagents plugin — Iron Laws and specialist agents for Elixir/Phoenix in Claude Code, Codex, OpenCode, and Pi.",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0 <23.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "sh scripts/clone-source.sh && astro build",
+    "build:local": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "dev:link": "sh scripts/dev-link.sh"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.39.1",
+    "astro": "^6.2.2",
+    "sharp": "^0.34.5",
+    "starlight-llms-txt": "^0.8.1"
+  }
+}

@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+
+export async function getStaticPaths() {
+  const skills = await getCollection('skills');
+  return skills.map((entry) => ({
+    params: { slug: entry.id.replace(/\/skill$/i, '') },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { name, description, effort } = entry.data;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: name,
+    description,
+    tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
+  }}
+>
+  <p style="opacity: 0.85; font-size: 0.95rem;">
+    {description}
+    {effort && <span> · <strong>effort:</strong> {effort}</span>}
+  </p>
+  <Content />
+</StarlightPage>
