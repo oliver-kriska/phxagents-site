@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import { buildSkillsSidebar, buildAgentsSidebar } from './src/lib/sidebar.mjs';
 
 export default defineConfig({
   site: 'https://phxagents.dev',
@@ -19,6 +20,17 @@ export default defineConfig({
       ],
       customCss: ['./src/styles/custom.css'],
       plugins: [starlightLlmsTxt()],
+      expressiveCode: {
+        shiki: {
+          // heex/eex aren't bundled with Shiki — alias to html for syntax similarity.
+          // Phoenix's official docs (hexdocs) use the same approach.
+          langAlias: {
+            heex: 'html',
+            eex: 'html',
+            sface: 'html',
+          },
+        },
+      },
       head: [
         {
           tag: 'script',
@@ -46,11 +58,11 @@ export default defineConfig({
         },
         {
           label: 'Skills',
-          link: '/skills/',
+          items: buildSkillsSidebar(),
         },
         {
           label: 'Agents',
-          link: '/agents/',
+          items: buildAgentsSidebar(),
         },
         {
           label: 'Iron Laws',
