@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
+// Use process.cwd() — Astro always runs from project root in both dev and build.
+// import.meta.url is unreliable here because Vite bundles modules to different paths.
+const ROOT = process.cwd();
 const PLUGIN_BASE = path.join(ROOT, 'plugin-source', 'plugins', 'elixir-phoenix');
 
 function safeReadJson<T>(p: string, fallback: T): T {
@@ -47,8 +48,16 @@ function countIronLaws(): number {
   const claudeMd = path.join(PLUGIN_BASE, '..', '..', 'CLAUDE.md');
   try {
     const content = fs.readFileSync(claudeMd, 'utf-8');
-    const match = content.match(/(\d+)\.\s+\*\*[A-Z@]/g);
-    return match ? match.length : 0;
+    // Carve out the Iron Laws section between its heading and the next ## heading.
+    // Using indexOf avoids JS regex `\Z` pitfall (it's literal 'Z' in JS, not EOI).
+    const start = content.indexOf('## Iron Laws Enforcement');
+    if (start === -1) return 0;
+    const rest = content.slice(start);
+    const nextHeading = rest.slice(1).match(/\n## (?!#)/);
+    const section = nextHeading ? rest.slice(0, nextHeading.index! + 1) : rest;
+    // Match numbered law items at line start: `N. **TITLE`
+    const laws = section.match(/^\d+\.\s+\*\*[A-Z@]/gm);
+    return laws ? laws.length : 0;
   } catch {
     return 0;
   }

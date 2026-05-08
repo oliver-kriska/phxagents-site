@@ -58,6 +58,27 @@
   margin-top: 0.25rem;
 }
 
+/* Intro paragraph below hero */
+.intro {
+  max-width: 60ch;
+  margin: 0 auto 2rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--sl-color-gray-2);
+}
+
+.intro strong:first-of-type {
+  display: block;
+  font-size: 1.15rem;
+  color: var(--sl-color-white);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.intro p {
+  margin: 0;
+}
+
 /* Latest release widget */
 .release-widget {
   border: 1px solid var(--sl-color-accent-low);

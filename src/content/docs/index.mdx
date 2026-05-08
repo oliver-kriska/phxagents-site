@@ -22,6 +22,14 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 import { stats } from '../../data/stats';
 import LatestRelease from '../../components/LatestRelease.astro';
 
+<div class="intro">
+
+**Your AI coding tool is great. But it doesn't know that `assign_new` silently skips on reconnect, that `:float` will corrupt your money fields, or that your Oban job isn't idempotent.**
+
+This plugin does. It coordinates **{stats.agents} specialist agents** that plan, implement, review, and verify your Elixir/Phoenix code in parallel — each with fresh context, domain expertise, and enforced [Iron Laws](/iron-laws/) that catch the bugs your tests won't. {stats.skills} skills auto-load based on the file you're editing, so there's no prompt engineering and no `/load` commands. Currently shipping for **Claude Code** at v{stats.version}; Codex, OpenCode, and Pi support landing in v3.0.0.
+
+</div>
+
 <LatestRelease />
 
 <div class="stat-grid">
@@ -42,12 +50,6 @@ import LatestRelease from '../../components/LatestRelease.astro';
     <div class="stat-label">deep-dive references for Phoenix, Ecto, LiveView, Oban, OTP</div>
   </div>
 </div>
-
-## What this is
-
-{stats.description}
-
-Currently shipping for **Claude Code** at v{stats.version}. Codex, OpenCode, and Pi support landing in v3.0.0 — see the [GitHub repo](https://github.com/oliver-kriska/claude-elixir-phoenix) for the latest status.
 
 ## How it works
 

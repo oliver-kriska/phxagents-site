@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
+// Astro config evaluates from project root — use process.cwd() for consistency
+// with src/data/stats.ts and to survive Vite bundling.
+const ROOT = process.cwd();
 const PLUGIN_BASE = path.join(ROOT, 'plugin-source', 'plugins', 'elixir-phoenix');
 
 function safeReadDir(p) {
