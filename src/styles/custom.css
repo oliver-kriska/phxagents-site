@@ -161,18 +161,27 @@ h4 {
   margin-right: auto;
 }
 
-/* Action button accent */
-.hero a.action.primary {
+/* Action button accent.
+   Selector targets Starlight's actual class `.sl-link-button.primary` (the
+   previous `.action.primary` selector silently never matched, so the gradient
+   bg never applied). Gradient is dark teal in BOTH themes, so text must
+   always be light — Starlight's default `color: var(--sl-color-black)` is
+   near-black in dark mode, which would be unreadable on a dark gradient. */
+.hero a.sl-link-button.primary,
+.hero a.sl-link-button.primary:hover,
+.hero a.sl-link-button.primary:focus,
+.hero a.sl-link-button.primary:active {
   background: var(--gradient-accent);
-  border: none;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset,
     0 8px 24px -8px rgba(1, 105, 111, 0.5);
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-.hero a.action.primary:hover {
+.hero a.sl-link-button.primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset,
     0 12px 32px -8px rgba(1, 105, 111, 0.6);
 }
 
