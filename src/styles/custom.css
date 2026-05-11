@@ -120,12 +120,17 @@ h4 {
   line-height: var(--leading-snug);
 }
 
-/* Display flourish — Instrument Serif for hero only */
+/* Display flourish — Instrument Serif for hero only.
+   line-height ≥1.15 is required: -webkit-text-fill-color: transparent +
+   background-clip: text clips anything outside the line box, so a tighter
+   line-height visibly cuts off descenders like the 'g' in "phxagents".
+   padding-bottom is belt-and-braces insurance for tall descenders. */
 .hero h1 {
   font-weight: 800;
   letter-spacing: -0.035em;
   font-size: clamp(2.5rem, 5vw, 3.75rem);
-  line-height: 1.05;
+  line-height: 1.18;
+  padding-bottom: 0.08em;
   background: linear-gradient(
     135deg,
     var(--sl-color-white) 0%,
@@ -137,9 +142,17 @@ h4 {
   -webkit-text-fill-color: transparent;
 }
 
-/* Hero ambient glow background */
+/* Hero ambient glow background + trimmed bottom padding so the splash
+   content (repo badge, intro) doesn't sit in a tall empty gap. */
 .hero {
   position: relative;
+  padding-bottom: 1.5rem !important;
+}
+
+@media (max-width: 50rem) {
+  .hero {
+    padding-bottom: 1rem !important;
+  }
 }
 
 .hero::before {
@@ -363,6 +376,103 @@ h4 {
   }
   .cursor {
     animation: none;
+  }
+}
+
+/* GitHub repo badge — star pill, theme-aware via CSS vars.
+   Two-part shield: label side uses bg-nav, count side uses accent tint. */
+.repo-badge {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  font-family: var(--sl-font-mono);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 999px;
+  overflow: hidden;
+  text-decoration: none !important;
+  color: var(--sl-color-gray-1);
+  background: var(--sl-color-bg-nav);
+  transition: border-color 150ms ease, transform 150ms ease,
+    box-shadow 150ms ease;
+  width: max-content;
+  line-height: 1;
+}
+
+.repo-badge:hover {
+  border-color: color-mix(in oklch, var(--sl-color-accent), transparent 40%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -14px rgba(1, 105, 111, 0.45);
+}
+
+.repo-badge-gh,
+.repo-badge-label,
+.repo-badge-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+}
+
+.repo-badge-gh {
+  padding-right: 0.35rem;
+  color: var(--sl-color-gray-2);
+}
+
+.repo-badge-label {
+  padding-left: 0.55rem;
+  padding-right: 1rem;
+  color: var(--sl-color-gray-1);
+}
+
+.repo-badge-sep {
+  width: 1px;
+  background: var(--sl-color-gray-5);
+  align-self: stretch;
+}
+
+.repo-badge-count {
+  background: color-mix(in oklch, var(--sl-color-accent), transparent 88%);
+  color: var(--sl-color-accent-high);
+  font-variant-numeric: tabular-nums;
+  gap: 0.4rem;
+}
+
+:root[data-theme='light'] .repo-badge-count {
+  background: color-mix(in oklch, var(--sl-color-accent), transparent 80%);
+  color: var(--sl-color-accent);
+}
+
+.repo-badge-star {
+  color: #f5b13a;
+}
+
+/* Centered placement helper when the badge sits in a splash hero block */
+.repo-badge-center {
+  display: flex;
+  justify-content: center;
+}
+
+/* Top-of-page placement — sits close to the hero buttons,
+   leaves clear air below before the intro paragraph. */
+.repo-badge-top {
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 50rem) {
+  .repo-badge {
+    font-size: 0.9rem;
+  }
+  .repo-badge-gh,
+  .repo-badge-label,
+  .repo-badge-count {
+    padding: 0.5rem 0.85rem;
+  }
+  .repo-badge-top {
+    margin-bottom: 1.5rem;
   }
 }
 

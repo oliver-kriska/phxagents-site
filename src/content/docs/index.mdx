@@ -21,10 +21,15 @@ hero:
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import { stats } from '../../data/stats';
 import LatestRelease from '../../components/LatestRelease.astro';
+import RepoBadge from '../../components/RepoBadge.astro';
 import HeroTerminal from '../../components/HeroTerminal.astro';
 import CompatibilityMatrix from '../../components/CompatibilityMatrix.astro';
 import FeaturedGrid from '../../components/FeaturedGrid.astro';
 import StatCounters from '../../components/StatCounters.astro';
+
+<div class="repo-badge-center repo-badge-top">
+  <RepoBadge />
+</div>
 
 <div class="intro">
 
