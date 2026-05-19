@@ -35,6 +35,33 @@ Run `/phx:intro` for a guided 6-section walkthrough, or jump straight in:
 /phx:plan Add a unique constraint on the email column
 ```
 
+## Companion plugin: catchup
+
+The same marketplace ships a second, **framework-agnostic** plugin called
+[`catchup`](https://github.com/oliver-kriska/claude-elixir-phoenix/tree/main/plugins/catchup)
+— async-team return-from-absence briefings. Fans out to GitHub, git,
+Linear MCP, and Google Calendar MCP, then emits one prioritized Context
+Brief instead of a firehose.
+
+```bash
+# Marketplace already added above? Skip this line.
+/plugin marketplace add oliver-kriska/claude-elixir-phoenix
+
+# Install the companion plugin
+/plugin install catchup
+```
+
+Then in any project — Elixir, Rails, Go, whatever — run:
+
+```bash
+/catchup --since last-session
+```
+
+Features `--depth quick|standard|deep`, `--focus`, and an "impact on your
+work" block that intersects what others moved upstream with your in-flight
+files. Graceful degradation is the contract: a missing source becomes one
+honest line in Risks, never an error.
+
 ## Coming soon
 
 | Agent | Status | Install |
