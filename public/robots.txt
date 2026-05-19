@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://phxagents.dev/sitemap-index.xml

@@ -1,0 +1,57 @@
+---
+import Default from '../layouts/Default.astro';
+---
+
+<Default title="Page not found" description="The page you're looking for doesn't exist.">
+  <section class="notfound">
+    <div class="wrap">
+      <div class="block">
+        <p class="kicker">404</p>
+        <h1>Page not found</h1>
+        <p class="lede">
+          The URL you tried doesn't exist on phxagents.dev. Maybe it was renamed, or maybe you typed it wrong.
+        </p>
+        <div class="actions">
+          <a class="btn-primary" href="/">Back to home</a>
+          <a class="btn-ghost" href="/catalog/">Browse the catalog</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Default>
+
+<style>
+  .notfound { padding: 120px 0 80px; }
+  .notfound .wrap { max-width: 640px; }
+  .block { text-align: center; }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin: 0 0 12px;
+  }
+  h1 {
+    font-size: clamp(32px, 4.5vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    margin: 0 0 14px;
+    color: var(--fg);
+  }
+  .lede {
+    color: var(--fg-soft);
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 460px;
+    margin: 0 auto 28px;
+  }
+  .actions {
+    display: inline-flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .actions .btn-primary, .actions .btn-ghost { height: 38px; padding: 0 16px; font-size: 13.5px; }
+</style>

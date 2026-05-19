@@ -1,47 +1,52 @@
 ---
 import { getCollection, render } from 'astro:content';
-import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import FirstFence from '../../components/FirstFence.astro';
+import DocsLayout from '../../components/DocsLayout.astro';
 
 export async function getStaticPaths() {
   const agents = await getCollection('agents');
-  return agents.map((entry) => ({
-    params: { slug: entry.id },
-    props: { entry },
-  }));
+  const sorted = [...agents].sort((a, b) =>
+    a.data.name.localeCompare(b.data.name)
+  );
+  return sorted.map((entry, idx) => {
+    const prev = idx > 0 ? sorted[idx - 1] : null;
+    const next = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+    return {
+      params: { slug: entry.id },
+      props: {
+        entry,
+        prev: prev ? { name: prev.data.name, slug: prev.id } : null,
+        next: next ? { name: next.data.name, slug: next.id } : null,
+      },
+    };
+  });
 }
 
-const { entry } = Astro.props;
+const { entry, prev, next } = Astro.props;
 const { Content } = await render(entry);
-const { name, description, model, effort, tools, skills } = entry.data;
+const { name, description, effort, model } = entry.data;
+const rawTools = entry.data.tools;
+const tools = Array.isArray(rawTools)
+  ? rawTools.join(', ')
+  : typeof rawTools === 'string'
+  ? rawTools
+  : undefined;
+const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/plugins/elixir-phoenix/agents/${entry.id}.md`;
+const prevNav = prev ? { name: prev.name, href: `/agents/${prev.slug}/` } : null;
+const nextNav = next ? { name: next.name, href: `/agents/${next.slug}/` } : null;
 ---
 
-<StarlightPage
-  frontmatter={{
-    title: name,
-    description,
-    tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
-  }}
+<DocsLayout
+  title={name}
+  description={description}
+  kind="agent"
+  name={name}
+  slug={entry.id}
+  effort={effort}
+  model={model}
+  tools={tools}
+  sourceUrl={sourceUrl}
+  prev={prevNav}
+  next={nextNav}
 >
-  <p style="opacity: 0.85; font-size: 0.95rem;">
-    {description}
-  </p>
-  <ul style="font-size: 0.9rem; opacity: 0.85;">
-    {model && <li><strong>Model:</strong> {model}</li>}
-    {effort && <li><strong>Effort:</strong> {effort}</li>}
-    {tools && <li><strong>Tools:</strong> <code>{tools}</code></li>}
-    {skills && skills.length > 0 && (
-      <li>
-        <strong>Preloaded skills:</strong>{' '}
-        {skills.map((s, i) => (
-          <span>
-            <code>{s}</code>
-            {i < skills.length - 1 ? ', ' : ''}
-          </span>
-        ))}
-      </li>
-    )}
-  </ul>
-  {entry.body && <FirstFence body={entry.body} title={`example · ${name}`} />}
   <Content />
-</StarlightPage>
+</DocsLayout>

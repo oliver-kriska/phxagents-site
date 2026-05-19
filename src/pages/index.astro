@@ -1,0 +1,659 @@
+---
+import Default from '../layouts/Default.astro';
+import { stats } from '../data/stats';
+import { getLatestRelease } from '../data/release';
+
+const release = await getLatestRelease();
+const releaseTag = release?.tag_name ?? `v${stats.version}`;
+const releaseAge = release?.published_at
+  ? Math.max(1, Math.round((Date.now() - new Date(release.published_at).getTime()) / (1000 * 60 * 60 * 24)))
+  : null;
+const releaseAgeLabel =
+  releaseAge === null ? '' :
+  releaseAge === 1 ? '1 day ago' :
+  releaseAge < 30 ? `${releaseAge} days ago` :
+  releaseAge < 60 ? '1 month ago' :
+  `${Math.round(releaseAge / 30)} months ago`;
+const total = stats.skills + stats.agents;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'phxagents',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  description: stats.description,
+  url: 'https://phxagents.dev',
+  softwareVersion: stats.version,
+  license: 'https://opensource.org/licenses/MIT',
+  author: {
+    '@type': 'Person',
+    name: 'Oliver Kriška',
+    url: 'https://github.com/oliver-kriska',
+  },
+  codeRepository: 'https://github.com/oliver-kriska/claude-elixir-phoenix',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
+---
+
+<Default title="phxagents" description={stats.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">
+            <span class="dot"></span>
+            <a href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">{releaseTag}</a> · stable for Claude Code
+          </div>
+          <h1 class="headline">
+            Elixir &amp; Phoenix<br />
+            context for <em>Claude Code</em>,<br />
+            Codex, OpenCode &amp; Pi.
+          </h1>
+          <p class="lede">
+            A plugin that teaches your AI editor how Phoenix actually works — contexts, scopes, LiveView async patterns, Ecto.Multi, Oban idempotency, and the production safety rails (Iron Laws) that keep generated code from hurting you in prod.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn-primary" href="/install/">
+              Install in 30 seconds
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a class="btn-ghost" href="/catalog/">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              Browse the catalog
+            </a>
+          </div>
+
+          <div class="meta-line">
+            <span><a class="num-link" href="/catalog/?type=skill">{stats.skills}</a> skills</span>
+            <span><a class="num-link" href="/catalog/?type=agent">{stats.agents}</a> agents</span>
+            <span><a class="num-link" href="/iron-laws/">{stats.ironLaws}</a> Iron Laws</span>
+            <span class="dim">·</span>
+            <span>MIT licensed</span>
+          </div>
+        </div>
+
+        <div class="term" aria-label="Demo terminal session">
+          <div class="term-head">
+            <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="title">~/my-phoenix-app · claude-code</div>
+          </div>
+          <div class="term-body">
+            <div class="term-line"><span class="prompt">›</span><span class="cmd">/phx:init</span></div>
+            <div class="term-out">
+<span class="dim">✓</span> Installing Iron Laws into CLAUDE.md
+<span class="dim">✓</span> Auto-activation rules registered
+<span class="dim">✓</span> {stats.references} references auto-loaded
+<span class="ok">Ready.</span> Try <span class="info">/phx:help</span></div>
+
+            <div class="term-line" style="margin-top:14px"><span class="prompt">›</span><span class="cmd">/phx:plan add billing portal with Stripe checkout</span></div>
+            <div class="term-out">
+<span class="info">→</span> phoenix-patterns-analyst:  scanning lib/billing
+<span class="info">→</span> ecto-schema-designer:      drafting Subscription, Invoice schemas
+<span class="info">→</span> security-analyzer:         webhook signature, idempotency keys
+<span class="info">→</span> oban-specialist:           retry policy, dead-letter queue
+<span class="ok">✓</span> plan.md written · 14 steps · <span class="dim">~280 LOC est.</span></div>
+
+            <div class="term-line" style="margin-top:14px"><span class="prompt">›</span><span class="cmd">/phx:work</span><span class="term-cursor"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-stats">
+    <div class="wrap">
+      <div class="stats numeric">
+        <a class="stat" href="/catalog/"><div class="n">{total}</div><div class="lbl">Skills + Agents</div></a>
+        <a class="stat" href="#clients"><div class="n">1</div><div class="lbl">AI clients shipped</div></a>
+        <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron Laws enforced</div></a>
+        <a class="stat" href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">
+          <div class="n">{releaseTag}</div>
+          <div class="lbl">{releaseAgeLabel ? `Latest · ${releaseAgeLabel}` : 'Latest release'}</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">Why phxagents</span>
+        <h2>Phoenix-shaped guardrails, not generic prompting.</h2>
+        <p>Generic AI editors hallucinate <code>Repo.preload</code> in the wrong places, swallow exceptions with bare <code>rescue</code>, and skip <code>Ecto.Multi</code> for transactions. phxagents knows the patterns and refuses to ship code that breaks them.</p>
+      </div>
+
+      <div class="features">
+        <article class="feature">
+          <span class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+          </span>
+          <h3>Iron Laws enforced</h3>
+          <p>{stats.ironLaws} non-negotiable rules: no <code>Repo</code> in loops, no bare rescues, no untyped Oban args, no missing <code>preload</code>. The judge agent blocks PRs that violate them.</p>
+          <div class="meta">iron-law-judge · /phx:review</div>
+        </article>
+
+        <article class="feature">
+          <span class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg>
+          </span>
+          <h3>Parallel review, 4 specialists</h3>
+          <p>elixir-reviewer, security-analyzer, testing-reviewer and verification-runner each read the diff in fresh context, then findings are deduped and triaged. No more single-pass slop.</p>
+          <div class="meta">/phx:review</div>
+        </article>
+
+        <article class="feature">
+          <span class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M9 4v16"/></svg>
+          </span>
+          <h3>Compound docs</h3>
+          <p>Every fixed bug is captured as a searchable solution doc with YAML frontmatter. Next time you hit a similar Ecto constraint error, the answer is one query away.</p>
+          <div class="meta">/phx:compound</div>
+        </article>
+
+        <article class="feature">
+          <span class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </span>
+          <h3>Workflow, not autocomplete</h3>
+          <p><code>/phx:plan</code> → <code>/phx:work</code> → <code>/phx:review</code> → <code>/phx:compound</code>. Each step has compile, format and test gates. Generated code that doesn't pass <code>mix test</code> doesn't get committed.</p>
+          <div class="meta">/phx:full · end-to-end</div>
+        </article>
+
+        <article class="feature">
+          <span class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          </span>
+          <h3>Context-aware</h3>
+          <p>Reads <code>mix.exs</code> to discover credo, dialyzer, sobelow, ex_check. Honors your custom aliases. Knows when you're on Phoenix 1.7 vs 1.8 Scope. Doesn't dictate — adapts.</p>
+          <div class="meta">verification-runner agent</div>
+        </article>
+
+        <article class="feature">
+          <span class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+          </span>
+          <h3>Supply-chain aware</h3>
+          <p>Audits Hex deps for bidi chars, compile-time exec, maintainer changes, typosquats and CVEs. Records vetted versions in <code>hex_vet.exs</code> so you don't re-review the same package twice.</p>
+          <div class="meta">/phx:deps-audit · /phx:deps-vet</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">The workflow</span>
+        <h2>Plan, work, review, compound.</h2>
+        <p>One command per phase. Each phase produces an artifact the next phase reads. The cycle is the product.</p>
+      </div>
+
+      <div class="workflow">
+        <ol>
+          <li>
+            <div>
+              <strong>Plan</strong>
+              <p>Specialist agents draft a multi-step plan.md with files, schemas and Oban jobs to touch.</p>
+            </div>
+            <a class="cmd-inline" href="/skills/plan/">/phx:plan</a>
+          </li>
+          <li>
+            <div>
+              <strong>Work</strong>
+              <p>Implements step-by-step. <code>mix compile</code> and <code>mix test</code> verified after each step.</p>
+            </div>
+            <a class="cmd-inline" href="/skills/work/">/phx:work</a>
+          </li>
+          <li>
+            <div>
+              <strong>Review</strong>
+              <p>4-track parallel review (Elixir, security, tests, verification) → findings → interactive triage.</p>
+            </div>
+            <a class="cmd-inline" href="/skills/review/">/phx:review</a>
+          </li>
+          <li>
+            <div>
+              <strong>Compound</strong>
+              <p>Captures what was learned as a searchable solution doc. Future you finds it in 2 seconds.</p>
+            </div>
+            <a class="cmd-inline" href="/skills/compound/">/phx:compound</a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="clients">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">Supported clients</span>
+        <h2>Shipping on Claude Code today.</h2>
+        <p>Built for Claude Code first. Codex, OpenCode, and Pi adapters are coming soon — the skills layer is already client-agnostic, the command shims are next.</p>
+      </div>
+
+      <div class="clients">
+        <div class="client">
+          <span class="client-mark" style="background: linear-gradient(135deg, oklch(70% 0.18 35), oklch(50% 0.22 30)); color: white;">C</span>
+          <div>
+            <div class="name">Claude Code</div>
+            <div class="stat-row">
+              <span class="ok">● stable</span>
+              <a href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">{releaseTag}</a>
+            </div>
+          </div>
+        </div>
+        <div class="client">
+          <span class="client-mark" style="background: linear-gradient(135deg, oklch(35% 0.05 240), oklch(20% 0.02 240)); color: white;">⌬</span>
+          <div>
+            <div class="name">OpenAI Codex</div>
+            <div class="stat-row"><span class="status-coming">Coming soon</span></div>
+          </div>
+        </div>
+        <div class="client">
+          <span class="client-mark" style="background: linear-gradient(135deg, oklch(55% 0.18 145), oklch(35% 0.14 145)); color: white;">⌃</span>
+          <div>
+            <div class="name">OpenCode</div>
+            <div class="stat-row"><span class="status-coming">Coming soon</span></div>
+          </div>
+        </div>
+        <div class="client">
+          <span class="client-mark" style="background: linear-gradient(135deg, oklch(55% 0.20 290), oklch(35% 0.16 290)); color: white;">π</span>
+          <div>
+            <div class="name">Pi</div>
+            <div class="stat-row"><span class="status-coming">Coming soon</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="cta-band">
+        <div>
+          <h2>Install in 30 seconds.</h2>
+          <p>One plugin manifest in your <code>.claude/</code> folder. Iron Laws and {stats.skills} skills auto-load.</p>
+        </div>
+        <div class="actions">
+          <a class="btn-primary" href="/install/">Installation</a>
+          <a class="btn-ghost" href="/catalog/">Browse catalog</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Default>
+
+<style>
+  .hero {
+    padding: 72px 0 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(800px 400px at 80% -10%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%),
+      radial-gradient(600px 300px at 0% 10%, color-mix(in oklab, var(--violet) 10%, transparent), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);
+  }
+  .eyebrow a { color: inherit; border-bottom: 1px dashed transparent; transition: color 120ms, border-color 120ms; }
+  .eyebrow a:hover { color: var(--fg); border-bottom-color: var(--muted); }
+  h1.headline {
+    font-size: clamp(34px, 4.8vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    margin: 0 0 18px;
+    color: var(--fg);
+  }
+  h1.headline em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--accent), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lede {
+    font-size: 16.5px;
+    line-height: 1.55;
+    color: var(--fg-soft);
+    max-width: 540px;
+    margin: 0 0 28px;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .hero-cta .btn-primary, .hero-cta .btn-ghost { height: 38px; padding: 0 16px; font-size: 13.5px; }
+  .meta-line {
+    margin-top: 24px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-family: var(--font-mono);
+  }
+  .meta-line span { display: inline-flex; align-items: center; gap: 6px; }
+  .meta-line .num-link {
+    color: var(--fg);
+    font-weight: 600;
+    border-bottom: 1px dashed color-mix(in oklab, var(--fg) 30%, transparent);
+    transition: color 120ms, border-color 120ms;
+  }
+  .meta-line .num-link:hover { color: var(--accent-fg); border-bottom-color: var(--accent); }
+  .meta-line .dim { color: var(--muted); }
+
+  /* Terminal */
+  .term {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  .term-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 36px;
+    padding: 0 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11.5px;
+  }
+  .term-head .traffic { display: flex; gap: 6px; }
+  .term-head .traffic i {
+    width: 11px; height: 11px; border-radius: 999px;
+    background: var(--border-strong);
+  }
+  .term-head .title { margin-left: 8px; font-size: 11.5px; }
+  .term-body { padding: 16px 18px 20px; line-height: 1.65; }
+  .term-line { display: flex; gap: 8px; }
+  .term-line .prompt { color: var(--accent); user-select: none; }
+  .term-line .cmd { color: var(--fg); }
+  .term-out { color: var(--fg-soft); padding-left: 18px; white-space: pre-wrap; }
+  .term-out .ok { color: var(--accent); }
+  .term-out .warn { color: var(--warn); }
+  .term-out .info { color: var(--info); }
+  .term-out .dim { color: var(--muted); }
+  .term-cursor::after {
+    content: "▍";
+    color: var(--accent);
+    animation: blink 1.1s steps(2) infinite;
+    margin-left: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Section bands */
+  section.band {
+    padding: 64px 0;
+    border-top: 1px solid var(--border);
+  }
+  section.band-stats { padding-top: 0; border-top: 0; }
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .section-head .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-fg);
+  }
+  .section-head h2 {
+    font-size: clamp(24px, 2.8vw, 34px);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0;
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .section-head p {
+    color: var(--muted);
+    max-width: 640px;
+    margin: 4px 0 0;
+    font-size: 14px;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .stat {
+    padding: 22px 24px;
+    border-right: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: background 120ms, color 120ms;
+    display: block;
+  }
+  .stat:last-child { border-right: 0; }
+  .stat:hover { background: var(--surface-2); }
+  .stat:hover .n { color: var(--accent-fg); }
+  .stat .n {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat .lbl {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+  }
+  @media (max-width: 760px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: 0; }
+    .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--border); }
+  }
+
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .feature {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 120ms;
+  }
+  .feature:hover { border-color: var(--border-strong); }
+  .feature-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--accent-fg);
+  }
+  .feature-icon svg { width: 18px; height: 18px; }
+  .feature h3 {
+    margin: 4px 0 0;
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+  }
+  .feature p {
+    color: var(--fg-soft);
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .feature .meta {
+    margin-top: auto;
+    padding-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    border-top: 1px dashed var(--border);
+  }
+  @media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+
+  /* Workflow */
+  .workflow ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: step;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .workflow ol li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 120ms;
+  }
+  .workflow ol li:hover { border-color: var(--border-strong); }
+  .workflow ol li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+    line-height: 26px;
+    height: 28px;
+    width: 32px;
+    align-self: center;
+  }
+  .workflow ol li strong { color: var(--fg); font-weight: 600; font-size: 14px; display: block; }
+  .workflow ol li p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+  @media (max-width: 900px) { .workflow ol { grid-template-columns: 1fr; } }
+
+  /* Clients */
+  .clients {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .client {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 18px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .client-mark {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .client .name { font-weight: 600; color: var(--fg); font-size: 14px; }
+  .client .stat-row {
+    display: flex; gap: 8px; margin-top: 3px;
+    color: var(--muted); font-size: 11.5px; font-family: var(--font-mono);
+  }
+  .client .stat-row .ok { color: var(--accent-fg); }
+  .client .stat-row a {
+    color: inherit;
+    border-bottom: 1px dashed color-mix(in oklab, currentColor 40%, transparent);
+  }
+  @media (max-width: 900px) { .clients { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .clients { grid-template-columns: 1fr; } }
+
+  /* CTA */
+  .cta-band {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 24px;
+  }
+  .cta-band h2 {
+    margin: 0;
+    font-size: clamp(22px, 2.4vw, 30px);
+    letter-spacing: -0.02em;
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .cta-band p { color: var(--muted); margin: 6px 0 0; font-size: 14px; }
+  .cta-band .actions { display: flex; gap: 10px; }
+  .cta-band .btn-primary, .cta-band .btn-ghost { height: 38px; padding: 0 16px; }
+  @media (max-width: 760px) { .cta-band { grid-template-columns: 1fr; } }
+
+  /* Hero responsive */
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero { padding: 56px 0 48px; }
+  }
+</style>

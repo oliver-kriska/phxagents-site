@@ -1,0 +1,177 @@
+---
+import '../styles/global.css';
+import { stats } from '../data/stats';
+import { getStargazersCount, formatStars } from '../data/release';
+
+interface Props {
+  title: string;
+  description?: string;
+  active?: 'docs' | 'catalog' | 'changelog' | 'iron-laws' | 'home' | null;
+}
+
+const { title, description = stats.description, active = null } = Astro.props;
+
+const stargazersCount = await getStargazersCount();
+const starsLabel = formatStars(stargazersCount);
+const starsLoaded = stargazersCount != null;
+const fullTitle = title === 'phxagents' ? title : `${title} — phxagents`;
+const canonical = `https://phxagents.dev${Astro.url.pathname.replace(/\/+$/, '/')}`;
+
+// Resolve aria-current accurately:
+// - "page" only when the URL exactly matches the link.
+// - "true" when this is the active section but URL is elsewhere (e.g., skill detail under "Catalog").
+function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | undefined {
+  const here = Astro.url.pathname.replace(/\/+$/, '/');
+  const there = href.replace(/\/+$/, '/');
+  if (here === there) return 'page';
+  if (sectionMatch) return 'true';
+  return undefined;
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{fullTitle}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="light dark" />
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="phxagents" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="canonical" href={canonical} />
+    <link rel="preconnect" href="https://api.github.com" crossorigin />
+    <link rel="preconnect" href="https://plausible.io" />
+
+    <!-- Theme — set ASAP to prevent flash -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('phx.theme');
+          var prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefers)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Plausible analytics -->
+    <script
+      defer
+      src="https://plausible.io/js/pa-s0rqHNTu3UMuNx6RHUnTD.js"
+      is:inline
+    ></script>
+    <script is:inline>
+      window.plausible = window.plausible || function() { (plausible.q = plausible.q || []).push(arguments); };
+      plausible.init = plausible.init || function(i) { plausible.o = i || {}; };
+      plausible.init();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <div class="nav-inner">
+        <a href="/" class="brand" aria-label="phxagents home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">phxagents<span>.dev</span></span>
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="/install/" aria-current={currentAttr('/install/', active === 'docs')}>Docs</a>
+          <a href="/catalog/" aria-current={currentAttr('/catalog/', active === 'catalog')}>Catalog</a>
+          <a href="/iron-laws/" aria-current={currentAttr('/iron-laws/', active === 'iron-laws')}>Iron Laws</a>
+          <a href="/changelog/" aria-current={currentAttr('/changelog/', active === 'changelog')}>Changelog</a>
+        </nav>
+        <div class="nav-spacer"></div>
+        <div class="nav-right">
+          <button class="search-btn" data-search-open aria-label="Open search (press / or ⌘K)" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <span class="search-label">Search docs, skills…</span>
+            <span class="kbd" aria-hidden="true">⌘K</span>
+          </button>
+          <a
+            class="gh-stars"
+            href="https://github.com/oliver-kriska/claude-elixir-phoenix/stargazers"
+            rel="noopener"
+            data-gh-stars
+            data-loaded={starsLoaded ? 'true' : undefined}
+            aria-label={`${starsLoaded ? stargazersCount : ''} stars on GitHub`.trim()}
+          >
+            <span class="gh-label">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+              <span class="gh-label-text">Star</span>
+            </span>
+            <span class="gh-count" data-gh-count>{starsLabel}</span>
+          </a>
+          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <a class="btn-primary" href="/install/">Install</a>
+          <button class="icon-btn menu-btn" data-menu-toggle aria-label="Open menu" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <nav aria-label="Mobile">
+        <a href="/install/">Docs</a>
+        <a href="/catalog/">Catalog</a>
+        <a href="/iron-laws/">Iron Laws</a>
+        <a href="/changelog/">Changelog</a>
+        <a href="https://github.com/oliver-kriska/claude-elixir-phoenix" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">phxagents<span>.dev</span></span>
+        </div>
+        <span class="numeric">© 2026 · MIT licensed</span>
+        <div class="footer-links">
+          <a href="/install/">Docs</a>
+          <a href="/catalog/">Catalog</a>
+          <a href="/changelog/">Changelog</a>
+          <a href="/iron-laws/">Iron Laws</a>
+          <a href="https://github.com/oliver-kriska/claude-elixir-phoenix">GitHub</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Search palette -->
+    <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Search" data-open="false">
+      <div class="search-panel" role="document">
+        <div class="search-input-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" placeholder="Search skills, agents, docs…" autocomplete="off" spellcheck="false" data-search-input aria-label="Search input" />
+          <button class="esc-btn" data-search-close aria-label="Close search" type="button">esc</button>
+        </div>
+        <div class="search-results" data-search-results></div>
+      </div>
+    </div>
+
+    <script>
+      import '../scripts/site.js';
+    </script>
+  </body>
+</html>

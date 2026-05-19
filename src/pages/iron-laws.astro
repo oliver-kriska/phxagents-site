@@ -1,0 +1,111 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Default from '../layouts/Default.astro';
+import { stats } from '../data/stats';
+import { marked } from 'marked';
+
+const ROOT = process.cwd();
+const CLAUDE_MD = path.join(ROOT, 'plugin-source', 'CLAUDE.md');
+
+let section = '';
+try {
+  const content = fs.readFileSync(CLAUDE_MD, 'utf-8');
+  const start = content.indexOf('## Iron Laws Enforcement');
+  if (start !== -1) {
+    const rest = content.slice(start);
+    const nextHeading = rest.slice(1).match(/\n## (?!#)/);
+    section = nextHeading ? rest.slice(0, nextHeading.index! + 1) : rest;
+  }
+} catch {
+  section = '## Iron Laws Enforcement\n\nIron Laws section not available.';
+}
+
+const html = await marked.parse(section);
+---
+
+<Default title="Iron Laws" description={`${stats.ironLaws} non-negotiable rules enforced by the phxagents plugin.`} active="iron-laws">
+  <main class="page">
+    <div class="wrap">
+      <div class="page-head">
+        <h1>Iron Laws</h1>
+        <p class="lede">
+          <strong>{stats.ironLaws} non-negotiable rules</strong> extracted from production Phoenix codebases. Each rule prevents a class of bugs that tests rarely catch. When code would violate a law, the plugin <strong>stops and explains</strong> before proceeding.
+        </p>
+        <p class="lede">
+          Defined in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a> in the plugin repo and inlined into every relevant skill.
+        </p>
+      </div>
+      <article class="docs-body" set:html={html}></article>
+    </div>
+  </main>
+</Default>
+
+<style>
+  .page { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
+  .page-head h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .page-head .lede {
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 640px;
+  }
+  .page-head .lede:last-child {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .docs-body :global(h1), .docs-body :global(h2) {
+    margin: 40px 0 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(h3) {
+    margin: 24px 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(p) {
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    line-height: 1.65;
+    font-size: 14.5px;
+  }
+  .docs-body :global(ul), .docs-body :global(ol) {
+    margin: 0 0 16px 0;
+    padding-left: 22px;
+    color: var(--fg-soft);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .docs-body :global(li) { margin: 4px 0; }
+  .docs-body :global(pre) {
+    margin: 14px 0 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 12.5px;
+    overflow-x: auto;
+  }
+  .docs-body :global(code) {
+    font-size: 0.92em;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+</style>

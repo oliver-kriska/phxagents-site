@@ -1,0 +1,98 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Default from '../layouts/Default.astro';
+import { stats } from '../data/stats';
+import { marked } from 'marked';
+
+const ROOT = process.cwd();
+const CHANGELOG_PATH = path.join(ROOT, 'plugin-source', 'CHANGELOG.md');
+
+let body = '';
+try {
+  body = fs.readFileSync(CHANGELOG_PATH, 'utf-8');
+} catch {
+  body = '# Changelog\n\nChangelog not available — plugin source missing.';
+}
+
+const html = await marked.parse(body);
+---
+
+<Default title="Changelog" description="Release notes for the phxagents plugin." active="changelog">
+  <main class="page">
+    <div class="wrap">
+      <div class="page-head">
+        <h1>Changelog</h1>
+        <p class="lede">
+          Release notes for the <code>elixir-phoenix</code> plugin. Current version <strong>v{stats.version}</strong>. Source: <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CHANGELOG.md" rel="noopener">CHANGELOG.md</a>.
+        </p>
+      </div>
+      <article class="docs-body changelog-body" set:html={html}></article>
+    </div>
+  </main>
+</Default>
+
+<style>
+  .page { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
+  .page-head h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .page-head .lede {
+    margin: 0 0 32px;
+    color: var(--fg-soft);
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 640px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .docs-body :global(h1) { display: none; }
+  .docs-body :global(h2) {
+    margin: 40px 0 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(h3) {
+    margin: 24px 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(p) {
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    line-height: 1.65;
+    font-size: 14.5px;
+  }
+  .docs-body :global(ul), .docs-body :global(ol) {
+    margin: 0 0 16px 0;
+    padding-left: 22px;
+    color: var(--fg-soft);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .docs-body :global(li) { margin: 4px 0; }
+  .docs-body :global(a) {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  .docs-body :global(pre) {
+    margin: 14px 0 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 12.5px;
+    overflow-x: auto;
+  }
+</style>

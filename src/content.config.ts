@@ -1,14 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { docsLoader } from '@astrojs/starlight/loaders';
-import { docsSchema } from '@astrojs/starlight/schema';
 
 const PLUGIN_BASE = './plugin-source/plugins/elixir-phoenix';
-
-const docs = defineCollection({
-  loader: docsLoader(),
-  schema: docsSchema(),
-});
 
 const skills = defineCollection({
   loader: glob({
@@ -20,7 +13,10 @@ const skills = defineCollection({
       name: z.string(),
       description: z.string(),
       effort: z.string().optional(),
-      featured: z.boolean().optional(),
+      'argument-hint': z.any().optional(),
+      'allowed-tools': z.any().optional(),
+      'disable-model-invocation': z.boolean().optional(),
+      'user-invocable': z.boolean().optional(),
     })
     .passthrough(),
 });
@@ -36,8 +32,11 @@ const agents = defineCollection({
       description: z.string(),
       model: z.string().optional(),
       effort: z.string().optional(),
-      tools: z.string().optional(),
-      featured: z.boolean().optional(),
+      tools: z.any().optional(),
+      disallowedTools: z.any().optional(),
+      permissionMode: z.string().optional(),
+      maxTurns: z.number().optional(),
+      omitClaudeMd: z.boolean().optional(),
     })
     .passthrough(),
 });
@@ -50,4 +49,4 @@ const references = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-export const collections = { docs, skills, agents, references };
+export const collections = { skills, agents, references };

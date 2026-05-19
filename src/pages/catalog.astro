@@ -1,0 +1,389 @@
+---
+import Default from '../layouts/Default.astro';
+import { getCollection } from 'astro:content';
+
+const skills = await getCollection('skills');
+const agents = await getCollection('agents');
+
+function groupOf(name: string, kind: 'skill' | 'agent'): string {
+  if (kind === 'agent') return 'agent';
+  if (name.startsWith('phx:')) return 'phx';
+  if (name.startsWith('lv:')) return 'lv';
+  if (name.startsWith('ecto:')) return 'ecto';
+  return 'reference';
+}
+
+interface Item {
+  type: 'skill' | 'agent';
+  group: string;
+  name: string;
+  desc: string;
+  slug: string;
+}
+
+const items: Item[] = [
+  ...skills.map((entry): Item => {
+    const slug = entry.id.replace(/\/SKILL$/i, '');
+    return {
+      type: 'skill',
+      group: groupOf(entry.data.name, 'skill'),
+      name: entry.data.name,
+      desc: entry.data.description,
+      slug: `/skills/${slug}/`,
+    };
+  }),
+  ...agents.map((entry): Item => ({
+    type: 'agent',
+    group: 'agent',
+    name: entry.data.name,
+    desc: entry.data.description,
+    slug: `/agents/${entry.id}/`,
+  })),
+].sort((a, b) => a.name.localeCompare(b.name));
+
+const counts = {
+  all: items.length,
+  skill: items.filter((i) => i.type === 'skill').length,
+  agent: items.filter((i) => i.type === 'agent').length,
+  phx: items.filter((i) => i.group === 'phx').length,
+  lv: items.filter((i) => i.group === 'lv').length,
+  ecto: items.filter((i) => i.group === 'ecto').length,
+  reference: items.filter((i) => i.group === 'reference').length,
+};
+
+function pillClass(group: string): string {
+  if (group === 'phx') return 'accent';
+  if (group === 'lv') return 'violet';
+  if (group === 'ecto') return 'info';
+  if (group === 'agent') return 'warn';
+  return '';
+}
+
+function displayName(item: Item): string {
+  if (item.type === 'agent') return item.name;
+  if (item.name.includes(':')) return '/' + item.name;
+  return item.name;
+}
+---
+
+<Default title="Catalog" description={`All ${items.length} skills and agents in the phxagents plugin.`} active="catalog">
+  <main class="catalog-shell" data-catalog>
+    <div class="catalog-head">
+      <div>
+        <h1>Catalog</h1>
+        <p>Every skill and agent that ships with phxagents. Search by name or behavior, filter by type or namespace.</p>
+      </div>
+      <div class="summary">
+        <b><span data-catalog-count aria-live="polite">{items.length}</span></b>
+        shown · {items.length} total
+      </div>
+    </div>
+
+    <div class="catalog-controls">
+      <div class="catalog-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder={`Search ${items.length} skills and agents…`} data-catalog-search autocomplete="off" spellcheck="false" />
+      </div>
+
+      <div class="filter-group" role="tablist" aria-label="Filter by type">
+        <button class="filter-chip" data-filter-group="type" data-catalog-filter="all" aria-pressed="true">All <span class="count">{counts.all}</span></button>
+        <button class="filter-chip" data-filter-group="type" data-catalog-filter="skill">Skills <span class="count">{counts.skill}</span></button>
+        <button class="filter-chip" data-filter-group="type" data-catalog-filter="agent">Agents <span class="count">{counts.agent}</span></button>
+      </div>
+    </div>
+
+    <div class="cat-bar" role="tablist" aria-label="Filter by namespace">
+      <button class="cat-chip" data-filter-group="group" data-catalog-filter="all" aria-pressed="true">All namespaces</button>
+      {counts.phx > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="phx">phx: ({counts.phx})</button>}
+      {counts.lv > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="lv">lv: ({counts.lv})</button>}
+      {counts.ecto > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="ecto">ecto: ({counts.ecto})</button>}
+      {counts.reference > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="reference">reference ({counts.reference})</button>}
+      {counts.agent > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="agent">agents ({counts.agent})</button>}
+    </div>
+
+    <div class="catalog-grid" id="catalog-grid">
+      {items.map((item) => (
+        <a
+          class="catalog-card"
+          href={item.slug}
+          data-catalog-item
+          data-type={item.type}
+          data-group={item.group}
+          data-search={`${item.name} ${item.desc} ${item.group}`.toLowerCase()}
+        >
+          <div class="row">
+            <span class={`pill pill-${pillClass(item.group)}`}>{item.type === 'agent' ? 'agent' : item.group}</span>
+          </div>
+          <div class="name">{displayName(item)}</div>
+          <div class="desc">{item.desc}</div>
+        </a>
+      ))}
+    </div>
+
+    <div class="catalog-empty" data-catalog-empty style="display:none">
+      No skills or agents match your filters.<br />
+      Try clearing them or searching for a different term.
+    </div>
+  </main>
+</Default>
+
+<script>
+  (function () {
+    const catalog = document.querySelector('[data-catalog]');
+    if (!catalog) return;
+    const search = catalog.querySelector('[data-catalog-search]') as HTMLInputElement;
+    const filters = catalog.querySelectorAll('[data-catalog-filter]');
+    const items = Array.from(catalog.querySelectorAll('[data-catalog-item]')) as HTMLElement[];
+    const count = catalog.querySelector('[data-catalog-count]');
+    const empty = catalog.querySelector('[data-catalog-empty]') as HTMLElement | null;
+    let activeType = 'all';
+    let activeGroup = 'all';
+
+    function setPressed(group: string, value: string) {
+      catalog.querySelectorAll(`[data-filter-group="${group}"]`).forEach((b) => {
+        const el = b as HTMLElement;
+        el.setAttribute('aria-pressed', el.dataset.catalogFilter === value ? 'true' : 'false');
+      });
+    }
+
+    function update() {
+      const q = (search.value || '').trim().toLowerCase();
+      let shown = 0;
+      items.forEach((it) => {
+        const t = it.dataset.type!;
+        const g = it.dataset.group!;
+        const text = it.dataset.search!;
+        const matchType = activeType === 'all' || activeType === t;
+        const matchGroup = activeGroup === 'all' || activeGroup === g;
+        const matchSearch = !q || text.indexOf(q) >= 0;
+        const visible = matchType && matchGroup && matchSearch;
+        it.style.display = visible ? '' : 'none';
+        if (visible) shown++;
+      });
+      if (count) count.textContent = String(shown);
+      if (empty) empty.style.display = shown === 0 ? '' : 'none';
+    }
+
+    // URL deep-link: ?type=skill&group=phx&q=plan
+    const params = new URLSearchParams(window.location.search);
+    const initialType = (params.get('type') || 'all').toLowerCase();
+    const initialGroup = params.get('group') || 'all';
+    const initialQ = params.get('q') || '';
+    if (['all', 'skill', 'agent'].includes(initialType)) {
+      activeType = initialType;
+      setPressed('type', initialType);
+    }
+    if (initialGroup !== 'all') {
+      const exists = catalog.querySelector(`[data-filter-group="group"][data-catalog-filter="${initialGroup}"]`);
+      if (exists) {
+        activeGroup = initialGroup;
+        setPressed('group', initialGroup);
+      }
+    }
+    if (initialQ) search.value = initialQ;
+
+    search.addEventListener('input', update);
+    filters.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLElement;
+        const group = el.dataset.filterGroup!;
+        const value = el.dataset.catalogFilter!;
+        setPressed(group, value);
+        if (group === 'type') activeType = value;
+        else if (group === 'group') activeGroup = value;
+        update();
+      });
+    });
+    update();
+  })();
+</script>
+
+<style>
+  .catalog-shell {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 36px 24px 64px;
+  }
+
+  .catalog-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .catalog-head h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .catalog-head p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+    max-width: 540px;
+  }
+  .catalog-head .summary {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--muted);
+    text-align: right;
+    flex: none;
+  }
+  .catalog-head .summary b { color: var(--fg); font-weight: 600; font-size: 22px; display: block; }
+
+  .catalog-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .catalog-search {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+  }
+  .catalog-search svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+  }
+  .catalog-search input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px 0 36px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    font-size: 14px;
+    outline: 0;
+    color: var(--fg);
+    transition: border-color 120ms;
+  }
+  .catalog-search input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .filter-chip {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 5px;
+    color: var(--fg-soft);
+    font-size: 12.5px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .filter-chip:hover { color: var(--fg); }
+  .filter-chip[aria-pressed="true"] {
+    background: var(--surface);
+    color: var(--fg);
+    box-shadow: var(--shadow-sm);
+  }
+  .filter-chip .count {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    padding: 0 4px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    margin-left: 4px;
+  }
+
+  .cat-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-chip {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--fg-soft);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+  }
+  .cat-chip:hover { border-color: var(--border-strong); color: var(--fg); }
+  .cat-chip[aria-pressed="true"] {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .catalog-card {
+    padding: 16px 18px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 120ms;
+    text-decoration: none;
+    color: inherit;
+  }
+  .catalog-card:hover { border-color: var(--border-strong); }
+  .catalog-card .row { display: flex; align-items: center; gap: 8px; }
+  .catalog-card .name {
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    color: var(--fg);
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .catalog-card .desc {
+    color: var(--fg-soft);
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 2px 0 0;
+  }
+
+  .catalog-empty {
+    padding: 48px 16px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  @media (max-width: 560px) {
+    .catalog-controls .filter-group { width: 100%; overflow-x: auto; }
+    .filter-chip .count { display: none; }
+    .catalog-search { width: 100%; }
+  }
+</style>
