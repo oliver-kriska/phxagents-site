@@ -111,7 +111,7 @@ const jsonLd = {
     <div class="wrap">
       <div class="stats numeric">
         <a class="stat" href="/catalog/"><div class="n">{total}</div><div class="lbl">Skills + Agents</div></a>
-        <a class="stat" href="#clients"><div class="n">1</div><div class="lbl">AI clients shipped</div></a>
+        <a class="stat" href="#clients"><div class="n">1<span class="n-soft">/4</span></div><div class="lbl">AI clients · 3 in v3.0</div></a>
         <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron Laws enforced</div></a>
         <a class="stat" href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">
           <div class="n">{releaseTag}</div>
@@ -234,8 +234,8 @@ const jsonLd = {
     <div class="wrap">
       <div class="section-head">
         <span class="label">Supported clients</span>
-        <h2>Shipping on Claude Code today.</h2>
-        <p>Built for Claude Code first. Codex, OpenCode, and Pi adapters are coming soon — the skills layer is already client-agnostic, the command shims are next.</p>
+        <h2>Shipping on Claude Code today. Three more in v3.0.</h2>
+        <p>Claude Code is stable. Codex, OpenCode and Pi adapters land together in v3.0 with full Phase 1 + Phase 2 parity — single source, three generated targets. Track progress in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>.</p>
       </div>
 
       <div class="clients">
@@ -253,21 +253,30 @@ const jsonLd = {
           <span class="client-mark" style="background: linear-gradient(135deg, oklch(35% 0.05 240), oklch(20% 0.02 240)); color: white;">⌬</span>
           <div>
             <div class="name">OpenAI Codex</div>
-            <div class="stat-row"><span class="status-coming">Coming soon</span></div>
+            <div class="stat-row">
+              <span class="status-coming">v3.0 · in review</span>
+              <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>
+            </div>
           </div>
         </div>
         <div class="client">
           <span class="client-mark" style="background: linear-gradient(135deg, oklch(55% 0.18 145), oklch(35% 0.14 145)); color: white;">⌃</span>
           <div>
             <div class="name">OpenCode</div>
-            <div class="stat-row"><span class="status-coming">Coming soon</span></div>
+            <div class="stat-row">
+              <span class="status-coming">v3.0 · in review</span>
+              <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>
+            </div>
           </div>
         </div>
         <div class="client">
           <span class="client-mark" style="background: linear-gradient(135deg, oklch(55% 0.20 290), oklch(35% 0.16 290)); color: white;">π</span>
           <div>
             <div class="name">Pi</div>
-            <div class="stat-row"><span class="status-coming">Coming soon</span></div>
+            <div class="stat-row">
+              <span class="status-coming">v3.0 · in review</span>
+              <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>
+            </div>
           </div>
         </div>
       </div>
@@ -485,6 +494,7 @@ const jsonLd = {
     letter-spacing: -0.02em;
     line-height: 1;
   }
+  .stat .n-soft { color: var(--muted); font-size: 20px; margin-left: 2px; }
   .stat .lbl {
     margin-top: 8px;
     font-size: 12px;
