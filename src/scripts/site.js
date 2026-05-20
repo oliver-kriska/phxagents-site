@@ -53,6 +53,46 @@ document.addEventListener('click', function (e) {
   });
 })();
 
+// Docs sidebar (mobile drawer)
+(function () {
+  function setOpen(nav, btn, open) {
+    nav.setAttribute('data-open', open ? 'true' : 'false');
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('docs-nav-open', open);
+  }
+  document.addEventListener('click', function (e) {
+    const nav = document.querySelector('[data-docs-nav]');
+    const btn = document.querySelector('[data-docs-nav-toggle]');
+    if (!nav) return;
+    if (e.target.closest('[data-docs-nav-toggle]')) {
+      e.preventDefault();
+      setOpen(nav, btn, nav.getAttribute('data-open') !== 'true');
+    } else if (e.target.closest('[data-docs-nav] a')) {
+      setOpen(nav, btn, false);
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    const nav = document.querySelector('[data-docs-nav]');
+    const btn = document.querySelector('[data-docs-nav-toggle]');
+    if (!nav) return;
+    if (e.key === 'Escape' && nav.getAttribute('data-open') === 'true') setOpen(nav, btn, false);
+  });
+  window.addEventListener('resize', function () {
+    const nav = document.querySelector('[data-docs-nav]');
+    const btn = document.querySelector('[data-docs-nav-toggle]');
+    if (!nav) return;
+    if (window.innerWidth > 860 && nav.getAttribute('data-open') === 'true') setOpen(nav, btn, false);
+  });
+  // Scroll the current page link into view inside the sidebar on load.
+  const nav = document.querySelector('[data-docs-nav]');
+  if (nav) {
+    const current = nav.querySelector('a[aria-current="page"]');
+    if (current && typeof current.scrollIntoView === 'function') {
+      requestAnimationFrame(() => current.scrollIntoView({ block: 'center' }));
+    }
+  }
+})();
+
 // Search palette — client-side over /search.json
 (function () {
   let CORPUS = null;
