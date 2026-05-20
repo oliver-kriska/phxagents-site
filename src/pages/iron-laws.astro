@@ -1,7 +1,7 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
-import Default from '../layouts/Default.astro';
+import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
 import { marked } from 'marked';
 
@@ -24,25 +24,20 @@ try {
 const html = await marked.parse(section);
 ---
 
-<Default title="Iron Laws" description={`${stats.ironLaws} non-negotiable rules enforced by the phxagents plugin.`} active="iron-laws">
-  <main class="page">
-    <div class="wrap">
-      <div class="page-head">
-        <h1>Iron Laws</h1>
-        <p class="lede">
-          <strong>{stats.ironLaws} non-negotiable rules</strong> extracted from production Phoenix codebases. Each rule prevents a class of bugs that tests rarely catch. When code would violate a law, the plugin <strong>stops and explains</strong> before proceeding.
-        </p>
-        <p class="lede">
-          Defined in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a> in the plugin repo and inlined into every relevant skill.
-        </p>
-      </div>
-      <article class="docs-body" set:html={html}></article>
-    </div>
-  </main>
-</Default>
+<DocPage title="Iron Laws" description={`${stats.ironLaws} non-negotiable rules enforced by the phxagents plugin.`} active="iron-laws">
+  <div class="page-head">
+    <h1>Iron Laws</h1>
+    <p class="lede">
+      <strong>{stats.ironLaws} non-negotiable rules</strong> extracted from production Phoenix codebases. Each rule prevents a class of bugs that tests rarely catch. When code would violate a law, the plugin <strong>stops and explains</strong> before proceeding.
+    </p>
+    <p class="lede">
+      Defined in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CLAUDE.md" rel="noopener">CLAUDE.md</a> in the plugin repo and inlined into every relevant skill.
+    </p>
+  </div>
+  <article class="docs-body" set:html={html}></article>
+</DocPage>
 
 <style>
-  .page { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
   .page-head h1 {
     font-size: clamp(28px, 3.4vw, 38px);
     line-height: 1.1;

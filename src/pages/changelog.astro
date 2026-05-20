@@ -1,7 +1,7 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
-import Default from '../layouts/Default.astro';
+import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
 import { marked } from 'marked';
 
@@ -18,22 +18,17 @@ try {
 const html = await marked.parse(body);
 ---
 
-<Default title="Changelog" description="Release notes for the phxagents plugin." active="changelog">
-  <main class="page">
-    <div class="wrap">
-      <div class="page-head">
-        <h1>Changelog</h1>
-        <p class="lede">
-          Release notes for the <code>elixir-phoenix</code> plugin. Current version <strong>v{stats.version}</strong>. Source: <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CHANGELOG.md" rel="noopener">CHANGELOG.md</a>.
-        </p>
-      </div>
-      <article class="docs-body changelog-body" set:html={html}></article>
-    </div>
-  </main>
-</Default>
+<DocPage title="Changelog" description="Release notes for the phxagents plugin." active="changelog">
+  <div class="page-head">
+    <h1>Changelog</h1>
+    <p class="lede">
+      Release notes for the <code>elixir-phoenix</code> plugin. Current version <strong>v{stats.version}</strong>. Source: <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/CHANGELOG.md" rel="noopener">CHANGELOG.md</a>.
+    </p>
+  </div>
+  <article class="docs-body changelog-body" set:html={html}></article>
+</DocPage>
 
 <style>
-  .page { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
   .page-head h1 {
     font-size: clamp(28px, 3.4vw, 38px);
     line-height: 1.1;

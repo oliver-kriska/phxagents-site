@@ -1,12 +1,10 @@
 ---
-import Default from '../layouts/Default.astro';
+import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
 ---
 
-<Default title="Install" description="How to install the phxagents plugin in Claude Code." active="docs">
-  <main class="page">
-    <div class="wrap">
-      <div class="page-head">
+<DocPage title="Install" description="How to install the phxagents plugin in Claude Code." active="docs">
+  <div class="page-head">
         <h1>Install phxagents</h1>
         <p class="lede">
           A 30-second installation that adds <strong>{stats.skills} skills</strong> and <strong>{stats.agents} agents</strong> to your Claude Code sessions for Elixir &amp; Phoenix work. Codex, OpenCode and Pi adapters land in v3.0 — track <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>.
@@ -98,13 +96,10 @@ import { stats } from '../data/stats';
             <tr><td>Pi</td><td>in development</td></tr>
           </tbody>
         </table>
-      </div>
-    </div>
-  </main>
-</Default>
+  </div>
+</DocPage>
 
 <style>
-  .page { max-width: 980px; margin: 0 auto; padding: 32px 24px 64px; }
   .page-head h1 {
     font-size: clamp(28px, 3.4vw, 38px);
     line-height: 1.1;
