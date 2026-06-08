@@ -46,6 +46,14 @@ export async function getStaticPaths() {
       slug: 'changelog',
       data: { title: 'Changelog', subtitle: 'Release notes for the phxagents plugin.', kind: 'docs' },
     },
+    {
+      slug: 'tidewave-mcp',
+      data: {
+        title: 'Tidewave MCP for Phoenix',
+        subtitle: 'Runtime debugging, live SQL, and Ecto introspection for Claude Code via Tidewave MCP.',
+        kind: 'docs',
+      },
+    },
     ...skills.map((entry) => {
       const slug = entry.id.replace(/\/SKILL$/i, '');
       const name = entry.data.name as string;

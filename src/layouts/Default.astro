@@ -23,7 +23,7 @@ const canonical = `https://phxagents.dev${Astro.url.pathname.replace(/\/+$/, '/'
 const ogPath = Astro.url.pathname.replace(/^\/+|\/+$/g, '');
 const ogSlug = ogPath === '' ? 'home' : ogPath;
 const ogHasCard =
-  ['home', 'install', 'catalog', 'iron-laws', 'changelog'].includes(ogSlug) ||
+  ['home', 'install', 'catalog', 'iron-laws', 'changelog', 'tidewave-mcp'].includes(ogSlug) ||
   ogSlug.startsWith('skills/') ||
   ogSlug.startsWith('agents/');
 const ogImage = new URL(`/og/${ogHasCard ? ogSlug : 'default'}.png`, Astro.site).href;

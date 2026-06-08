@@ -1,0 +1,237 @@
+---
+import DocPage from '../layouts/DocPage.astro';
+import { stats } from '../data/stats';
+
+const title = 'Tidewave MCP';
+const description =
+  'How to use Tidewave MCP with phxagents and Phoenix — runtime debugging, live SQL queries, Ecto schema introspection, and version-exact hex docs inside Claude Code.';
+const pageUrl = 'https://phxagents.dev/tidewave-mcp/';
+
+// Structured data: Breadcrumb + a TechArticle for the Tidewave MCP guide, plus
+// an FAQPage so AI answer engines can extract the "what / how" directly. Mirrors
+// the pattern used on skill/agent detail pages.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: 'Tidewave MCP', item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'TechArticle',
+      '@id': `${pageUrl}#article`,
+      headline: 'Tidewave MCP for Phoenix',
+      name: 'Tidewave MCP for Phoenix',
+      description,
+      url: pageUrl,
+      inLanguage: 'en',
+      author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
+      publisher: { '@id': 'https://phxagents.dev/#org' },
+      isPartOf: { '@id': 'https://phxagents.dev/#website' },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${pageUrl}#faq`,
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is Tidewave MCP?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text:
+              'Tidewave MCP is a Model Context Protocol server (from Dashbit) that exposes a running Phoenix application’s runtime to AI editors and coding agents — live SQL queries, code evaluation, Ecto schema and source lookup, logs, and version-exact hex docs. phxagents teaches Claude Code to prefer these runtime tools over guessing from Bash.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do I use Tidewave MCP with phxagents?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text:
+              'Install the elixir-phoenix plugin in Claude Code and add Tidewave to your Phoenix app. When the mcp__tidewave__ tools are available in a dev session, phxagents’ tidewave-integration skill activates and routes runtime questions — docs, SQL, schema introspection — through Tidewave instead of shelling out.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is Tidewave MCP safe to use in production?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text:
+              'No. phxagents treats Tidewave as dev-only. Its tools evaluate code and run SQL against the live runtime, so the plugin never uses them in production contexts and avoids shared dev servers holding copies of production data.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<DocPage title={title} description={description} active="docs">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="page-head">
+    <h1>Tidewave MCP for Phoenix</h1>
+    <p class="lede">
+      <strong>Tidewave MCP</strong> gives your AI editor runtime intelligence for a running Phoenix
+      app — live SQL, code evaluation, Ecto schema introspection, and version-exact hex docs over the
+      Model Context Protocol. <a href="/install/">phxagents</a> ships a dedicated
+      <a href="/skills/tidewave-integration/">Tidewave integration skill</a> so Claude Code prefers
+      these runtime tools over guessing from <code>Bash</code>.
+    </p>
+  </div>
+
+  <div class="docs-body">
+    <h2>What is Tidewave MCP?</h2>
+    <p>
+      <a href="https://tidewave.ai" rel="noopener">Tidewave</a> (from Dashbit, the team behind Elixir
+      and Livebook) exposes a running Phoenix application&rsquo;s runtime to AI editors and coding
+      agents through an <strong>MCP server</strong>. Instead of reading static files and guessing,
+      the agent can query the live database, evaluate code in the running app, look up Ecto schemas
+      and source locations, read logs, and fetch documentation pinned to <em>your</em>
+      <code>mix.lock</code> versions.
+    </p>
+    <p>
+      phxagents wires this into the Claude Code workflow with the
+      <a href="/skills/tidewave-integration/"><code>tidewave-integration</code> skill</a>. When the
+      <code>mcp__tidewave__</code> tools are present in a dev session, the plugin routes runtime
+      questions through Tidewave automatically.
+    </p>
+
+    <h2 id="tools">Runtime tools phxagents uses</h2>
+    <p>Each Tidewave MCP tool has a Bash fallback the plugin only reaches for when Tidewave is unavailable:</p>
+    <table>
+      <thead><tr><th>Task</th><th>Tidewave MCP tool</th><th>Fallback</th></tr></thead>
+      <tbody>
+        <tr><td>Version-exact hex docs</td><td><code>mcp__tidewave__get_docs</code></td><td><code>web_fetch hexdocs.pm/…</code></td></tr>
+        <tr><td>Evaluate code in the app</td><td><code>mcp__tidewave__project_eval</code></td><td><code>mix run -e "…"</code></td></tr>
+        <tr><td>Run a SQL query</td><td><code>mcp__tidewave__execute_sql_query</code></td><td><code>psql $DATABASE_URL</code></td></tr>
+        <tr><td>Find a source location</td><td><code>mcp__tidewave__get_source_location</code></td><td><code>grep -rn "defmodule"</code></td></tr>
+        <tr><td>List Ecto schemas</td><td><code>mcp__tidewave__get_ecto_schemas</code></td><td>Read <code>lib/*/schemas/</code></td></tr>
+        <tr><td>Read runtime logs</td><td><code>mcp__tidewave__get_logs</code></td><td><code>tail -f log/dev.log</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="setup">Setup &amp; detection</h2>
+    <p>
+      Add Tidewave to your Phoenix app (see <a href="https://tidewave.ai" rel="noopener">tidewave.ai</a>),
+      then confirm the MCP endpoint is reachable in development:
+    </p>
+    <div class="code-block">
+      <div class="code-head">
+        <span>Check the Tidewave MCP endpoint</span>
+        <button class="copy" data-copy>Copy</button>
+      </div>
+      <pre>curl -s http://localhost:4000/tidewave/mcp \
+  -H "Content-Type: application/json" \
+  -d '&lbrace;"jsonrpc":"2.0","id":1,"method":"ping"&rbrace;'</pre>
+    </div>
+    <p>
+      Inside Claude Code, run <code>/mcp</code> to verify the <code>mcp__tidewave__</code> tools are
+      connected. Once they are, phxagents&rsquo; runtime workflows light up with no extra
+      configuration.
+    </p>
+
+    <h2 id="safety">Dev only — never in production</h2>
+    <p>
+      Tidewave tools evaluate code and run SQL against the live runtime, so phxagents enforces a
+      hard rule: <strong>Tidewave is dev-only.</strong> The plugin never uses these tools in
+      production contexts and avoids shared dev servers that hold copies of production data. SQL is
+      treated as read-heavy — <code>execute_sql_query</code> for <code>SELECT</code>s, with care
+      around mutations.
+    </p>
+
+    <h2>Learn more</h2>
+    <ul>
+      <li><a href="/skills/tidewave-integration/">tidewave-integration skill</a> — the full reference phxagents loads on demand</li>
+      <li><a href="/install/">Install phxagents</a> — add {stats.skills} skills and {stats.agents} agents to Claude Code</li>
+      <li><a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/plugins/elixir-phoenix/skills/tidewave-integration/SKILL.md" rel="noopener">SKILL.md source on GitHub</a></li>
+      <li><a href="https://tidewave.ai" rel="noopener">tidewave.ai</a> — the Tidewave runtime intelligence product</li>
+    </ul>
+  </div>
+</DocPage>
+
+<style>
+  .page-head h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .page-head .lede {
+    margin: 0 0 32px;
+    color: var(--fg-soft);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 640px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-head .lede a {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .docs-body { max-width: 720px; }
+  .docs-body h2 {
+    margin: 40px 0 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body h2:first-of-type { padding-top: 0; border-top: 0; margin-top: 0; }
+  .docs-body p {
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    line-height: 1.65;
+    font-size: 14.5px;
+  }
+  .docs-body ul {
+    margin: 0 0 16px 0;
+    padding-left: 22px;
+    color: var(--fg-soft);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .docs-body li { margin: 4px 0; }
+  .docs-body a {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .docs-body a:hover { color: var(--accent); }
+  .docs-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 22px;
+    font-size: 13.5px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .docs-body th, .docs-body td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .docs-body th {
+    font-weight: 500;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .docs-body tr:last-child td { border-bottom: 0; }
+</style>
