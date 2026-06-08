@@ -23,10 +23,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout site repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -51,7 +51,7 @@ jobs:
             --production-branch=main || echo "Project already exists, continuing"
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
