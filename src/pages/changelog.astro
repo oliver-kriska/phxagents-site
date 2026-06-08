@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 
 const ROOT = process.cwd();
 const CHANGELOG_PATH = path.join(ROOT, 'plugin-source', 'CHANGELOG.md');
@@ -15,6 +15,14 @@ try {
   body = '# Changelog\n\nChangelog not available — plugin source missing.';
 }
 
+// Demote every heading by one level (h1→h2 …) so the page-head <h1> below is the
+// only <h1> on the page. Mirrors the rehype shift used for skill/agent bodies.
+// Local Marked instance to avoid mutating the shared parser used by iron-laws.astro.
+const marked = new Marked({
+  walkTokens(token) {
+    if (token.type === 'heading') token.depth = Math.min(token.depth + 1, 6);
+  },
+});
 const html = await marked.parse(body);
 ---
 
@@ -46,8 +54,10 @@ const html = await marked.parse(body);
     padding-bottom: 24px;
     border-bottom: 1px solid var(--border);
   }
-  .docs-body :global(h1) { display: none; }
-  .docs-body :global(h2) {
+  /* Headings shifted +1 at parse time (see frontmatter): the body's "# Changelog"
+     becomes <h2> (hidden), "## [version]" becomes <h3>, "### Added" becomes <h4>. */
+  .docs-body :global(h2) { display: none; }
+  .docs-body :global(h3) {
     margin: 40px 0 14px;
     padding-top: 24px;
     border-top: 1px solid var(--border);
@@ -56,7 +66,7 @@ const html = await marked.parse(body);
     font-weight: 600;
     color: var(--fg);
   }
-  .docs-body :global(h3) {
+  .docs-body :global(h4) {
     margin: 24px 0 10px;
     font-size: 15px;
     font-weight: 600;

@@ -26,6 +26,7 @@ const {
   description,
   kind,
   name,
+  slug,
   effort,
   argumentHint,
   model,
@@ -51,9 +52,41 @@ const pillKind =
 const modelPillClass =
   model === 'opus' ? 'pill-violet' : model === 'haiku' ? 'pill-info' : 'pill-accent';
 const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?type=skill';
+
+// Structured data: breadcrumb trail + a per-entity TechArticle so each skill/agent
+// is a distinct entity. Mirrors the visible crumbs and the SoftwareApplication
+// schema on the homepage.
+const sectionName = kind === 'agent' ? 'Agents' : 'Skills';
+const pageUrl = `https://phxagents.dev/${kind === 'agent' ? 'agents' : 'skills'}/${slug}/`;
+const detailJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: sectionName, item: `https://phxagents.dev${catalogFilter}` },
+        { '@type': 'ListItem', position: 3, name: displayName, item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'TechArticle',
+      '@id': `${pageUrl}#${kind}`,
+      headline: displayName,
+      name: displayName,
+      ...(description ? { description } : {}),
+      url: pageUrl,
+      inLanguage: 'en',
+      author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
+      publisher: { '@id': 'https://phxagents.dev/#org' },
+      isPartOf: { '@id': 'https://phxagents.dev/#website' },
+    },
+  ],
+};
 ---
 
 <DocPage title={title} description={description} active="catalog">
+  <script type="application/ld+json" set:html={JSON.stringify(detailJsonLd)} />
   <div class="crumbs">
     <a href="/">phxagents</a>
     <span class="sep">/</span>
@@ -185,9 +218,12 @@ const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?typ
     overflow-x: auto;
   }
 
-  /* Markdown body */
-  .docs-body :global(h1) { display: none; }
-  .docs-body :global(h2) {
+  /* Markdown body — headings are shifted +1 at render time (rehypeShiftHeadings
+     in astro.config.mjs) so the layout title above is the page's only <h1>.
+     The body's own "# Title" becomes <h2> (hidden), its "##" sections become
+     <h3>, its "###" subsections become <h4>. Selectors below mirror that +1. */
+  .docs-body :global(h2) { display: none; }
+  .docs-body :global(h3) {
     margin: 40px 0 14px;
     padding-top: 24px;
     border-top: 1px solid var(--border);
@@ -197,7 +233,7 @@ const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?typ
     color: var(--fg);
     scroll-margin-top: calc(var(--nav-h) + 16px);
   }
-  .docs-body :global(h3) {
+  .docs-body :global(h4) {
     margin: 24px 0 10px;
     font-size: 15px;
     font-weight: 600;

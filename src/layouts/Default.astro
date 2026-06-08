@@ -17,6 +17,41 @@ const starsLoaded = stargazersCount != null;
 const fullTitle = title === 'phxagents' ? title : `${title} — phxagents`;
 const canonical = `https://phxagents.dev${Astro.url.pathname.replace(/\/+$/, '/')}`;
 
+// Per-page Open Graph image, generated at build by /og/[...slug].png. The slug
+// mirrors the path (/ → home, /skills/plan/ → skills/plan); any page without a
+// generated card (e.g. 404, redirect stubs) falls back to the default card.
+const ogPath = Astro.url.pathname.replace(/^\/+|\/+$/g, '');
+const ogSlug = ogPath === '' ? 'home' : ogPath;
+const ogHasCard =
+  ['home', 'install', 'catalog', 'iron-laws', 'changelog'].includes(ogSlug) ||
+  ogSlug.startsWith('skills/') ||
+  ogSlug.startsWith('agents/');
+const ogImage = new URL(`/og/${ogHasCard ? ogSlug : 'default'}.png`, Astro.site).href;
+
+// Site-wide structured data (Organization + WebSite), present on every page.
+const siteJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://phxagents.dev/#org',
+      name: 'phxagents',
+      url: 'https://phxagents.dev',
+      logo: 'https://phxagents.dev/favicon.svg',
+      sameAs: ['https://github.com/oliver-kriska/claude-elixir-phoenix'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://phxagents.dev/#website',
+      name: 'phxagents',
+      url: 'https://phxagents.dev',
+      description: stats.description,
+      inLanguage: 'en',
+      publisher: { '@id': 'https://phxagents.dev/#org' },
+    },
+  ],
+};
+
 // Resolve aria-current accurately:
 // - "page" only when the URL exactly matches the link.
 // - "true" when this is the active section but URL is elsewhere (e.g., skill detail under "Catalog").
@@ -45,9 +80,17 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="phxagents" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={fullTitle} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(siteJsonLd)} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
