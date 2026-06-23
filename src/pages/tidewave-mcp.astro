@@ -102,17 +102,19 @@ const jsonLd = {
 
     <h2 id="tools">Runtime tools phxagents uses</h2>
     <p>Each Tidewave MCP tool has a Bash fallback the plugin only reaches for when Tidewave is unavailable:</p>
-    <table>
-      <thead><tr><th>Task</th><th>Tidewave MCP tool</th><th>Fallback</th></tr></thead>
-      <tbody>
-        <tr><td>Version-exact hex docs</td><td><code>mcp__tidewave__get_docs</code></td><td><code>web_fetch hexdocs.pm/…</code></td></tr>
-        <tr><td>Evaluate code in the app</td><td><code>mcp__tidewave__project_eval</code></td><td><code>mix run -e "…"</code></td></tr>
-        <tr><td>Run a SQL query</td><td><code>mcp__tidewave__execute_sql_query</code></td><td><code>psql $DATABASE_URL</code></td></tr>
-        <tr><td>Find a source location</td><td><code>mcp__tidewave__get_source_location</code></td><td><code>grep -rn "defmodule"</code></td></tr>
-        <tr><td>List Ecto schemas</td><td><code>mcp__tidewave__get_ecto_schemas</code></td><td>Read <code>lib/*/schemas/</code></td></tr>
-        <tr><td>Read runtime logs</td><td><code>mcp__tidewave__get_logs</code></td><td><code>tail -f log/dev.log</code></td></tr>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Task</th><th>Tidewave MCP tool</th><th>Fallback</th></tr></thead>
+        <tbody>
+          <tr><td>Version-exact hex docs</td><td><code>mcp__tidewave__get_docs</code></td><td><code>web_fetch hexdocs.pm/…</code></td></tr>
+          <tr><td>Evaluate code in the app</td><td><code>mcp__tidewave__project_eval</code></td><td><code>mix run -e "…"</code></td></tr>
+          <tr><td>Run a SQL query</td><td><code>mcp__tidewave__execute_sql_query</code></td><td><code>psql $DATABASE_URL</code></td></tr>
+          <tr><td>Find a source location</td><td><code>mcp__tidewave__get_source_location</code></td><td><code>grep -rn "defmodule"</code></td></tr>
+          <tr><td>List Ecto schemas</td><td><code>mcp__tidewave__get_ecto_schemas</code></td><td>Read <code>lib/*/schemas/</code></td></tr>
+          <tr><td>Read runtime logs</td><td><code>mcp__tidewave__get_logs</code></td><td><code>tail -f log/dev.log</code></td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h2 id="setup">Setup &amp; detection</h2>
     <p>
@@ -209,15 +211,23 @@ const jsonLd = {
     text-underline-offset: 2px;
   }
   .docs-body a:hover { color: var(--accent); }
-  .docs-body table {
-    width: 100%;
-    border-collapse: collapse;
+  /* Scroll the table horizontally on narrow viewports instead of letting the
+     non-wrapping mcp__tidewave__* tool names overflow the page. */
+  .table-wrap {
     margin: 14px 0 22px;
-    font-size: 13.5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
   }
+  .docs-body table {
+    width: 100%;
+    min-width: 540px;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 13.5px;
+  }
+  .docs-body table code { white-space: nowrap; }
   .docs-body th, .docs-body td {
     padding: 10px 14px;
     text-align: left;
