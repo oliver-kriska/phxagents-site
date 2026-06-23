@@ -82,17 +82,18 @@ function displayName(item: Item): string {
     <div class="catalog-controls">
       <div class="catalog-search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" placeholder={`Search ${items.length} skills and agents…`} data-catalog-search autocomplete="off" spellcheck="false" />
+        <input type="search" placeholder={`Search ${items.length} skills and agents…`} data-catalog-search aria-label="Search skills and agents" autocomplete="off" spellcheck="false" />
       </div>
 
-      <div class="filter-group" role="tablist" aria-label="Filter by type">
+      <div class="filter-group" role="group" aria-label="Filter by type">
         <button class="filter-chip" data-filter-group="type" data-catalog-filter="all" aria-pressed="true">All <span class="count">{counts.all}</span></button>
         <button class="filter-chip" data-filter-group="type" data-catalog-filter="skill">Skills <span class="count">{counts.skill}</span></button>
         <button class="filter-chip" data-filter-group="type" data-catalog-filter="agent">Agents <span class="count">{counts.agent}</span></button>
       </div>
+      <button class="catalog-clear" data-catalog-clear type="button" hidden>Clear</button>
     </div>
 
-    <div class="cat-bar" role="tablist" aria-label="Filter by namespace">
+    <div class="cat-bar" role="group" aria-label="Filter by namespace">
       <button class="cat-chip" data-filter-group="group" data-catalog-filter="all" aria-pressed="true">All namespaces</button>
       {counts.phx > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="phx">phx: ({counts.phx})</button>}
       {counts.lv > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="lv">lv: ({counts.lv})</button>}
@@ -122,7 +123,8 @@ function displayName(item: Item): string {
 
     <div class="catalog-empty" data-catalog-empty style="display:none">
       No skills or agents match your filters.<br />
-      Try clearing them or searching for a different term.
+      Try a different term, or
+      <button class="catalog-clear-link" data-catalog-clear type="button">clear all filters</button>.
     </div>
   </main>
 </Default>
@@ -162,6 +164,30 @@ function displayName(item: Item): string {
       });
       if (count) count.textContent = String(shown);
       if (empty) empty.style.display = shown === 0 ? '' : 'none';
+      const rawQ = (search.value || '').trim();
+      const anyActive = activeType !== 'all' || activeGroup !== 'all' || rawQ.length > 0;
+      const clearBtn = catalog.querySelector('.catalog-clear') as HTMLElement | null;
+      if (clearBtn) clearBtn.hidden = !anyActive;
+      // Reflect filter state in the URL so a filtered view is shareable.
+      const url = new URL(window.location.href);
+      const setParam = (k: string, v: string) => {
+        if (v && v !== 'all') url.searchParams.set(k, v);
+        else url.searchParams.delete(k);
+      };
+      setParam('type', activeType);
+      setParam('group', activeGroup);
+      setParam('q', rawQ);
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+
+    function clearAll() {
+      activeType = 'all';
+      activeGroup = 'all';
+      search.value = '';
+      setPressed('type', 'all');
+      setPressed('group', 'all');
+      update();
+      search.focus();
     }
 
     // URL deep-link: ?type=skill&group=phx&q=plan
@@ -194,6 +220,7 @@ function displayName(item: Item): string {
         update();
       });
     });
+    catalog.querySelectorAll('[data-catalog-clear]').forEach((b) => b.addEventListener('click', clearAll));
     update();
   })();
 </script>
@@ -285,7 +312,7 @@ function displayName(item: Item): string {
   .filter-chip {
     height: 30px;
     padding: 0 12px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     color: var(--fg-soft);
     font-size: 12.5px;
     font-weight: 500;
@@ -380,6 +407,32 @@ function displayName(item: Item): string {
     border: 1px dashed var(--border);
     border-radius: var(--radius-lg);
   }
+
+  .catalog-clear {
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--fg-soft);
+    font-size: 13px;
+    cursor: pointer;
+    flex: none;
+    transition: border-color 120ms, color 120ms;
+  }
+  .catalog-clear:hover { border-color: var(--border-strong); color: var(--fg); }
+  .catalog-clear[hidden] { display: none; }
+
+  .catalog-clear-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--accent-fg);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .catalog-clear-link:hover { text-decoration: none; }
 
   @media (max-width: 560px) {
     .catalog-controls .filter-group { width: 100%; overflow-x: auto; }

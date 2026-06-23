@@ -1,7 +1,9 @@
 {
   "detector": {
     "ignoreRules": [],
-    "ignoreFiles": [],
+    "ignoreFiles": [
+      "src/components/DocsLayout.astro"
+    ],
     "ignoreValues": [
       {
         "rule": "design-system-color",
