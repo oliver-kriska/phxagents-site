@@ -63,9 +63,20 @@ import { stats } from '../data/stats';
           <pre>/phx:plan Add a unique constraint on the email column</pre>
         </div>
 
-        <h2>Companion plugin: <code>catchup</code></h2>
+        <h2>Client support</h2>
+        <table>
+          <thead><tr><th>Client</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Claude Code</td><td><span class="cstat shipped">shipped (v{stats.version})</span></td></tr>
+            <tr><td>Codex</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+            <tr><td>OpenCode</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+            <tr><td>Pi</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+          </tbody>
+        </table>
+
+        <h2>Also in this marketplace: <code>catchup</code></h2>
         <p>
-          The same marketplace ships a second, <strong>framework-agnostic</strong> plugin called <code>catchup</code> — async-team return-from-absence briefings. Fans out to GitHub, git, Linear MCP, and Google Calendar MCP, then emits one prioritized Context Brief instead of a firehose.
+          The same marketplace ships a second, <strong>framework-agnostic</strong> plugin called <code>catchup</code> — async-team return-from-absence briefings. Fans out to GitHub, git, Linear MCP, and Google Calendar MCP, then emits one prioritized Context Brief instead of a firehose. Not required for phxagents.
         </p>
 
         <div class="code-block">
@@ -85,17 +96,6 @@ import { stats } from '../data/stats';
           </div>
           <pre>/catchup --since last-session</pre>
         </div>
-
-        <h2>Client support</h2>
-        <table>
-          <thead><tr><th>Client</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>Claude Code</td><td>✓ shipped (v{stats.version})</td></tr>
-            <tr><td>Codex</td><td>in development</td></tr>
-            <tr><td>OpenCode</td><td>in development</td></tr>
-            <tr><td>Pi</td><td>in development</td></tr>
-          </tbody>
-        </table>
   </div>
 </DocPage>
 
@@ -166,4 +166,20 @@ import { stats } from '../data/stats';
     font-family: var(--font-mono);
   }
   .docs-body tr:last-child td { border-bottom: 0; }
+  .cstat {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .cstat::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--dot, currentColor);
+    flex: none;
+  }
+  .cstat.shipped { color: var(--accent-fg); --dot: var(--accent); }
+  .cstat.pending { color: var(--warn-fg); --dot: var(--warn); }
 </style>
