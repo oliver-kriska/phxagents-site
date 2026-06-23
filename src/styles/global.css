@@ -53,7 +53,8 @@
   --surface-2: oklch(23% 0.014 250);
   --fg:        oklch(94% 0.008 240);
   --fg-soft:   oklch(80% 0.012 240);
-  --muted:     oklch(62% 0.014 240);
+  /* --muted bumped 62%→67% L for AA margin on surface-2 (was 4.61:1 at 11.5px) */
+  --muted:     oklch(67% 0.014 240);
   --border:    oklch(28% 0.016 240);
   --border-strong: oklch(36% 0.018 240);
   --accent:    oklch(72% 0.18 145);

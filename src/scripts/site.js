@@ -16,12 +16,21 @@ function applyTheme(t) {
   else document.documentElement.removeAttribute('data-theme');
 }
 
+function syncThemeToggle() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+    b.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  });
+}
+syncThemeToggle();
+
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('[data-theme-toggle]');
   if (!btn) return;
   const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
   const next = cur === 'dark' ? 'light' : 'dark';
   applyTheme(next);
+  syncThemeToggle();
   try { localStorage.setItem('phx.theme', next); } catch (e) {}
 });
 
@@ -30,6 +39,8 @@ document.addEventListener('click', function (e) {
   function setOpen(menu, open) {
     menu.setAttribute('data-open', open ? 'true' : 'false');
     document.body.classList.toggle('menu-open', open);
+    const btn = document.querySelector('[data-menu-toggle]');
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
   document.addEventListener('click', function (e) {
     const menu = document.getElementById('mobile-menu');
@@ -97,6 +108,7 @@ document.addEventListener('click', function (e) {
 (function () {
   let CORPUS = null;
   let loadingPromise = null;
+  let lastFocused = null;
 
   function loadCorpus() {
     if (CORPUS) return Promise.resolve(CORPUS);
@@ -186,6 +198,7 @@ document.addEventListener('click', function (e) {
   function open() {
     const els = getEls();
     if (!els) return;
+    lastFocused = document.activeElement;
     els.overlay.setAttribute('data-open', 'true');
     document.body.classList.add('menu-open');
     if (els.input) els.input.value = '';
@@ -200,6 +213,8 @@ document.addEventListener('click', function (e) {
     if (!els) return;
     els.overlay.setAttribute('data-open', 'false');
     document.body.classList.remove('menu-open');
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    lastFocused = null;
   }
 
   document.addEventListener('click', function (e) {
@@ -217,6 +232,18 @@ document.addEventListener('click', function (e) {
     const els = getEls();
     if (!els) return;
     const isOpen = els.overlay.getAttribute('data-open') === 'true';
+    if (isOpen && e.key === 'Tab') {
+      const focusable = els.overlay.querySelectorAll(
+        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length) {
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        else if (!els.overlay.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      }
+    }
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       isOpen ? close() : open();
