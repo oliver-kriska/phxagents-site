@@ -339,3 +339,47 @@ document.addEventListener('click', function (e) {
     })
     .catch(() => {});
 });
+
+// Detail-page enhancements: copy buttons on rendered code + heading anchors.
+// Runs only where doc content exists (skill/agent pages); no-op elsewhere.
+(function () {
+  const body = document.querySelector('.docs-body');
+  if (!body) return;
+
+  // Copy buttons on rendered <pre> and the synopsis. Skip hand-authored
+  // .code-block blocks (install/index), which already carry their own.
+  const pres = Array.from(document.querySelectorAll('.docs-body pre, pre.synopsis'))
+    .filter((pre) => !pre.closest('.code-block'));
+  pres.forEach((pre) => {
+    if (pre.dataset.copyReady) return;
+    pre.dataset.copyReady = '1';
+    const original = pre.innerText;
+    pre.classList.add('has-copy');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    btn.textContent = 'Copy';
+    btn.setAttribute('aria-label', 'Copy code');
+    btn.addEventListener('click', () => {
+      navigator.clipboard
+        .writeText(original)
+        .then(() => {
+          btn.textContent = 'Copied';
+          setTimeout(() => (btn.textContent = 'Copy'), 1200);
+        })
+        .catch(() => {});
+    });
+    pre.appendChild(btn);
+  });
+
+  // Hover/focus-revealed anchor link on each section heading (ids emitted at build).
+  body.querySelectorAll('h3[id], h4[id]').forEach((h) => {
+    if (h.querySelector('.heading-anchor')) return;
+    const a = document.createElement('a');
+    a.className = 'heading-anchor';
+    a.href = '#' + h.id;
+    a.textContent = '#';
+    a.setAttribute('aria-label', 'Link to this section');
+    h.appendChild(a);
+  });
+})();

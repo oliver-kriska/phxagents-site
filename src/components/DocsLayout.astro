@@ -301,7 +301,49 @@ const detailJsonLd = {
     background: var(--surface-2);
     color: var(--fg-soft);
     border-radius: 0 var(--radius) var(--radius) 0;
+    max-width: 640px;
   }
+
+  /* Cap prose measure (~72ch, matches the lede) for readability. pre/table and
+     the h3 section-divider rules deliberately keep the full content width. */
+  .docs-body :global(p),
+  .docs-body :global(ul),
+  .docs-body :global(ol) { max-width: 640px; }
+
+  /* Copy buttons on rendered code blocks + the synopsis (injected by site.js,
+     so the controls match the hand-authored install/index pages). */
+  .docs-body :global(pre) { position: relative; }
+  .docs-body :global(pre.has-copy) { padding-right: 58px; }
+  .synopsis { position: relative; }
+  .synopsis.has-copy { padding-right: 58px; }
+  :global(.code-copy) {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    font: 500 11px/1 var(--font-mono);
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: color 120ms, border-color 120ms;
+  }
+  :global(.code-copy:hover) { color: var(--fg); border-color: var(--border-strong); }
+
+  /* Heading anchors for deep-linking sections (ids emitted at build). */
+  .docs-body :global(h3), .docs-body :global(h4) { position: relative; }
+  :global(.heading-anchor) {
+    margin-left: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+  :global(.docs-body h3:hover .heading-anchor),
+  :global(.docs-body h4:hover .heading-anchor),
+  :global(.heading-anchor:focus-visible) { opacity: 1; }
 
   .pager {
     display: grid;
