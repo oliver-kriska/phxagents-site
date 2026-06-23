@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-Documentation site for the **phxagents** Claude Code plugin, deployed at [phxagents.dev](https://phxagents.dev). Built with **Astro 6 using native, hand-written layouts** (Starlight was dropped in commit `c58b6dd` in favor of a custom design + catalog + client search). Hosted on Cloudflare Pages.
+Documentation site for the **phxagents** Claude Code plugin, deployed at [phxagents.dev](https://phxagents.dev). Built with **Astro 7 using native, hand-written layouts** (Starlight was dropped in commit `c58b6dd` in favor of a custom design + catalog + client search). Hosted on Cloudflare Pages.
 
 **This repo contains no plugin source.** The plugin lives in [`oliver-kriska/claude-elixir-phoenix`](https://github.com/oliver-kriska/claude-elixir-phoenix) and is consumed at build time via `./plugin-source/`. That directory is gitignored — it is either a local symlink (dev) or a shallow clone (CI).
 
@@ -68,7 +68,7 @@ Key files:
 
 - `src/styles/global.css` — design tokens (teal accent, Inter/JetBrains Mono fonts, hero gradient, cards)
 - `src/assets/logo.svg`, `src/assets/houston.webp`, `public/favicon.svg` — brand assets
-- `astro.config.mjs` — `site`, the `sitemap()` integration, the `rehypeShiftHeadings` plugin (one-`<h1>`-per-page), and Shiki `langAlias` for `heex`/`eex`/`sface` (aliased to `html`)
+- `astro.config.mjs` — `site`, the `sitemap()` integration, `markdown.processor` (`unified()` from `@astrojs/markdown-remark`) carrying the `rehypeShiftHeadings` plugin (one-`<h1>`-per-page), `compressHTML: true` (restores v6 inline-whitespace collapsing — Astro 7's Rust compiler defaults to `'jsx'`, which strips newline-only whitespace between inline elements and would glue words like `dedicated<a>…`), and Shiki `langAlias` for `heex`/`eex`/`sface` (aliased to `html`)
 - The narrative `.astro` pages' prose (`index`, `install`, `iron-laws`, `changelog`, `catalog`, `tidewave-mcp`). The Iron Laws *count*, version, and skill/agent *lists* on them are still derived via the `stats`/`getCollection` imports — only the surrounding copy is editable.
 - Footer text and the Plausible tag live in `src/layouts/Default.astro`.
 - `public/skills/index.html` and `public/agents/index.html` — static meta-refresh **redirect stubs** to `/catalog/?type=skill|agent`, carrying `noindex`. These are the `/skills/` and `/agents/` landing URLs.
@@ -90,7 +90,7 @@ Full deployment details: `docs/cloudflare-setup.md`.
 
 ## Conventions specific to this site
 
-- **One `<h1>` per page** — `rehypeShiftHeadings` in `astro.config.mjs` demotes every in-content heading by one level (h1→h2 … h6 stays) so the layout's title is the only `<h1>`. It runs on the rehype HTML AST, so `#` inside fenced code blocks is untouched; the companion CSS in `DocsLayout.astro` is shifted by the same +1, leaving rendering unchanged.
+- **One `<h1>` per page** — `rehypeShiftHeadings` in `astro.config.mjs` (wired through `markdown.processor: unified({ rehypePlugins: [...] })` under Astro 7) demotes every in-content heading by one level (h1→h2 … h6 stays) so the layout's title is the only `<h1>`. It runs on the rehype HTML AST, so `#` inside fenced code blocks is untouched; the companion CSS in `DocsLayout.astro` is shifted by the same +1, leaving rendering unchanged.
 - **Per-page OG images** — generated at build by `satori` → `sharp` (`src/lib/og.ts` + `/og/[...slug].png.ts`). No runtime image service.
 - **Heex/EEx/Surface code blocks** — Shiki doesn't bundle these. `astro.config.mjs` aliases `heex`/`eex`/`sface` to `html` (matches hexdocs.pm). Don't register a real grammar — the alias is fine.
 - **Plausible analytics** — inline `<head>` script in `src/layouts/Default.astro`. Privacy-first, no cookies.
