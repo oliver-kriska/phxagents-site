@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-23T00:00:00Z",
+  "title": "Design System: phxagents.dev",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "Signal Green", "canonical": "oklch(55% 0.16 145)", "tonalRamp": ["oklch(20% 0.08 145)", "oklch(30% 0.10 145)", "oklch(40% 0.13 145)", "oklch(50% 0.15 145)", "oklch(55% 0.16 145)", "oklch(68% 0.16 145)", "oklch(80% 0.10 145)", "oklch(94% 0.05 145)"] },
+      "violet": { "role": "secondary", "displayName": "Signal Violet", "canonical": "oklch(52% 0.18 295)", "tonalRamp": ["oklch(22% 0.10 295)", "oklch(32% 0.13 295)", "oklch(42% 0.16 295)", "oklch(52% 0.18 295)", "oklch(62% 0.18 295)", "oklch(74% 0.15 295)", "oklch(85% 0.09 295)", "oklch(95% 0.04 295)"] },
+      "warn": { "role": "tertiary", "displayName": "Amber Warn", "canonical": "oklch(70% 0.14 75)", "tonalRamp": ["oklch(28% 0.07 75)", "oklch(40% 0.10 75)", "oklch(52% 0.12 75)", "oklch(62% 0.13 75)", "oklch(70% 0.14 75)", "oklch(82% 0.12 75)", "oklch(90% 0.08 75)", "oklch(96% 0.05 75)"] },
+      "danger": { "role": "tertiary", "displayName": "Red Danger", "canonical": "oklch(60% 0.20 25)", "tonalRamp": ["oklch(26% 0.10 25)", "oklch(38% 0.14 25)", "oklch(50% 0.18 25)", "oklch(60% 0.20 25)", "oklch(70% 0.20 25)", "oklch(80% 0.15 25)", "oklch(90% 0.08 25)", "oklch(96% 0.04 25)"] },
+      "info": { "role": "tertiary", "displayName": "Blue Info", "canonical": "oklch(62% 0.13 240)", "tonalRamp": ["oklch(26% 0.07 240)", "oklch(38% 0.10 240)", "oklch(50% 0.12 240)", "oklch(62% 0.13 240)", "oklch(72% 0.14 240)", "oklch(82% 0.10 240)", "oklch(90% 0.06 240)", "oklch(96% 0.03 240)"] },
+      "neutral": { "role": "neutral", "displayName": "Cool Ink & Canvas", "canonical": "oklch(22% 0.02 240)", "tonalRamp": ["oklch(16% 0.014 250)", "oklch(22% 0.02 240)", "oklch(36% 0.02 240)", "oklch(52% 0.018 240)", "oklch(72% 0.012 240)", "oklch(82% 0.012 240)", "oklch(90% 0.008 240)", "oklch(98.5% 0.004 250)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headline only — the one loud moment per page." },
+      "headline": { "displayName": "Headline", "purpose": "Landing-page section headings." },
+      "title": { "displayName": "Title", "purpose": "Doc page titles and card headings." },
+      "lede": { "displayName": "Lede", "purpose": "Hero subhead and section intros, capped near 540px." },
+      "body": { "displayName": "Body", "purpose": "All prose. Deliberately dense at 14px." },
+      "label": { "displayName": "Label (Mono)", "purpose": "Eyebrows, group labels, meta, pills, kbd — machine layer only." }
+    },
+    "shadows": [
+      { "name": "resting-hairline", "value": "0 1px 2px oklch(20% 0.02 240 / 0.04)", "purpose": "Barely-there lift for subtly raised controls." },
+      { "name": "floating-surface", "value": "0 4px 16px oklch(20% 0.02 240 / 0.06), 0 1px 2px oklch(20% 0.02 240 / 0.05)", "purpose": "Cmd-K search palette, dropdowns, popovers. Reserved for genuinely floating UI." },
+      { "name": "floating-surface-dark", "value": "0 8px 24px oklch(0% 0 0 / 0.40), 0 1px 2px oklch(0% 0 0 / 0.30)", "purpose": "Dark-theme equivalent of floating-surface." }
+    ],
+    "motion": [
+      { "name": "ease-state", "value": "120ms ease", "purpose": "Default transition for color, border-color, and opacity on interactive elements." },
+      { "name": "backdrop-blur-nav", "value": "blur(10px) saturate(140%)", "purpose": "Sticky nav legibility over scrolling content. Sanctioned glass, not decoration." },
+      { "name": "reduced-motion", "value": "animation-duration: 0.01ms; transition-duration: 0.01ms", "purpose": "prefers-reduced-motion alternative — applied globally to all animation/transition." }
+    ],
+    "breakpoints": [
+      { "name": "lg", "value": "900px" },
+      { "name": "md", "value": "720px" },
+      { "name": "sm", "value": "560px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The confident inverted block; one true CTA per region.",
+      "html": "<button class=\"ds-btn-primary\">Install</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 6px; background: oklch(22% 0.02 240); color: oklch(98.5% 0.004 250); font-family: 'Inter Variable', system-ui, sans-serif; font-size: 13px; font-weight: 500; border: 1px solid oklch(22% 0.02 240); cursor: pointer; transition: opacity 120ms ease; } .ds-btn-primary:hover { opacity: 0.88; } .ds-btn-primary:focus-visible { outline: 2px solid oklch(55% 0.16 145); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Default secondary action; bordered, quiet.",
+      "html": "<button class=\"ds-btn-ghost\">Docs</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 6px; background: oklch(100% 0 0); color: oklch(22% 0.02 240); font-family: 'Inter Variable', system-ui, sans-serif; font-size: 13px; font-weight: 500; border: 1px solid oklch(90% 0.008 240); cursor: pointer; transition: border-color 120ms ease; } .ds-btn-ghost:hover { border-color: oklch(82% 0.012 240); } .ds-btn-ghost:focus-visible { outline: 2px solid oklch(55% 0.16 145); outline-offset: 2px; }"
+    },
+    {
+      "name": "Accent Button",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "Green-tinted call-to-action; the accent's rare appearance.",
+      "html": "<button class=\"ds-btn-accent\">Get started</button>",
+      "css": ".ds-btn-accent { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 6px; background: oklch(96% 0.04 145); color: oklch(28% 0.10 145); font-family: 'Inter Variable', system-ui, sans-serif; font-size: 13px; font-weight: 600; border: 1px solid color-mix(in oklab, oklch(55% 0.16 145) 30%, transparent); cursor: pointer; transition: border-color 120ms ease; } .ds-btn-accent:hover { border-color: oklch(55% 0.16 145); } .ds-btn-accent:focus-visible { outline: 2px solid oklch(55% 0.16 145); outline-offset: 2px; }"
+    },
+    {
+      "name": "Pill",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Mono status tag with optional leading dot; accent variant shown.",
+      "html": "<span class=\"ds-pill ds-pill-accent\"><span class=\"ds-dot\"></span>v0.1.0</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.01em; background: oklch(97.5% 0.005 240); color: oklch(36% 0.02 240); border: 1px solid oklch(90% 0.008 240); } .ds-pill .ds-dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; } .ds-pill-accent { color: oklch(28% 0.10 145); background: oklch(96% 0.04 145); border-color: color-mix(in oklab, oklch(55% 0.16 145) 25%, transparent); }"
+    },
+    {
+      "name": "Callout (Info)",
+      "kind": "custom",
+      "refersTo": "callout",
+      "description": "Signature tinted block: icon + content, full border, single sanctioned 3px left accent.",
+      "html": "<div class=\"ds-callout ds-callout-info\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 7.5v.5\"/></svg><div><strong>Heads up.</strong> This is the one surface allowed a colored left stripe.</div></div>",
+      "css": ".ds-callout { display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 14px 16px; border: 1px solid oklch(90% 0.008 240); border-left: 3px solid oklch(62% 0.13 240); border-radius: 6px; background: oklch(96% 0.03 240); color: oklch(36% 0.02 240); font-family: 'Inter Variable', system-ui, sans-serif; font-size: 13.5px; line-height: 1.55; } .ds-callout > svg { width: 18px; height: 18px; color: oklch(62% 0.13 240); margin-top: 1px; } .ds-callout strong { color: oklch(22% 0.02 240); font-weight: 600; }"
+    },
+    {
+      "name": "Inline Code",
+      "kind": "custom",
+      "refersTo": "code-inline",
+      "description": "Mono command/path token inside prose.",
+      "html": "<code class=\"ds-code\">/phx:review</code>",
+      "css": ".ds-code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.92em; padding: 1px 5px; border-radius: 4px; background: oklch(97.5% 0.005 240); border: 1px solid oklch(90% 0.008 240); color: oklch(22% 0.02 240); }"
+    },
+    {
+      "name": "GitHub Stars Widget",
+      "kind": "custom",
+      "refersTo": "gh-stars",
+      "description": "Split pill: label segment + mono tabular count that flips to accent once loaded.",
+      "html": "<span class=\"ds-gh\" data-loaded=\"true\"><span class=\"ds-gh-label\"><svg viewBox=\"0 0 16 16\" fill=\"currentColor\"><path d=\"M8 .25a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.23 1.87.87 2.33.67.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 .25Z\"/></svg><span>Star</span></span><span class=\"ds-gh-count\">128</span></span>",
+      "css": ".ds-gh { display: inline-flex; align-items: stretch; height: 32px; border: 1px solid oklch(90% 0.008 240); border-radius: 6px; background: oklch(97.5% 0.005 240); font-family: 'Inter Variable', system-ui, sans-serif; font-size: 12.5px; font-weight: 500; overflow: hidden; } .ds-gh-label { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; color: oklch(36% 0.02 240); } .ds-gh-label svg { width: 14px; height: 14px; } .ds-gh-count { display: inline-flex; align-items: center; padding: 0 10px; background: oklch(96% 0.04 145); color: oklch(28% 0.10 145); font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; border-left: 1px solid oklch(90% 0.008 240); } .ds-gh-count::before { content: '★'; margin-right: 4px; color: oklch(70% 0.14 75); }"
+    },
+    {
+      "name": "Cmd-K Search Result",
+      "kind": "nav",
+      "refersTo": "search-item",
+      "description": "A row in the floating search palette; mono name + muted description, 44px min.",
+      "html": "<a class=\"ds-search-item\"><span class=\"ds-search-name\">/phx:plan</span><span class=\"ds-search-desc\">Plan a feature across domains</span></a>",
+      "css": ".ds-search-item { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 6px; min-height: 44px; cursor: pointer; text-decoration: none; } .ds-search-item:hover, .ds-search-item:focus-visible { background: oklch(97.5% 0.005 240); outline: 0; } .ds-search-name { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: oklch(22% 0.02 240); } .ds-search-desc { color: oklch(52% 0.018 240); font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Field Manual",
+    "overview": "phxagents.dev reads like a well-set engineering field manual: a practitioner's reference with strong, stated rules, dense information laid out for fast scanning, and zero ornament that doesn't carry meaning. The product it sells is enforced discipline (the Iron Laws, named specialist agents), so the site itself must look engineered, not decorated. The system is tech-utility: a near-white, faintly blue-tinted neutral canvas; a single green signal accent that earns its rare appearances; monospace reserved for the machine layer; and a type scale that gets genuinely large at the hero and stays tight and quiet everywhere else. It explicitly rejects the AI-marketing house style — no warm cream backgrounds, no gradient-text headlines, no decorative glassmorphism, no hero-metric template, no per-section eyebrows, nothing playful or mascot-driven. Warmth and credibility come from precision and specificity.",
+    "keyCharacteristics": [
+      "Dense, signal-first layout; whitespace earns its place rather than padding for elegance.",
+      "One green accent (145 degrees) used sparingly; violet (295 degrees) as a secondary signal only.",
+      "Inter for everything readable, JetBrains Mono for everything machine (commands, counts, labels, code).",
+      "Flat-by-default surfaces: 1px borders + tonal layering, shadows only on floating UI.",
+      "First-class light and dark themes; both pass WCAG 2.2 AA independently."
+    ],
+    "rules": [
+      { "name": "The One Signal Rule", "body": "Green is the only brand accent and appears on <=10% of any screen. If two things are green, neither reads as the action — pull one back to neutral.", "section": "colors" },
+      { "name": "The Cool-Neutral Rule", "body": "Neutrals are tinted toward blue (hue 240-250), never toward warm/cream. A beige or sand canvas is the AI-marketing tell this brand exists to avoid.", "section": "colors" },
+      { "name": "The Mono-Means-Machine Rule", "body": "Monospace is reserved for things that are literally code: commands, file paths, counts, version strings, kbd hints, labels. Mono as decorative developer flavor is forbidden.", "section": "colors" },
+      { "name": "The Weight-Not-Family Rule", "body": "Hierarchy comes from Inter's weight and size contrast plus the mono/sans axis. Never introduce a second sans display face.", "section": "typography" },
+      { "name": "The 75ch Rule", "body": "Long-form prose caps at ~65-75ch measure; the lede caps near 540px. Full-width body text is forbidden in reading columns.", "section": "typography" },
+      { "name": "The Flat-At-Rest Rule", "body": "Surfaces are flat at rest: borders + tonal fills do the separating. A shadow only appears when an element genuinely floats above the page or as a hover/focus response.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep green to <=10% of any screen (The One Signal Rule).",
+      "Do tint neutrals toward blue (hue 240-250), never toward warm/cream.",
+      "Do use JetBrains Mono only for machine content — commands, counts, paths, labels, kbd, code.",
+      "Do build depth from 1px borders + tonal surface layering; reserve shadows for floating UI.",
+      "Do keep prose at a 65-75ch measure and body at 14px; density is intentional.",
+      "Do verify 4.5:1 body contrast (3:1 large) in both light and dark themes, including placeholders.",
+      "Do show keyboard focus with the 2px accent :focus-visible ring, and ship a reduced-motion alternative for every animation."
+    ],
+    "donts": [
+      "Don't use gradient text (background-clip: text over a gradient). The hero h1 em currently does this — it is design debt to remove, not a pattern to copy.",
+      "Don't use a warm SaaS-cream/beige/sand background, a hero-metric template, or an endless grid of identical icon + heading + text feature cards.",
+      "Don't use glassmorphism decoratively. Blur is only sanctioned for the sticky nav and the search overlay.",
+      "Don't put a tiny uppercase tracked eyebrow above every section, or numbered 01/02/03 markers as default scaffolding.",
+      "Don't add side-stripe accents (border-left > 1px as the only accent) to cards, list items, or alerts. The callout is the single sanctioned exception.",
+      "Don't nest cards, and don't add resting shadows to cards.",
+      "Don't go playful — no emoji-as-decoration, bouncy/elastic motion, or mascots.",
+      "Don't imply any affiliation with the Phoenix Framework or commercial phoenix.new."
+    ]
+  }
+}
