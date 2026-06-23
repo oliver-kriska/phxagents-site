@@ -22,6 +22,7 @@
   --violet-soft: oklch(96% 0.04 295);
   --warn:      oklch(70% 0.14 75);
   --warn-soft: oklch(96% 0.05 75);
+  --warn-fg:   oklch(50% 0.12 65);
   --danger:    oklch(60% 0.20 25);
   --danger-soft: oklch(96% 0.04 25);
   --info:      oklch(62% 0.13 240);
@@ -62,6 +63,7 @@
   --violet-soft: oklch(28% 0.06 295);
   --warn:      oklch(78% 0.15 80);
   --warn-soft: oklch(28% 0.06 80);
+  --warn-fg:   oklch(78% 0.15 80);
   --danger:    oklch(70% 0.20 25);
   --danger-soft: oklch(28% 0.08 25);
   --info:      oklch(72% 0.14 240);
@@ -498,7 +500,7 @@ a.cmd-inline:hover {
 }
 
 .status-coming {
-  color: var(--warn);
+  color: var(--warn-fg);
   font-family: var(--font-mono);
   font-size: 11.5px;
   display: inline-flex;

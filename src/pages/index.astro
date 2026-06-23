@@ -54,12 +54,10 @@ const jsonLd = {
             <a href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">{releaseTag}</a> · stable for Claude Code
           </div>
           <h1 class="headline">
-            Elixir &amp; Phoenix<br />
-            context for <em>Claude Code</em>,<br />
-            Codex, OpenCode &amp; Pi.
+            Elixir &amp; Phoenix context for <em>Claude&nbsp;Code</em>, Codex, OpenCode &amp; Pi.
           </h1>
           <p class="lede">
-            <strong>phxagents is the best AI coding agent for Elixir and Phoenix</strong> — the specialized Claude Code plugin that teaches your AI editor how Phoenix actually works: contexts, scopes, LiveView async patterns, Ecto.Multi, Oban idempotency, and the production safety rails (Iron Laws) that keep generated code from hurting you in prod.
+            <strong>The specialized Claude Code plugin for Elixir &amp; Phoenix.</strong> It teaches your AI editor how Phoenix actually works — contexts, scopes, LiveView async patterns, Ecto.Multi, Oban idempotency, and the Iron Laws (production safety rails that stop generated code from hurting you in prod). That focus is what makes phxagents the best AI coding agent for Elixir and Phoenix.
           </p>
 
           <div class="hero-cta">
@@ -114,7 +112,7 @@ const jsonLd = {
     <div class="wrap">
       <div class="stats numeric">
         <a class="stat" href="/catalog/"><div class="n">{total}</div><div class="lbl">Skills + Agents</div></a>
-        <a class="stat" href="#clients"><div class="n">1<span class="n-soft">/4</span></div><div class="lbl">AI clients · 3 in v3.0</div></a>
+        <a class="stat" href="#clients"><div class="n">1</div><div class="lbl">AI client live · 3 in v3.0</div></a>
         <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron Laws enforced</div></a>
         <a class="stat" href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">
           <div class="n">{releaseTag}</div>
@@ -127,27 +125,38 @@ const jsonLd = {
   <section class="band">
     <div class="wrap">
       <div class="section-head">
-        <span class="label">Why phxagents</span>
         <h2>Phoenix-shaped guardrails, not generic prompting.</h2>
         <p>Generic AI editors hallucinate <code>Repo.preload</code> in the wrong places, swallow exceptions with bare <code>rescue</code>, and skip <code>Ecto.Multi</code> for transactions. phxagents knows the patterns and refuses to ship code that breaks them.</p>
       </div>
 
       <div class="features">
-        <article class="feature">
+        <article class="feature feature--featured">
           <span class="feature-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
           </span>
           <h3>Iron Laws enforced</h3>
-          <p>{stats.ironLaws} non-negotiable rules: no <code>Repo</code> in loops, no bare rescues, no untyped Oban args, no missing <code>preload</code>. The judge agent blocks PRs that violate them.</p>
+          <p>{stats.ironLaws} non-negotiable rules. The judge agent blocks PRs that violate them — no exceptions:</p>
+          <ul class="feature-tags">
+            <li>no <code>Repo</code> in loops</li>
+            <li>no bare <code>rescue</code></li>
+            <li>no untyped Oban args</li>
+            <li>no missing <code>preload</code></li>
+          </ul>
           <div class="meta">iron-law-judge · /phx:review</div>
         </article>
 
-        <article class="feature">
+        <article class="feature feature--featured">
           <span class="feature-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg>
           </span>
           <h3>Parallel code review, 4 specialists</h3>
-          <p>A code review agent fans out to elixir-reviewer, security-analyzer, testing-reviewer and verification-runner — each reads the diff in fresh context, then findings are deduped and triaged. No more single-pass slop.</p>
+          <p>Each specialist reads the diff in fresh context; findings are then deduped and triaged. No more single-pass slop.</p>
+          <ul class="feature-tags">
+            <li>elixir-reviewer</li>
+            <li>security-analyzer</li>
+            <li>testing-reviewer</li>
+            <li>verification-runner</li>
+          </ul>
           <div class="meta">parallel-reviewer · /phx:review</div>
         </article>
 
@@ -193,7 +202,6 @@ const jsonLd = {
   <section class="band">
     <div class="wrap">
       <div class="section-head">
-        <span class="label">The workflow</span>
         <h2>Plan, work, review, compound.</h2>
         <p>One command per phase. Each phase produces an artifact the next phase reads. The cycle is the product.</p>
       </div>
@@ -236,7 +244,6 @@ const jsonLd = {
   <section class="band" id="clients">
     <div class="wrap">
       <div class="section-head">
-        <span class="label">Supported clients</span>
         <h2>Shipping on Claude Code today. Three more in v3.0.</h2>
         <p>Claude Code is stable. Codex, OpenCode and Pi adapters land together in v3.0 with full Phase 1 + Phase 2 parity — single source, three generated targets. Track progress in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>.</p>
       </div>
@@ -305,20 +312,7 @@ const jsonLd = {
 <style>
   .hero {
     padding: 72px 0 64px;
-    position: relative;
-    overflow: hidden;
   }
-  .hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(800px 400px at 80% -10%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%),
-      radial-gradient(600px 300px at 0% 10%, color-mix(in oklab, var(--violet) 10%, transparent), transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .hero .wrap { position: relative; z-index: 1; }
   .hero-grid {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
@@ -350,13 +344,11 @@ const jsonLd = {
     font-weight: 600;
     margin: 0 0 18px;
     color: var(--fg);
+    text-wrap: balance;
   }
   h1.headline em {
     font-style: normal;
-    background: linear-gradient(90deg, var(--accent), var(--violet));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--accent-fg);
   }
   .lede {
     font-size: 16.5px;
@@ -395,7 +387,7 @@ const jsonLd = {
   .term {
     background: var(--surface);
     border: 1px solid var(--border-strong);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     overflow: hidden;
     font-family: var(--font-mono);
@@ -447,13 +439,6 @@ const jsonLd = {
     gap: 8px;
     margin-bottom: 32px;
   }
-  .section-head .label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent-fg);
-  }
   .section-head h2 {
     font-size: clamp(24px, 2.8vw, 34px);
     letter-spacing: -0.02em;
@@ -497,7 +482,6 @@ const jsonLd = {
     letter-spacing: -0.02em;
     line-height: 1;
   }
-  .stat .n-soft { color: var(--muted); font-size: 20px; margin-left: 2px; }
   .stat .lbl {
     margin-top: 8px;
     font-size: 12px;
@@ -515,7 +499,7 @@ const jsonLd = {
   /* Features */
   .features {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
   }
   .feature {
@@ -529,9 +513,36 @@ const jsonLd = {
     transition: border-color 120ms;
   }
   .feature:hover { border-color: var(--border-strong); }
+  /* Bento: the two conversion features lead, spanning twice the width */
+  .feature--featured { grid-column: span 2; padding: 24px 24px 26px; }
+  .feature--featured h3 { font-size: 17px; }
+  .feature-tags {
+    list-style: none;
+    margin: 2px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .feature-tags li {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .feature-tags code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+    color: var(--accent-fg);
+  }
   .feature-icon {
     width: 36px; height: 36px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     background: var(--surface-2);
     border: 1px solid var(--border);
     display: inline-flex; align-items: center; justify-content: center;
@@ -559,8 +570,14 @@ const jsonLd = {
     color: var(--muted);
     border-top: 1px dashed var(--border);
   }
-  @media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) {
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .feature--featured { grid-column: span 2; }
+  }
+  @media (max-width: 600px) {
+    .features { grid-template-columns: 1fr; }
+    .feature--featured { grid-column: span 1; }
+  }
 
   /* Workflow */
   .workflow ol {
@@ -620,7 +637,7 @@ const jsonLd = {
   }
   .client-mark {
     width: 36px; height: 36px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     background: var(--surface-2);
     border: 1px solid var(--border);
     display: inline-flex; align-items: center; justify-content: center;

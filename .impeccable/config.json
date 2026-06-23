@@ -1,0 +1,56 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "oklch(70% 0.18 35)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.311Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(50% 0.22 30)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.357Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(35% 0.05 240)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.416Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(20% 0.02 240)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.470Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(55% 0.18 145)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.578Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(35% 0.14 145)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.653Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(55% 0.20 290)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.729Z"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "oklch(35% 0.16 290)",
+        "reason": "external client product brand mark (Claude/Codex/OpenCode/Pi logo tile)",
+        "createdAt": "2026-06-23T06:48:39.778Z"
+      }
+    ]
+  }
+}
