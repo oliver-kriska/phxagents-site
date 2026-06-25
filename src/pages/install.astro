@@ -52,6 +52,23 @@ import { stats } from '../data/stats';
           <li><a href="/tidewave-mcp/">Tidewave MCP integration</a> for runtime introspection — live SQL, Ecto schemas, version-exact docs</li>
         </ul>
 
+        <h2 id="security">Security &amp; trust</h2>
+        <p>
+          The plugin runs skills, agents, and hooks inside Claude Code with your tool
+          permissions — so it's independently scanned with
+          <a href="https://github.com/NVIDIA/SkillSpector" rel="noopener">NVIDIA SkillSpector</a>,
+          a static security scanner for AI-agent skills. The scan runs with <strong>zero data egress</strong>.
+        </p>
+        <ul>
+          <li><strong>65 / 75 components SAFE</strong> on a raw static scan; <strong>75 / 75</strong> after reviewed baselines.</li>
+          <li>The few higher-scoring components are <strong>documented false positives</strong> — a static scanner flags the safety-enforcing and security-auditing skills precisely because they name dangerous patterns in order to <em>forbid or detect</em> them (one flagged line literally reads <code>NEVER bypass security checks for speed</code>).</li>
+          <li><strong>No data exfiltration</strong>, <strong>read-only review agents</strong> (source edits disallowed), and <strong>auditable bash hooks</strong>.</li>
+        </ul>
+        <p>
+          Read the full report, line-by-line triage, and a reproduce-it-yourself command in
+          <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.
+        </p>
+
         <h2>After install</h2>
         <p>Run <code>/phx:intro</code> for a guided walkthrough, or jump straight in:</p>
 
