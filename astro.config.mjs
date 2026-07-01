@@ -61,6 +61,14 @@ export default defineConfig({
   // between inline elements (JSX semantics) — that glued words like
   // "dedicated<a>…" in prose. `true` restores v6 HTML whitespace collapsing.
   compressHTML: true,
+  build: {
+    // Default 'auto' only inlines stylesheets under ~4KB; this site's shared
+    // layout + per-page bundles all sit above that, so every page shipped two
+    // render-blocking <link rel="stylesheet"> tags. Inlining trades cross-page
+    // CSS caching (82 pages share Default.css) for removing that render-block
+    // on every page — worth it here since the total CSS is small and gzips well.
+    inlineStylesheets: 'always',
+  },
   integrations: [sitemap()],
   markdown: {
     // Astro 7: remark/rehype plugins run through the `unified` processor from
