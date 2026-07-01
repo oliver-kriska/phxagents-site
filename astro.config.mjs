@@ -28,6 +28,33 @@ function rehypeShiftHeadings() {
   };
 }
 
+/**
+ * Wrap every rendered markdown `<table>` in `<div class="table-wrap">` so
+ * skill/agent tables can scroll horizontally on narrow viewports instead of
+ * forcing the whole page wider (same pattern as the hand-authored tables in
+ * install.astro / tidewave-mcp.astro — see DocsLayout.astro's matching CSS).
+ */
+function rehypeWrapTables() {
+  const wrap = (/** @type {any} */ node) => {
+    if (!node.children) return;
+    node.children = node.children.map((/** @type {any} */ child) => {
+      if (child.type === 'element' && child.tagName === 'table') {
+        return {
+          type: 'element',
+          tagName: 'div',
+          properties: { className: ['table-wrap'] },
+          children: [child],
+        };
+      }
+      wrap(child);
+      return child;
+    });
+  };
+  return (/** @type {any} */ tree) => {
+    wrap(tree);
+  };
+}
+
 export default defineConfig({
   site: 'https://phxagents.dev',
   // Astro 7 changed the default to 'jsx', which strips newline-only whitespace
@@ -40,7 +67,7 @@ export default defineConfig({
     // @astrojs/markdown-remark (the old `markdown.rehypePlugins` shorthand is
     // deprecated). shikiConfig stays at the markdown level — it's applied by
     // Astro's syntax highlighter, not the unified processor.
-    processor: unified({ rehypePlugins: [rehypeShiftHeadings] }),
+    processor: unified({ rehypePlugins: [rehypeShiftHeadings, rehypeWrapTables] }),
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark-dimmed' },
       langAlias: { heex: 'html', eex: 'html', sface: 'html' },

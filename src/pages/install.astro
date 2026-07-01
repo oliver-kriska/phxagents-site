@@ -13,15 +13,17 @@ import { stats } from '../data/stats';
 
       <div class="docs-body">
         <h2>Requirements</h2>
-        <table>
-          <thead><tr><th>Tool</th><th>Version</th><th>Why</th></tr></thead>
-          <tbody>
-            <tr><td><code>elixir</code></td><td>≥ 1.15</td><td>Pattern-matched function heads, ExUnit improvements</td></tr>
-            <tr><td><code>phoenix</code></td><td>1.7 or 1.8</td><td>Scope-aware codegen (1.8), <code>core_components</code> assumed</td></tr>
-            <tr><td><code>claude</code></td><td>≥ 1.0.50</td><td>Plugin manifest format v2</td></tr>
-            <tr><td><code>git</code></td><td>≥ 2.30</td><td>Required by <code>/phx:review</code> diff scanning</td></tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tool</th><th>Version</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td><code>elixir</code></td><td>≥ 1.15</td><td>Pattern-matched function heads, ExUnit improvements</td></tr>
+              <tr><td><code>phoenix</code></td><td>1.7 or 1.8</td><td>Scope-aware codegen (1.8), <code>core_components</code> assumed</td></tr>
+              <tr><td><code>claude</code></td><td>≥ 1.0.50</td><td>Plugin manifest format v2</td></tr>
+              <tr><td><code>git</code></td><td>≥ 2.30</td><td>Required by <code>/phx:review</code> diff scanning</td></tr>
+            </tbody>
+          </table>
+        </div>
 
         <h2 id="install">Installation</h2>
         <p>Run these in Claude Code, one at a time:</p>
@@ -42,7 +44,7 @@ import { stats } from '../data/stats';
           <pre>/plugin install elixir-phoenix</pre>
         </div>
 
-        <p>The plugin auto-loads relevant skills based on the file you're editing. No configuration required.</p>
+        <p>The plugin auto-loads relevant skills based on the file you’re editing. No configuration required.</p>
 
         <h2>What gets installed</h2>
         <ul>
@@ -55,7 +57,7 @@ import { stats } from '../data/stats';
         <h2 id="security">Security &amp; trust</h2>
         <p>
           The plugin runs skills, agents, and hooks inside Claude Code with your tool
-          permissions — so it's independently scanned with
+          permissions — so it’s independently scanned with
           <a href="https://github.com/NVIDIA/SkillSpector" rel="noopener">NVIDIA SkillSpector</a>,
           a static security scanner for AI-agent skills. The scan runs with <strong>zero data egress</strong>.
         </p>
@@ -81,15 +83,17 @@ import { stats } from '../data/stats';
         </div>
 
         <h2>Client support</h2>
-        <table>
-          <thead><tr><th>Client</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>Claude Code</td><td><span class="cstat shipped">shipped (v{stats.version})</span></td></tr>
-            <tr><td>Codex</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
-            <tr><td>OpenCode</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
-            <tr><td>Pi</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Client</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Claude Code</td><td><span class="cstat shipped">shipped (v{stats.version})</span></td></tr>
+              <tr><td>Codex</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+              <tr><td>OpenCode</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+              <tr><td>Pi</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+            </tbody>
+          </table>
+        </div>
 
         <h2>Also in this marketplace: <code>catchup</code></h2>
         <p>
@@ -159,14 +163,19 @@ import { stats } from '../data/stats';
     line-height: 1.65;
   }
   .docs-body li { margin: 4px 0; }
-  .docs-body table {
-    width: 100%;
-    border-collapse: collapse;
+  .table-wrap {
     margin: 14px 0 22px;
-    font-size: 13.5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
+  }
+  .docs-body table {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 13.5px;
   }
   .docs-body th, .docs-body td {
     padding: 10px 14px;

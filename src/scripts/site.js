@@ -16,6 +16,19 @@ function applyTheme(t) {
   else document.documentElement.removeAttribute('data-theme');
 }
 
+// Shared Tab-trap for open dialogs/drawers (search palette, mobile menu, docs drawer).
+function trapTab(container, e) {
+  const focusable = container.querySelectorAll(
+    'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+  );
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  else if (!container.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+}
+
 function syncThemeToggle() {
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
@@ -36,11 +49,20 @@ document.addEventListener('click', function (e) {
 
 // Mobile menu
 (function () {
+  let lastFocused = null;
   function setOpen(menu, open) {
     menu.setAttribute('data-open', open ? 'true' : 'false');
     document.body.classList.toggle('menu-open', open);
     const btn = document.querySelector('[data-menu-toggle]');
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      lastFocused = document.activeElement;
+      const first = menu.querySelector('a[href]');
+      if (first) first.focus();
+    } else if (lastFocused && typeof lastFocused.focus === 'function') {
+      lastFocused.focus();
+      lastFocused = null;
+    }
   }
   document.addEventListener('click', function (e) {
     const menu = document.getElementById('mobile-menu');
@@ -55,7 +77,9 @@ document.addEventListener('click', function (e) {
   document.addEventListener('keydown', function (e) {
     const menu = document.getElementById('mobile-menu');
     if (!menu) return;
-    if (e.key === 'Escape' && menu.getAttribute('data-open') === 'true') setOpen(menu, false);
+    if (menu.getAttribute('data-open') !== 'true') return;
+    if (e.key === 'Escape') { setOpen(menu, false); return; }
+    if (e.key === 'Tab') trapTab(menu, e);
   });
   window.addEventListener('resize', function () {
     const menu = document.getElementById('mobile-menu');
@@ -66,10 +90,27 @@ document.addEventListener('click', function (e) {
 
 // Docs sidebar (mobile drawer)
 (function () {
+  let lastFocused = null;
+  // Below 860px the sidebar becomes an off-canvas drawer (see DocPage.astro);
+  // keep it out of the closed tab order there so it can't be focused while
+  // it's translated off-screen. Above 860px it's the always-visible sidebar.
+  function applyInert(nav) {
+    const isMobile = window.matchMedia('(max-width: 860px)').matches;
+    nav.inert = isMobile && nav.getAttribute('data-open') !== 'true';
+  }
   function setOpen(nav, btn, open) {
     nav.setAttribute('data-open', open ? 'true' : 'false');
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('docs-nav-open', open);
+    applyInert(nav);
+    if (open) {
+      lastFocused = document.activeElement;
+      const first = nav.querySelector('a[href]');
+      if (first) first.focus();
+    } else if (lastFocused && typeof lastFocused.focus === 'function') {
+      lastFocused.focus();
+      lastFocused = null;
+    }
   }
   document.addEventListener('click', function (e) {
     const nav = document.querySelector('[data-docs-nav]');
@@ -86,17 +127,22 @@ document.addEventListener('click', function (e) {
     const nav = document.querySelector('[data-docs-nav]');
     const btn = document.querySelector('[data-docs-nav-toggle]');
     if (!nav) return;
-    if (e.key === 'Escape' && nav.getAttribute('data-open') === 'true') setOpen(nav, btn, false);
+    if (nav.getAttribute('data-open') !== 'true') return;
+    if (e.key === 'Escape') { setOpen(nav, btn, false); return; }
+    if (e.key === 'Tab') trapTab(nav, e);
   });
   window.addEventListener('resize', function () {
     const nav = document.querySelector('[data-docs-nav]');
     const btn = document.querySelector('[data-docs-nav-toggle]');
     if (!nav) return;
     if (window.innerWidth > 860 && nav.getAttribute('data-open') === 'true') setOpen(nav, btn, false);
+    else applyInert(nav);
   });
-  // Scroll the current page link into view inside the sidebar on load.
+  // Initial state: inert while off-canvas on mobile, and scroll the current
+  // page link into view inside the sidebar on load.
   const nav = document.querySelector('[data-docs-nav]');
   if (nav) {
+    applyInert(nav);
     const current = nav.querySelector('a[aria-current="page"]');
     if (current && typeof current.scrollIntoView === 'function') {
       requestAnimationFrame(() => current.scrollIntoView({ block: 'center' }));
@@ -140,7 +186,7 @@ document.addEventListener('click', function (e) {
     return '';
   }
 
-  function render(q, container) {
+  function render(q, container, status) {
     const query = q.trim().toLowerCase();
     if (!CORPUS) return;
     const matches = !query
@@ -151,6 +197,12 @@ document.addEventListener('click', function (e) {
             item.desc.toLowerCase().includes(query) ||
             item.group.toLowerCase().includes(query)
         ).slice(0, 30);
+
+    if (status) {
+      status.textContent = query
+        ? matches.length + ' result' + (matches.length === 1 ? '' : 's') + ' for "' + q.trim() + '"'
+        : matches.length + ' suggestion' + (matches.length === 1 ? '' : 's');
+    }
 
     if (matches.length === 0) {
       container.innerHTML =
@@ -163,16 +215,17 @@ document.addEventListener('click', function (e) {
     const labels = { skill: 'Skills', agent: 'Agents', page: 'Pages' };
 
     let html = '';
+    let renderedIndex = 0;
     ['skill', 'agent', 'page'].forEach((t) => {
       if (!groups[t] || !groups[t].length) return;
       html += '<div class="search-group-label">' + labels[t] + '</div>';
-      groups[t].forEach((item, i) => {
+      groups[t].forEach((item) => {
         const cls = pillClass(item.type, item.group);
         html +=
           '<a class="search-item" href="' +
           escapeHtml(item.url) +
           '" data-index="' +
-          (i === 0 && t === 'skill' ? '0' : '') +
+          renderedIndex++ +
           '">' +
           (cls ? '<span class="pill pill-' + cls + '">' + escapeHtml(item.group) + '</span>' : '<span class="pill">' + escapeHtml(item.group) + '</span>') +
           '<span class="search-name">' +
@@ -192,7 +245,8 @@ document.addEventListener('click', function (e) {
     if (!overlay) return null;
     const input = overlay.querySelector('[data-search-input]');
     const results = overlay.querySelector('[data-search-results]');
-    return { overlay, input, results };
+    const status = overlay.querySelector('[data-search-status]');
+    return { overlay, input, results, status };
   }
 
   function open() {
@@ -204,7 +258,7 @@ document.addEventListener('click', function (e) {
     if (els.input) els.input.value = '';
     if (els.results) els.results.innerHTML = '<div class="search-empty">Loading…</div>';
     loadCorpus().then(() => {
-      render('', els.results);
+      render('', els.results, els.status);
       setTimeout(() => els.input && els.input.focus(), 30);
     });
   }
@@ -232,18 +286,7 @@ document.addEventListener('click', function (e) {
     const els = getEls();
     if (!els) return;
     const isOpen = els.overlay.getAttribute('data-open') === 'true';
-    if (isOpen && e.key === 'Tab') {
-      const focusable = els.overlay.querySelectorAll(
-        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusable.length) {
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-        else if (!els.overlay.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
-      }
-    }
+    if (isOpen && e.key === 'Tab') trapTab(els.overlay, e);
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       isOpen ? close() : open();
@@ -254,6 +297,21 @@ document.addEventListener('click', function (e) {
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       e.preventDefault();
       open();
+    } else if (isOpen && e.key === 'Enter' && document.activeElement === els.input) {
+      const top = els.results.querySelector('[data-index="0"]');
+      if (top) { e.preventDefault(); top.click(); }
+    } else if (isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      const items = els.results.querySelectorAll('.search-item');
+      if (!items.length) return;
+      const idx = Array.prototype.indexOf.call(items, document.activeElement);
+      e.preventDefault();
+      if (e.key === 'ArrowDown') {
+        if (document.activeElement === els.input) items[0].focus();
+        else if (idx > -1 && idx < items.length - 1) items[idx + 1].focus();
+      } else {
+        if (idx === 0) els.input.focus();
+        else if (idx > 0) items[idx - 1].focus();
+      }
     }
   });
 
@@ -262,7 +320,7 @@ document.addEventListener('click', function (e) {
     const target = e.target;
     if (!target || !target.matches || !target.matches('[data-search-input]')) return;
     const els = getEls();
-    if (els && els.results) render(target.value, els.results);
+    if (els && els.results) render(target.value, els.results, els.status);
   });
 })();
 
@@ -314,7 +372,8 @@ document.addEventListener('click', function (e) {
   }
 })();
 
-// Copy buttons
+// Copy buttons — aria-live so the "Copy" -> "Copied" text swap is announced.
+document.querySelectorAll('[data-copy]').forEach((btn) => btn.setAttribute('aria-live', 'polite'));
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('[data-copy]');
   if (!btn) return;
@@ -360,6 +419,7 @@ document.addEventListener('click', function (e) {
     btn.className = 'code-copy';
     btn.textContent = 'Copy';
     btn.setAttribute('aria-label', 'Copy code');
+    btn.setAttribute('aria-live', 'polite');
     btn.addEventListener('click', () => {
       navigator.clipboard
         .writeText(original)

@@ -209,6 +209,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
           <input type="search" placeholder="Search skills, agents, docs…" autocomplete="off" spellcheck="false" data-search-input aria-label="Search input" />
           <button class="esc-btn" data-search-close aria-label="Close search" type="button">esc</button>
         </div>
+        <div class="sr-only" aria-live="polite" data-search-status></div>
         <div class="search-results" data-search-results></div>
       </div>
     </div>

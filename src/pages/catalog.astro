@@ -85,21 +85,21 @@ function displayName(item: Item): string {
         <input type="search" placeholder={`Search ${items.length} skills and agents…`} data-catalog-search aria-label="Search skills and agents" autocomplete="off" spellcheck="false" />
       </div>
 
-      <div class="filter-group" role="group" aria-label="Filter by type">
-        <button class="filter-chip" data-filter-group="type" data-catalog-filter="all" aria-pressed="true">All <span class="count">{counts.all}</span></button>
-        <button class="filter-chip" data-filter-group="type" data-catalog-filter="skill">Skills <span class="count">{counts.skill}</span></button>
-        <button class="filter-chip" data-filter-group="type" data-catalog-filter="agent">Agents <span class="count">{counts.agent}</span></button>
+      <div class="filter-group" role="radiogroup" aria-label="Filter by type">
+        <button class="filter-chip" role="radio" data-filter-group="type" data-catalog-filter="all" aria-checked="true" tabindex="0">All <span class="count">{counts.all}</span></button>
+        <button class="filter-chip" role="radio" data-filter-group="type" data-catalog-filter="skill" aria-checked="false" tabindex="-1">Skills <span class="count">{counts.skill}</span></button>
+        <button class="filter-chip" role="radio" data-filter-group="type" data-catalog-filter="agent" aria-checked="false" tabindex="-1">Agents <span class="count">{counts.agent}</span></button>
       </div>
       <button class="catalog-clear" data-catalog-clear type="button" hidden>Clear</button>
     </div>
 
-    <div class="cat-bar" role="group" aria-label="Filter by namespace">
-      <button class="cat-chip" data-filter-group="group" data-catalog-filter="all" aria-pressed="true">All namespaces</button>
-      {counts.phx > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="phx">phx: ({counts.phx})</button>}
-      {counts.lv > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="lv">lv: ({counts.lv})</button>}
-      {counts.ecto > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="ecto">ecto: ({counts.ecto})</button>}
-      {counts.reference > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="reference">reference ({counts.reference})</button>}
-      {counts.agent > 0 && <button class="cat-chip" data-filter-group="group" data-catalog-filter="agent">agents ({counts.agent})</button>}
+    <div class="cat-bar" role="radiogroup" aria-label="Filter by namespace">
+      <button class="cat-chip" role="radio" data-filter-group="group" data-catalog-filter="all" aria-checked="true" tabindex="0">All namespaces</button>
+      {counts.phx > 0 && <button class="cat-chip" role="radio" data-filter-group="group" data-catalog-filter="phx" aria-checked="false" tabindex="-1">phx: ({counts.phx})</button>}
+      {counts.lv > 0 && <button class="cat-chip" role="radio" data-filter-group="group" data-catalog-filter="lv" aria-checked="false" tabindex="-1">lv: ({counts.lv})</button>}
+      {counts.ecto > 0 && <button class="cat-chip" role="radio" data-filter-group="group" data-catalog-filter="ecto" aria-checked="false" tabindex="-1">ecto: ({counts.ecto})</button>}
+      {counts.reference > 0 && <button class="cat-chip" role="radio" data-filter-group="group" data-catalog-filter="reference" aria-checked="false" tabindex="-1">reference ({counts.reference})</button>}
+      {counts.agent > 0 && <button class="cat-chip" role="radio" data-filter-group="group" data-catalog-filter="agent" aria-checked="false" tabindex="-1">agents ({counts.agent})</button>}
     </div>
 
     <div class="catalog-grid" id="catalog-grid">
@@ -144,7 +144,9 @@ function displayName(item: Item): string {
     function setPressed(group: string, value: string) {
       catalog.querySelectorAll(`[data-filter-group="${group}"]`).forEach((b) => {
         const el = b as HTMLElement;
-        el.setAttribute('aria-pressed', el.dataset.catalogFilter === value ? 'true' : 'false');
+        const selected = el.dataset.catalogFilter === value;
+        el.setAttribute('aria-checked', selected ? 'true' : 'false');
+        el.tabIndex = selected ? 0 : -1;
       });
     }
 
@@ -208,18 +210,42 @@ function displayName(item: Item): string {
     }
     if (initialQ) search.value = initialQ;
 
+    function selectFilter(el: HTMLElement) {
+      const group = el.dataset.filterGroup!;
+      const value = el.dataset.catalogFilter!;
+      setPressed(group, value);
+      if (group === 'type') activeType = value;
+      else if (group === 'group') activeGroup = value;
+      update();
+    }
+
     search.addEventListener('input', update);
     filters.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const el = btn as HTMLElement;
-        const group = el.dataset.filterGroup!;
-        const value = el.dataset.catalogFilter!;
-        setPressed(group, value);
-        if (group === 'type') activeType = value;
-        else if (group === 'group') activeGroup = value;
-        update();
+      btn.addEventListener('click', () => selectFilter(btn as HTMLElement));
+    });
+
+    // WAI-ARIA radiogroup pattern: arrow keys move focus AND select; Home/End
+    // jump to the first/last radio in the group.
+    catalog.querySelectorAll('[role="radiogroup"]').forEach((group) => {
+      group.addEventListener('keydown', (e) => {
+        const key = (e as KeyboardEvent).key;
+        const radios = Array.from(group.querySelectorAll('[role="radio"]')) as HTMLElement[];
+        const current = document.activeElement as HTMLElement;
+        const idx = radios.indexOf(current);
+        if (idx === -1) return;
+        let next: HTMLElement | null = null;
+        if (key === 'ArrowRight' || key === 'ArrowDown') next = radios[(idx + 1) % radios.length];
+        else if (key === 'ArrowLeft' || key === 'ArrowUp') next = radios[(idx - 1 + radios.length) % radios.length];
+        else if (key === 'Home') next = radios[0];
+        else if (key === 'End') next = radios[radios.length - 1];
+        if (next) {
+          e.preventDefault();
+          next.focus();
+          selectFilter(next);
+        }
       });
     });
+
     catalog.querySelectorAll('[data-catalog-clear]').forEach((b) => b.addEventListener('click', clearAll));
     update();
   })();
@@ -324,7 +350,7 @@ function displayName(item: Item): string {
     cursor: pointer;
   }
   .filter-chip:hover { color: var(--fg); }
-  .filter-chip[aria-pressed="true"] {
+  .filter-chip[aria-checked="true"] {
     background: var(--surface);
     color: var(--fg);
     box-shadow: var(--shadow-sm);
@@ -360,7 +386,7 @@ function displayName(item: Item): string {
     cursor: pointer;
   }
   .cat-chip:hover { border-color: var(--border-strong); color: var(--fg); }
-  .cat-chip[aria-pressed="true"] {
+  .cat-chip[aria-checked="true"] {
     background: var(--fg);
     color: var(--bg);
     border-color: var(--fg);
@@ -383,7 +409,9 @@ function displayName(item: Item): string {
     text-decoration: none;
     color: inherit;
   }
-  .catalog-card:hover { border-color: var(--border-strong); }
+  @media (hover: hover) and (pointer: fine) {
+    .catalog-card:hover { border-color: var(--border-strong); }
+  }
   .catalog-card .row { display: flex; align-items: center; gap: 8px; }
   .catalog-card .name {
     font-family: var(--font-mono);
@@ -438,5 +466,10 @@ function displayName(item: Item): string {
     .catalog-controls .filter-group { width: 100%; overflow-x: auto; }
     .filter-chip .count { display: none; }
     .catalog-search { width: 100%; }
+  }
+
+  @media (max-width: 900px) {
+    .filter-chip { height: 44px; }
+    .cat-chip { height: 44px; padding: 0 14px; }
   }
 </style>

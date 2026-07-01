@@ -49,8 +49,11 @@ const pillKind =
       : name.startsWith('ecto:')
         ? 'pill-info'
         : 'pill-accent';
+// Model-tier hues intentionally avoid pill-violet: that hue already means
+// "lv:" namespace on skill pages (see pillKind above), and reusing it here
+// for "opus" would let the same color mean two unrelated things sitewide.
 const modelPillClass =
-  model === 'opus' ? 'pill-violet' : model === 'haiku' ? 'pill-info' : 'pill-accent';
+  model === 'opus' ? 'pill-warn' : model === 'haiku' ? 'pill-info' : 'pill-accent';
 const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?type=skill';
 
 // Structured data: breadcrumb trail + a per-entity TechArticle so each skill/agent
@@ -219,10 +222,24 @@ const detailJsonLd = {
   }
 
   /* Markdown body — headings are shifted +1 at render time (rehypeShiftHeadings
-     in astro.config.mjs) so the layout title above is the page's only <h1>.
-     The body's own "# Title" becomes <h2> (hidden), its "##" sections become
-     <h3>, its "###" subsections become <h4>. Selectors below mirror that +1. */
-  .docs-body :global(h2) { display: none; }
+     in astro.config.mjs) so the layout title above is the page's only visible
+     <h1>. The body's own "# Title" becomes <h2>, its "##" sections become
+     <h3>, its "###" subsections become <h4>. Selectors below mirror that +1.
+     The <h2> duplicates the layout's <h1> visually, so it's hidden the
+     screen-reader-only way (clipped, not display:none) — display:none would
+     also remove it from the accessibility tree and leave heading navigation
+     skipping straight from H1 to H3 on every skill/agent page. */
+  .docs-body :global(h2) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .docs-body :global(h3) {
     margin: 40px 0 14px;
     padding-top: 24px;
@@ -270,14 +287,19 @@ const detailJsonLd = {
     line-height: 1.6;
     overflow-x: auto;
   }
-  .docs-body :global(table) {
-    width: 100%;
-    border-collapse: collapse;
+  .docs-body :global(.table-wrap) {
     margin: 14px 0 22px;
-    font-size: 13.5px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
+  }
+  .docs-body :global(table) {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 13.5px;
   }
   .docs-body :global(th), .docs-body :global(td) {
     padding: 10px 14px;

@@ -97,9 +97,10 @@ const violationHtml = violationSrc.trim() ? await marked.parse(violationSrc.trim
           </a>
         ))}
       </nav>
+      <p class="law-index-note">Badge numbers are each law's position in the full {stats.ironLaws}-law list, so they run in order overall but not always within a single category.</p>
 
       {categories.map((c) => (
-        <section class="law-cat" id={c.slug} aria-labelledby={`${c.slug}-h`}>
+        <section class={`law-cat${c.laws.length === 1 ? ' law-cat--single' : ''}`} id={c.slug} aria-labelledby={`${c.slug}-h`}>
           <h2 class="law-cat-head" id={`${c.slug}-h`}>
             {c.label}
             <span class="law-cat-count">{c.laws.length} {c.laws.length === 1 ? 'law' : 'laws'}</span>
@@ -185,10 +186,17 @@ const violationHtml = violationSrc.trim() ? await marked.parse(violationSrc.trim
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
+  .law-index-note {
+    margin: -28px 0 40px;
+    font-size: 12.5px;
+    color: var(--muted);
+    max-width: 560px;
+  }
 
   /* Category section */
   .law-cat { scroll-margin-top: calc(var(--nav-h) + 20px); }
   .law-cat + .law-cat { margin-top: 40px; }
+  .law-cat + .law-cat.law-cat--single { margin-top: 24px; }
   .law-cat-head {
     display: flex;
     align-items: baseline;
@@ -200,6 +208,14 @@ const violationHtml = violationSrc.trim() ? await marked.parse(violationSrc.trim
     letter-spacing: -0.015em;
     font-weight: 600;
     color: var(--fg);
+  }
+  /* Single-law categories (Verification, Code Style) don't need the same
+     heavy section chrome as multi-law ones — a full-weight divider + heading
+     for one list item reads as broken rhythm, not emphasis. */
+  .law-cat--single .law-cat-head {
+    padding-top: 10px;
+    margin-bottom: 8px;
+    font-size: 16px;
   }
   .law-cat-count {
     font-family: var(--font-mono);
