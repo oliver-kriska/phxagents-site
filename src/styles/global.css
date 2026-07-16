@@ -275,9 +275,10 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
   font-size: 13px;
   font-weight: 500;
   border: 1px solid var(--fg);
-  transition: opacity 120ms;
+  transition: opacity 120ms, transform 120ms;
 }
 .btn-primary:hover { color: var(--bg); opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
 
 .btn-ghost {
   display: inline-flex;
@@ -291,8 +292,10 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
   color: var(--fg);
   font-size: 13px;
   font-weight: 500;
+  transition: border-color 120ms, color 120ms, transform 120ms;
 }
 .btn-ghost:hover { border-color: var(--border-strong); color: var(--fg); }
+.btn-ghost:active { transform: scale(0.98); }
 
 .btn-accent {
   display: inline-flex;

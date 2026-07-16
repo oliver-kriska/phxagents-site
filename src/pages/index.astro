@@ -74,7 +74,7 @@ const jsonLd = {
           <div class="meta-line">
             <span><a class="num-link" href="/catalog/?type=skill">{stats.skills}</a> skills</span>
             <span><a class="num-link" href="/catalog/?type=agent">{stats.agents}</a> agents</span>
-            <span><a class="num-link" href="/iron-laws/">{stats.ironLaws}</a> Iron Laws</span>
+            <span><a class="num-link" href="/iron-laws/">{stats.ironLaws}</a> Iron&nbsp;Laws</span>
             <span class="dim">·</span>
             <span>MIT licensed</span>
           </div>
@@ -113,7 +113,7 @@ const jsonLd = {
       <div class="stats numeric">
         <a class="stat" href="/catalog/"><div class="n">{total}</div><div class="lbl">Skills + Agents</div></a>
         <a class="stat" href="#clients"><div class="n">1</div><div class="lbl">AI client live · 3 in v3.0</div></a>
-        <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron Laws enforced</div></a>
+        <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron&nbsp;Laws enforced</div></a>
         <a class="stat" href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">
           <div class="n">{releaseTag}</div>
           <div class="lbl">{releaseAgeLabel ? `Latest · ${releaseAgeLabel}` : 'Latest release'}</div>
@@ -134,7 +134,7 @@ const jsonLd = {
           <span class="feature-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
           </span>
-          <h3>Iron Laws enforced</h3>
+          <h3>Iron&nbsp;Laws enforced</h3>
           <p>{stats.ironLaws} non-negotiable rules. The judge agent blocks PRs that violate them — no exceptions:</p>
           <ul class="feature-tags">
             <li>no <code>Repo</code> in loops</li>
@@ -174,8 +174,8 @@ const jsonLd = {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           </span>
           <h3>Runtime introspection</h3>
-          <p>Live SQL queries, real Ecto schemas, version-exact hex docs — via <a href="/tidewave-mcp/">Tidewave MCP</a>. The agent reads your running app instead of guessing.</p>
-          <div class="meta">Tidewave MCP</div>
+          <p>Live SQL queries, real Ecto schemas, version-exact hex docs — via <a href="/tidewave-mcp/">Tidewave&nbsp;MCP</a>. The agent reads your running app instead of guessing.</p>
+          <div class="meta">Tidewave&nbsp;MCP</div>
         </article>
 
         <article class="feature">
@@ -451,6 +451,7 @@ const jsonLd = {
     margin: 0;
     color: var(--fg);
     font-weight: 600;
+    text-wrap: balance;
   }
   .section-head p {
     color: var(--muted);
@@ -686,6 +687,7 @@ const jsonLd = {
     letter-spacing: -0.02em;
     color: var(--fg);
     font-weight: 600;
+    text-wrap: balance;
   }
   .cta-band p { color: var(--muted); margin: 6px 0 0; font-size: 14px; }
   .cta-band .actions { display: flex; gap: 10px; }
