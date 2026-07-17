@@ -6,15 +6,21 @@ import { getStargazersCount, formatStars } from '../data/release';
 interface Props {
   title: string;
   description?: string;
+  /**
+   * Overrides the `<title>` (and the OG/Twitter titles derived from it) when the
+   * page's own heading makes a poor search result — e.g. a skill page whose H1 is
+   * the bare name "oban". Pages that omit it keep the "<title> — phxagents" form.
+   */
+  seoTitle?: string;
   active?: 'docs' | 'catalog' | 'changelog' | 'iron-laws' | 'home' | null;
 }
 
-const { title, description = stats.description, active = null } = Astro.props;
+const { title, description = stats.description, seoTitle, active = null } = Astro.props;
 
 const stargazersCount = await getStargazersCount();
 const starsLabel = formatStars(stargazersCount);
 const starsLoaded = stargazersCount != null;
-const fullTitle = title === 'phxagents' ? title : `${title} — phxagents`;
+const fullTitle = seoTitle ?? (title === 'phxagents' ? title : `${title} — phxagents`);
 const canonical = `https://phxagents.dev${Astro.url.pathname.replace(/\/+$/, '/')}`;
 
 // Per-page Open Graph image, generated at build by /og/[...slug].png. The slug

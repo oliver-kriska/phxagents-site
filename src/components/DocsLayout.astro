@@ -1,5 +1,6 @@
 ---
 import DocPage from '../layouts/DocPage.astro';
+import { serpDescription, serpTitle } from '../lib/seo';
 
 interface PagerEntry {
   name: string;
@@ -88,7 +89,14 @@ const detailJsonLd = {
 };
 ---
 
-<DocPage title={title} description={description} active="catalog">
+<!-- The lede and the JSON-LD below keep the plugin's raw description; only the
+     search snippet is rewritten for a human reader (see ../lib/seo.ts). -->
+<DocPage
+  title={title}
+  description={description && serpDescription(description)}
+  seoTitle={serpTitle(displayName, kind)}
+  active="catalog"
+>
   <script type="application/ld+json" set:html={JSON.stringify(detailJsonLd)} />
   <div class="crumbs">
     <a href="/">phxagents</a>

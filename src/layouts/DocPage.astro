@@ -5,10 +5,11 @@ import { getDocsNav } from '../lib/docsNav';
 interface Props {
   title: string;
   description?: string;
+  seoTitle?: string;
   active?: string;
 }
 
-const { title, description, active = 'docs' } = Astro.props;
+const { title, description, seoTitle, active = 'docs' } = Astro.props;
 const currentPath = Astro.url.pathname;
 const nav = getDocsNav();
 
@@ -18,7 +19,7 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
 }
 ---
 
-<Default title={title} description={description} active={active}>
+<Default title={title} description={description} seoTitle={seoTitle} active={active}>
   <div class="docs-shell">
     <button class="docs-nav-trigger btn-ghost" data-docs-nav-toggle type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="docs-sidebar">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
