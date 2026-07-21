@@ -1,0 +1,175 @@
+---
+import { getEntry, render } from 'astro:content';
+import DocPage from '../layouts/DocPage.astro';
+
+const title = 'Use the Elixir/Phoenix Skills with Amp';
+const description =
+  'Install and use the phxagents Elixir, Phoenix, LiveView, Ecto, Oban, testing, and security skills as first-class Amp Agent Skills.';
+const pageUrl = 'https://phxagents.dev/amp/';
+
+const entry = await getEntry('upstreamDocs', 'amp');
+if (!entry) {
+  throw new Error(
+    'Missing canonical Amp documentation at plugin-source/docs/amp.md. Clone or link the plugin source before building.'
+  );
+}
+const { Content } = await render(entry);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: 'Amp', item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'TechArticle',
+      '@id': `${pageUrl}#article`,
+      headline: title,
+      name: title,
+      description,
+      url: pageUrl,
+      inLanguage: 'en',
+      author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
+      publisher: { '@id': 'https://phxagents.dev/#org' },
+      isPartOf: { '@id': 'https://phxagents.dev/#website' },
+    },
+  ],
+};
+---
+
+<DocPage title="Amp" seoTitle={`${title} — phxagents`} description={description} active="docs">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="page-head">
+    <h1>{title}</h1>
+  </div>
+  <div class="docs-body">
+    <Content />
+  </div>
+</DocPage>
+
+<style>
+  .page-head h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body { max-width: 720px; }
+  /* The Markdown H1 is shifted to H2 by the site's standard processor. Keep it
+     in the accessibility tree while the page header above supplies the sole H1. */
+  .docs-body :global(h2:first-child) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .docs-body :global(h3) {
+    margin: 40px 0 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    color: var(--fg);
+    scroll-margin-top: calc(var(--nav-h) + 16px);
+  }
+  .docs-body :global(h4) {
+    margin: 24px 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(p) {
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    line-height: 1.65;
+    font-size: 14.5px;
+    max-width: 640px;
+  }
+  .docs-body :global(ul), .docs-body :global(ol) {
+    margin: 0 0 16px;
+    padding-left: 22px;
+    color: var(--fg-soft);
+    font-size: 14.5px;
+    line-height: 1.65;
+    max-width: 640px;
+  }
+  .docs-body :global(li) { margin: 4px 0; }
+  .docs-body :global(a) {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .docs-body :global(a:hover) { color: var(--accent); }
+  .docs-body :global(pre) {
+    position: relative;
+    margin: 14px 0 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .docs-body :global(pre.has-copy) { padding-right: 58px; }
+  .docs-body :global(.table-wrap) {
+    margin: 14px 0 22px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .docs-body :global(table) {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 13.5px;
+  }
+  .docs-body :global(th), .docs-body :global(td) {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .docs-body :global(th) {
+    font-weight: 500;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--surface-2);
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .docs-body :global(tr:last-child td) { border-bottom: 0; }
+  :global(.code-copy) {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    font: 500 11px/1 var(--font-mono);
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: color 120ms, border-color 120ms;
+  }
+  :global(.code-copy:hover) { color: var(--fg); border-color: var(--border-strong); }
+</style>

@@ -48,6 +48,13 @@ export const GET: APIRoute = async () => {
     },
     {
       type: 'page' as const,
+      name: 'Amp',
+      desc: 'Install and use the phxagents Elixir and Phoenix skills with Amp.',
+      url: '/amp/',
+      group: 'docs',
+    },
+    {
+      type: 'page' as const,
       name: 'Iron Laws',
       desc: 'Non-negotiable rules that prevent the bugs Elixir tests don\'t catch.',
       url: '/iron-laws/',

@@ -54,6 +54,14 @@ export async function getStaticPaths() {
         kind: 'docs',
       },
     },
+    {
+      slug: 'amp',
+      data: {
+        title: 'Elixir & Phoenix skills for Amp',
+        subtitle: 'Install and use the phxagents skill set as first-class Amp Agent Skills.',
+        kind: 'docs',
+      },
+    },
     ...skills.map((entry) => {
       const slug = entry.id.replace(/\/SKILL$/i, '');
       const name = entry.data.name as string;
