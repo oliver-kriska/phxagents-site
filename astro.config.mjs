@@ -55,6 +55,30 @@ function rehypeWrapTables() {
   };
 }
 
+/**
+ * The canonical Amp guide lives in plugin-source/docs/amp.md, where its README
+ * link is relative to the plugin repository. On the site that relative URL
+ * would point at a page that does not exist, so map only that source link to
+ * its public GitHub destination. Other links, including Amp's manual, remain
+ * untouched.
+ */
+function rehypeUpstreamDocLinks() {
+  const rewrite = (/** @type {any} */ node) => {
+    if (
+      node.type === 'element' &&
+      node.tagName === 'a' &&
+      node.properties?.href === '../README.md'
+    ) {
+      node.properties.href =
+        'https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/README.md';
+    }
+    if (node.children) for (const child of node.children) rewrite(child);
+  };
+  return (/** @type {any} */ tree) => {
+    rewrite(tree);
+  };
+}
+
 export default defineConfig({
   site: 'https://phxagents.dev',
   // Astro 7 changed the default to 'jsx', which strips newline-only whitespace
@@ -75,7 +99,9 @@ export default defineConfig({
     // @astrojs/markdown-remark (the old `markdown.rehypePlugins` shorthand is
     // deprecated). shikiConfig stays at the markdown level — it's applied by
     // Astro's syntax highlighter, not the unified processor.
-    processor: unified({ rehypePlugins: [rehypeShiftHeadings, rehypeWrapTables] }),
+    processor: unified({
+      rehypePlugins: [rehypeShiftHeadings, rehypeWrapTables, rehypeUpstreamDocLinks],
+    }),
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark-dimmed' },
       langAlias: { heex: 'html', eex: 'html', sface: 'html' },
