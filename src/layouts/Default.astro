@@ -213,7 +213,10 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
         <div class="search-input-wrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="search" placeholder="Search skills, agents, docs…" autocomplete="off" spellcheck="false" data-search-input aria-label="Search input" />
-          <button class="esc-btn" data-search-close aria-label="Close search" type="button">esc</button>
+          <button class="esc-btn" data-search-close aria-label="Close search" type="button">
+            <span class="esc-label" aria-hidden="true">esc</span>
+            <svg class="esc-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
         </div>
         <div class="sr-only" aria-live="polite" data-search-status></div>
         <div class="search-results" data-search-results></div>
