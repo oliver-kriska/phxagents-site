@@ -17,10 +17,10 @@ import { stats } from '../data/stats';
           <table>
             <thead><tr><th>Tool</th><th>Version</th><th>Why</th></tr></thead>
             <tbody>
-              <tr><td><code>elixir</code></td><td>≥ 1.15</td><td>Pattern-matched function heads, ExUnit improvements</td></tr>
-              <tr><td><code>phoenix</code></td><td>1.7 or 1.8</td><td>Scope-aware codegen (1.8), <code>core_components</code> assumed</td></tr>
-              <tr><td><code>claude</code></td><td>≥ 1.0.50</td><td>Plugin manifest format v2</td></tr>
-              <tr><td><code>git</code></td><td>≥ 2.30</td><td>Required by <code>/phx:review</code> diff scanning</td></tr>
+              <tr><td data-label="Tool"><code>elixir</code></td><td data-label="Version">≥ 1.15</td><td data-label="Why">Pattern-matched function heads, ExUnit improvements</td></tr>
+              <tr><td data-label="Tool"><code>phoenix</code></td><td data-label="Version">1.7 or 1.8</td><td data-label="Why">Scope-aware codegen (1.8), <code>core_components</code> assumed</td></tr>
+              <tr><td data-label="Tool"><code>claude</code></td><td data-label="Version">≥ 1.0.50</td><td data-label="Why">Plugin manifest format v2</td></tr>
+              <tr><td data-label="Tool"><code>git</code></td><td data-label="Version">≥ 2.30</td><td data-label="Why">Required by <code>/phx:review</code> diff scanning</td></tr>
             </tbody>
           </table>
         </div>
@@ -87,36 +87,13 @@ import { stats } from '../data/stats';
           <table>
             <thead><tr><th>Client</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Claude Code</td><td><span class="cstat shipped">shipped (v{stats.version})</span></td></tr>
-              <tr><td>Amp</td><td><a href="/amp/"><span class="cstat shipped">skills edition available</span></a></td></tr>
-              <tr><td>Codex</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
-              <tr><td>OpenCode</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
-              <tr><td>Pi</td><td><span class="cstat pending">v3.0 · in review</span></td></tr>
+              <tr><td data-label="Client">Claude Code</td><td data-label="Status"><span class="cstat shipped">shipped (v{stats.version})</span></td></tr>
+              <tr><td data-label="Client">Amp</td><td data-label="Status"><a href="/amp/"><span class="cstat shipped">skills edition available</span></a></td></tr>
+              <tr><td data-label="Client">Codex</td><td data-label="Status"><span class="cstat pending">v3.0 · in review</span></td></tr>
+              <tr><td data-label="Client">OpenCode</td><td data-label="Status"><span class="cstat pending">v3.0 · in review</span></td></tr>
+              <tr><td data-label="Client">Pi</td><td data-label="Status"><span class="cstat pending">v3.0 · in review</span></td></tr>
             </tbody>
           </table>
-        </div>
-
-        <h2>Also in this marketplace: <code>catchup</code></h2>
-        <p>
-          The same marketplace ships a second, <strong>framework-agnostic</strong> plugin called <code>catchup</code> — async-team return-from-absence briefings. Fans out to GitHub, git, Linear MCP, and Google Calendar MCP, then emits one prioritized Context Brief instead of a firehose. Not required for phxagents.
-        </p>
-
-        <div class="code-block">
-          <div class="code-head">
-            <span>Install the companion</span>
-            <button class="copy" data-copy>Copy</button>
-          </div>
-          <pre>/plugin install catchup</pre>
-        </div>
-
-        <p>Then in any project — Elixir, Rails, Go, whatever:</p>
-
-        <div class="code-block">
-          <div class="code-head">
-            <span>Terminal</span>
-            <button class="copy" data-copy>Copy</button>
-          </div>
-          <pre>/catchup --since last-session</pre>
         </div>
   </div>
 </DocPage>
@@ -209,4 +186,42 @@ import { stats } from '../data/stats';
   }
   .cstat.shipped { color: var(--accent-fg); --dot: var(--accent); }
   .cstat.pending { color: var(--warn-fg); --dot: var(--warn); }
+
+  @media (max-width: 600px) {
+    .table-wrap { overflow: visible; }
+    .docs-body table { min-width: 0; }
+    .docs-body thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .docs-body tbody,
+    .docs-body tr,
+    .docs-body td { display: block; }
+    .docs-body tr {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .docs-body tr:last-child { border-bottom: 0; }
+    .docs-body td {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 12px;
+      padding: 4px 0;
+      border: 0;
+    }
+    .docs-body td::before {
+      content: attr(data-label);
+      color: var(--muted);
+      font: 500 10.5px/1.55 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+  }
 </style>

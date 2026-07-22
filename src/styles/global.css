@@ -26,6 +26,7 @@
   --danger:    oklch(60% 0.20 25);
   --danger-soft: oklch(96% 0.04 25);
   --info:      oklch(62% 0.13 240);
+  --info-fg:   oklch(47% 0.13 240);
   --info-soft: oklch(96% 0.03 240);
 
   --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -72,6 +73,7 @@
   --danger:    oklch(70% 0.20 25);
   --danger-soft: oklch(28% 0.08 25);
   --info:      oklch(72% 0.14 240);
+  --info-fg:   oklch(80% 0.11 240);
   --info-soft: oklch(28% 0.06 240);
 
   --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.30);
@@ -622,6 +624,9 @@ body.menu-open { overflow: hidden; }
   border-radius: var(--radius-sm);
 }
 .esc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -632,6 +637,7 @@ body.menu-open { overflow: hidden; }
   cursor: pointer;
   flex: none;
 }
+.esc-icon { display: none; }
 .esc-btn:hover { color: var(--fg); border-color: var(--border-strong); }
 .search-results {
   flex: 1;
@@ -696,18 +702,62 @@ body.menu-open { overflow: hidden; }
   /* Touch targets: nav chrome collapses to icon-only here, so raise every
      icon-only/primary control to the 44px minimum. */
   .icon-btn, .search-btn, .gh-stars { width: auto; height: 44px; }
+  .search-btn { min-width: 44px; justify-content: center; }
   .icon-btn { width: 44px; }
   .icon-btn svg { width: 18px; height: 18px; }
   .btn-primary, .btn-ghost, .btn-accent { min-height: 44px; }
   .esc-btn { min-height: 44px; padding: 0 12px; }
   .code-block .code-head { height: 40px; }
   .code-block .code-head .copy { padding: 8px 10px; }
+  .code-block pre {
+    overscroll-behavior-inline: contain;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    background: linear-gradient(to right, transparent calc(100% - 20px), color-mix(in oklab, var(--border) 55%, transparent));
+  }
+  .esc-btn { width: 44px; justify-content: center; }
+  .esc-label { display: none; }
+  .esc-icon { display: block; }
+  .search-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  .search-item .search-desc {
+    grid-column: 1 / -1;
+    display: -webkit-box;
+    overflow: hidden;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 }
 @media (max-width: 720px) {
+  .search-overlay {
+    padding: 12px;
+  }
+  .search-panel {
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+  }
   .nav .btn-primary,
   .nav .btn-ghost { display: none; }
   .nav-inner { gap: 12px; padding: 0 16px; }
   .nav-right { gap: 6px; }
+  .site-footer .wrap { align-items: flex-start; }
+  .site-footer .footer-links {
+    width: 100%;
+    margin-left: 0;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .site-footer .footer-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 10px;
+    margin-left: -10px;
+  }
 }
 @media (max-width: 560px) {
   .brand-name span { display: none; }

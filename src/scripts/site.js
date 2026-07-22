@@ -399,7 +399,7 @@ document.addEventListener('click', function (e) {
     .catch(() => {});
 });
 
-// Detail-page enhancements: copy buttons on rendered code + heading anchors.
+// Detail-page enhancements: copy buttons, local table of contents, and heading anchors.
 // Runs only where doc content exists (skill/agent pages); no-op elsewhere.
 (function () {
   const body = document.querySelector('.docs-body');
@@ -432,8 +432,27 @@ document.addEventListener('click', function (e) {
     pre.appendChild(btn);
   });
 
+  const headings = Array.from(body.querySelectorAll('h3[id], h4[id]'));
+  const tocLists = document.querySelectorAll('[data-page-toc-list]');
+  if (headings.length && tocLists.length) {
+    const escapeTocHtml = (value) => String(value).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+    );
+    const html = headings
+      .map((h) => {
+        const label = h.textContent.trim();
+        return '<li data-level="' + h.tagName.slice(1) + '"><a href="#' +
+          escapeTocHtml(h.id) + '">' + escapeTocHtml(label) + '</a></li>';
+      })
+      .join('');
+    tocLists.forEach((list) => { list.innerHTML = html; });
+    document.querySelectorAll('[data-page-toc], [data-mobile-page-toc]').forEach((toc) => {
+      toc.hidden = false;
+    });
+  }
+
   // Hover/focus-revealed anchor link on each section heading (ids emitted at build).
-  body.querySelectorAll('h3[id], h4[id]').forEach((h) => {
+  headings.forEach((h) => {
     if (h.querySelector('.heading-anchor')) return;
     const a = document.createElement('a');
     a.className = 'heading-anchor';

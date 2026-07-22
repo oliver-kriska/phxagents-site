@@ -134,29 +134,116 @@ const detailJsonLd = {
     )}
   </div>
 
-  <div class="docs-body">
-    <slot />
-  </div>
+  <div class="entity-layout">
+    <div class="entity-content">
+      <details class="mobile-toc" data-mobile-page-toc hidden>
+        <summary>On this page</summary>
+        <ol data-page-toc-list></ol>
+      </details>
 
-  {(prev || next) && (
-    <nav class="pager" aria-label={`${kind === 'agent' ? 'Agent' : 'Skill'} navigation`}>
-      {prev ? (
-        <a class="pager-link prev" href={prev.href} rel="prev">
-          <span class="pager-direction">← Previous</span>
-          <span class="pager-name">{pagerLabel(prev.name)}</span>
-        </a>
-      ) : <span class="pager-spacer" />}
-      {next ? (
-        <a class="pager-link next" href={next.href} rel="next">
-          <span class="pager-direction">Next →</span>
-          <span class="pager-name">{pagerLabel(next.name)}</span>
-        </a>
-      ) : <span class="pager-spacer" />}
-    </nav>
-  )}
+      <div class="docs-body">
+        <slot />
+      </div>
+
+      {(prev || next) && (
+        <nav class="pager" aria-label={`${kind === 'agent' ? 'Agent' : 'Skill'} navigation`}>
+          {prev ? (
+            <a class="pager-link prev" href={prev.href} rel="prev">
+              <span class="pager-direction">← Previous</span>
+              <span class="pager-name">{pagerLabel(prev.name)}</span>
+            </a>
+          ) : <span class="pager-spacer" />}
+          {next ? (
+            <a class="pager-link next" href={next.href} rel="next">
+              <span class="pager-direction">Next →</span>
+              <span class="pager-name">{pagerLabel(next.name)}</span>
+            </a>
+          ) : <span class="pager-spacer" />}
+        </nav>
+      )}
+    </div>
+
+    <aside class="page-toc" aria-label="On this page" data-page-toc hidden>
+      <p>On this page</p>
+      <ol data-page-toc-list></ol>
+    </aside>
+  </div>
 </DocPage>
 
 <style>
+  .entity-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) 180px;
+    gap: 32px;
+    align-items: start;
+  }
+  .entity-content { min-width: 0; }
+  .page-toc {
+    position: sticky;
+    top: calc(var(--nav-h) + 24px);
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+    max-height: calc(100vh - var(--nav-h) - 48px);
+    overflow-y: auto;
+  }
+  .page-toc p {
+    margin: 0 0 8px;
+    color: var(--fg);
+    font: 600 11px/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .page-toc ol,
+  .mobile-toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .page-toc li + li { margin-top: 2px; }
+  .page-toc li[data-level="4"] { padding-left: 12px; }
+  .page-toc a {
+    display: block;
+    padding: 4px 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+  .page-toc a:hover { color: var(--fg); }
+  .mobile-toc { display: none; }
+  .page-toc[hidden],
+  .mobile-toc[hidden] { display: none; }
+  .mobile-toc summary {
+    min-height: 44px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--fg);
+    font: 600 12px/1.4 var(--font-mono);
+  }
+  .mobile-toc summary::after {
+    content: "+";
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .mobile-toc[open] summary::after { content: "−"; }
+  .mobile-toc ol {
+    padding: 4px 12px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .mobile-toc li[data-level="4"] { padding-left: 14px; }
+  .mobile-toc a {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    color: var(--fg-soft);
+    font-size: 13px;
+    text-decoration: none;
+  }
+
   .crumbs {
     display: flex;
     align-items: center;
@@ -415,7 +502,23 @@ const detailJsonLd = {
     white-space: nowrap;
   }
   .pager-spacer {}
+  @media (max-width: 1180px) {
+    .entity-layout { display: block; }
+    .entity-content { max-width: 760px; }
+    .page-toc { display: none; }
+    .mobile-toc {
+      display: block;
+      margin: 0 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+  }
   @media (max-width: 600px) {
+    .synopsis {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
     .pager { grid-template-columns: 1fr; }
     .pager-link.next { text-align: left; }
   }

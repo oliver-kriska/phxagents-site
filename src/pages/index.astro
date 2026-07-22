@@ -41,8 +41,8 @@ const jsonLd = {
 ---
 
 <Default
-  title="Best AI coding agent for Elixir & Phoenix"
-  description="phxagents is the best AI coding agent for Elixir and Phoenix: a Claude Code plugin with specialist agents, parallel code review, Iron Laws, and Tidewave MCP integration."
+  title="Claude Code plugin for Elixir & Phoenix"
+  description="phxagents gives Claude Code specialist Elixir and Phoenix context through named agents, parallel code review, enforced Iron Laws, and Tidewave MCP integration."
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <section class="hero">
@@ -54,10 +54,10 @@ const jsonLd = {
             <a href={`https://github.com/oliver-kriska/claude-elixir-phoenix/releases/tag/${releaseTag}`} rel="noopener">{releaseTag}</a> · stable for Claude Code
           </div>
           <h1 class="headline">
-            Elixir &amp; Phoenix context for <em>Claude&nbsp;Code</em>, Codex, OpenCode &amp; Pi.
+            Elixir &amp; Phoenix context for <em>Claude&nbsp;Code</em>.
           </h1>
           <p class="lede">
-            <strong>The specialized Claude Code plugin for Elixir &amp; Phoenix.</strong> It teaches your AI editor how Phoenix actually works — contexts, scopes, LiveView async patterns, Ecto.Multi, Oban idempotency, and the Iron Laws (production safety rails that stop generated code from hurting you in prod). That focus is what makes phxagents the best AI coding agent for Elixir and Phoenix.
+            <strong>The specialized Claude Code plugin for Elixir &amp; Phoenix.</strong> It teaches your AI editor how Phoenix actually works — contexts, scopes, LiveView async patterns, Ecto.Multi, Oban idempotency, and the Iron Laws that stop generated code from hurting you in prod. Codex, OpenCode &amp; Pi adapters are in review for v3.0.
           </p>
 
           <div class="hero-cta">
@@ -417,7 +417,7 @@ const jsonLd = {
   .term-out { color: var(--fg-soft); padding-left: 18px; white-space: pre-wrap; }
   .term-out .ok { color: var(--accent); }
   .term-out .warn { color: var(--warn); }
-  .term-out .info { color: var(--info); }
+  .term-out .info { color: var(--info-fg); }
   .term-out .dim { color: var(--muted); }
   .term-cursor::after {
     content: "▍";
@@ -705,5 +705,11 @@ const jsonLd = {
   @media (max-width: 900px) {
     .hero-cta .btn-primary, .hero-cta .btn-ghost,
     .cta-band .btn-primary, .cta-band .btn-ghost { height: 44px; }
+    .workflow .cmd-inline {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 12px;
+    }
   }
 </style>
