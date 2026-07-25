@@ -1,17 +1,10 @@
 ---
 import Default from '../layouts/Default.astro';
 import { getCollection } from 'astro:content';
+import { getSkillIdentity } from '../lib/skillNames';
 
 const skills = await getCollection('skills');
 const agents = await getCollection('agents');
-
-function groupOf(name: string, kind: 'skill' | 'agent'): string {
-  if (kind === 'agent') return 'agent';
-  if (name.startsWith('phx:')) return 'phx';
-  if (name.startsWith('lv:')) return 'lv';
-  if (name.startsWith('ecto:')) return 'ecto';
-  return 'reference';
-}
 
 interface Item {
   type: 'skill' | 'agent';
@@ -24,10 +17,11 @@ interface Item {
 const items: Item[] = [
   ...skills.map((entry): Item => {
     const slug = entry.id.replace(/\/SKILL$/i, '');
+    const identity = getSkillIdentity(slug, entry.data.name);
     return {
       type: 'skill',
-      group: groupOf(entry.data.name, 'skill'),
-      name: entry.data.name,
+      group: identity.group,
+      name: identity.claudeName,
       desc: entry.data.description,
       slug: `/skills/${slug}/`,
     };
@@ -66,12 +60,12 @@ function displayName(item: Item): string {
 }
 ---
 
-<Default title="Catalog" description={`All ${items.length} skills and agents in the phxagents plugin.`} active="catalog">
-  <main class="catalog-shell" data-catalog>
+<Default title="Catalog" description={`All ${items.length} canonical skills and Claude Code agents in phxagents.`} active="catalog">
+  <div class="catalog-shell" data-catalog>
     <div class="catalog-head">
       <div>
         <h1>Catalog</h1>
-        <p>Every skill and agent that ships with phxagents. Search by name or behavior, filter by type or namespace.</p>
+        <p>Every canonical skill and Claude Code agent that ships with phxagents. Skills also generate for Amp, Codex, Pi and OpenCode. <a href="/compatibility/">Compare runtimes →</a></p>
       </div>
       <div class="summary">
         <b><span data-catalog-count aria-live="polite">{items.length}</span></b>
@@ -126,7 +120,7 @@ function displayName(item: Item): string {
       Try a different term, or
       <button class="catalog-clear-link" data-catalog-clear type="button">clear all filters</button>.
     </div>
-  </main>
+  </div>
 </Default>
 
 <script>

@@ -1,0 +1,120 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+  variant: 'desktop' | 'mobile';
+  forceVisible?: boolean;
+}
+
+const { headings, variant, forceVisible = false } = Astro.props;
+// rehypeShiftHeadings runs before Astro collects headings, so source ##/###
+// sections arrive here as depth 3/4. Depth 2 is the duplicate document title.
+const items = headings.filter((heading) => heading.depth === 3 || heading.depth === 4);
+const shouldRender = items.length >= 3;
+---
+
+{shouldRender && variant === 'desktop' && (
+  <aside class="page-toc" aria-label="On this page">
+    <p>On this page</p>
+    <ol>
+      {items.map((heading) => (
+        <li data-level={heading.depth}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </aside>
+)}
+
+{shouldRender && variant === 'mobile' && (
+  <details class:list={["mobile-toc", { "force-visible": forceVisible }]}>
+    <summary>On this page</summary>
+    <ol>
+      {items.map((heading) => (
+        <li data-level={heading.depth}>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+        </li>
+      ))}
+    </ol>
+  </details>
+)}
+
+<style>
+  .page-toc {
+    position: sticky;
+    top: calc(var(--nav-h) + 24px);
+    padding-left: 16px;
+    border-left: 1px solid var(--border);
+    max-height: calc(100vh - var(--nav-h) - 48px);
+    overflow-y: auto;
+  }
+  .page-toc p {
+    margin: 0 0 8px;
+    color: var(--fg);
+    font: 600 11px/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .page-toc ol,
+  .mobile-toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .page-toc li + li { margin-top: 2px; }
+  .page-toc li[data-level="4"] { padding-left: 12px; }
+  .page-toc a {
+    display: block;
+    padding: 4px 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+  .page-toc a:hover { color: var(--fg); }
+
+  .mobile-toc {
+    display: none;
+    margin: 0 0 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .mobile-toc.force-visible { display: block; }
+  .mobile-toc summary {
+    min-height: 44px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--fg);
+    font: 600 12px/1.4 var(--font-mono);
+  }
+  .mobile-toc summary::after {
+    content: "+";
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .mobile-toc[open] summary::after { content: "−"; }
+  .mobile-toc ol {
+    padding: 4px 12px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .mobile-toc li[data-level="4"] { padding-left: 14px; }
+  .mobile-toc a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--fg-soft);
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  @media (max-width: 1180px) {
+    .page-toc { display: none; }
+    .mobile-toc { display: block; }
+  }
+</style>

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { getSkillIdentity } from '../lib/skillNames';
 
 export const GET: APIRoute = async () => {
   const skills = await getCollection('skills');
@@ -14,15 +15,13 @@ export const GET: APIRoute = async () => {
   }[] = [
     ...skills.map((entry) => {
       const slug = entry.id.replace(/\/SKILL$/i, '');
-      const group = entry.data.name.includes(':')
-        ? entry.data.name.split(':')[0]
-        : 'reference';
+      const identity = getSkillIdentity(slug, entry.data.name);
       return {
         type: 'skill' as const,
-        name: entry.data.name,
+        name: identity.claudeName,
         desc: entry.data.description,
         url: `/skills/${slug}/`,
-        group,
+        group: identity.group,
       };
     }),
     ...agents.map((entry) => ({
@@ -35,8 +34,15 @@ export const GET: APIRoute = async () => {
     {
       type: 'page' as const,
       name: 'Install',
-      desc: 'How to install the phxagents plugin in Claude Code.',
+      desc: 'Install phxagents for Claude Code, Amp, Codex, Pi, or OpenCode.',
       url: '/install/',
+      group: 'docs',
+    },
+    {
+      type: 'page' as const,
+      name: 'Runtime compatibility',
+      desc: 'Compare supported and deferred phxagents capabilities across five AI coding runtimes.',
+      url: '/compatibility/',
       group: 'docs',
     },
     {
@@ -48,9 +54,30 @@ export const GET: APIRoute = async () => {
     },
     {
       type: 'page' as const,
-      name: 'Amp',
-      desc: 'Install and use the phxagents Elixir and Phoenix skills with Amp.',
-      url: '/amp/',
+      name: 'Install for Amp',
+      desc: 'Install and use all phxagents skills as Amp Agent Skills.',
+      url: '/install/amp/',
+      group: 'docs',
+    },
+    {
+      type: 'page' as const,
+      name: 'Install for Codex',
+      desc: 'Install phxagents as a native Codex skills plugin.',
+      url: '/install/codex/',
+      group: 'docs',
+    },
+    {
+      type: 'page' as const,
+      name: 'Install for Pi',
+      desc: 'Install phxagents through Pi’s native Git package support.',
+      url: '/install/pi/',
+      group: 'docs',
+    },
+    {
+      type: 'page' as const,
+      name: 'Install for OpenCode',
+      desc: 'Install the generated phxagents skill tree for OpenCode.',
+      url: '/install/opencode/',
       group: 'docs',
     },
     {
@@ -58,6 +85,13 @@ export const GET: APIRoute = async () => {
       name: 'Iron Laws',
       desc: 'Non-negotiable rules that prevent the bugs Elixir tests don\'t catch.',
       url: '/iron-laws/',
+      group: 'docs',
+    },
+    {
+      type: 'page' as const,
+      name: 'Tidewave MCP',
+      desc: 'Use Tidewave runtime introspection with phxagents in a running Phoenix application.',
+      url: '/tidewave-mcp/',
       group: 'docs',
     },
     {

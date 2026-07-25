@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import DocsLayout from '../../components/DocsLayout.astro';
+import { getSkillIdentity } from '../../lib/skillNames';
 
 export async function getStaticPaths() {
   const skills = await getCollection('skills');
@@ -16,13 +17,19 @@ export async function getStaticPaths() {
         entry,
         prev: prev
           ? {
-              name: prev.data.name,
+              name: getSkillIdentity(
+                prev.id.replace(/\/SKILL$/i, ''),
+                prev.data.name
+              ).claudeName,
               slug: prev.id.replace(/\/SKILL$/i, ''),
             }
           : null,
         next: next
           ? {
-              name: next.data.name,
+              name: getSkillIdentity(
+                next.id.replace(/\/SKILL$/i, ''),
+                next.data.name
+              ).claudeName,
               slug: next.id.replace(/\/SKILL$/i, ''),
             }
           : null,
@@ -32,7 +39,7 @@ export async function getStaticPaths() {
 }
 
 const { entry, prev, next } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 const { name, description, effort } = entry.data;
 const rawHint = entry.data['argument-hint'];
 const argumentHint = Array.isArray(rawHint)
@@ -57,6 +64,7 @@ const nextNav = next ? { name: next.name, href: `/skills/${next.slug}/` } : null
   effort={effort}
   argumentHint={argumentHint}
   sourceUrl={sourceUrl}
+  headings={headings}
   prev={prevNav}
   next={nextNav}
 >

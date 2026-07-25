@@ -1,0 +1,44 @@
+---
+import UpstreamDocPage from '../../components/UpstreamDocPage.astro';
+
+export function getStaticPaths() {
+  const runtimes = {
+    amp: {
+      entryId: 'amp',
+      title: 'Install phxagents for Amp',
+      description: 'Install all canonical phxagents skills as project-local or global Amp Agent Skills.',
+    },
+    codex: {
+      entryId: 'codex',
+      title: 'Install phxagents for Codex',
+      description: 'Install the generated phxagents target as a native Codex skills plugin.',
+    },
+    pi: {
+      entryId: 'pi',
+      title: 'Install phxagents for Pi',
+      description: 'Install the generated phxagents skills package through Pi’s native Git package support.',
+    },
+    opencode: {
+      entryId: 'opencode',
+      title: 'Install phxagents for OpenCode',
+      description: 'Install the generated phxagents skill tree with a project-local or global sparse checkout.',
+    },
+  };
+
+  return Object.entries(runtimes).map(([runtime, data]) => ({
+    params: { runtime },
+    props: data,
+  }));
+}
+
+const { entryId, title, description } = Astro.props;
+const runtime = Astro.params.runtime!;
+---
+
+<UpstreamDocPage
+  entryId={entryId}
+  title={title}
+  description={description}
+  pageUrl={`https://phxagents.dev/install/${runtime}/`}
+  breadcrumb={runtime === 'opencode' ? 'OpenCode' : runtime === 'codex' ? 'Codex' : runtime === 'amp' ? 'Amp' : 'Pi'}
+/>

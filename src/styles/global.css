@@ -378,6 +378,8 @@ pre {
   font-variant-ligatures: none;
 }
 
+.table-scroll-hint { display: none; }
+
 /* Shiki-generated code blocks */
 .astro-code,
 pre.astro-code {
@@ -680,9 +682,20 @@ body.menu-open { overflow: hidden; }
 }
 .site-footer .wrap {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 24px;
+}
+.site-footer .footer-identity {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 8px 16px;
+}
+.site-footer .footer-note {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
+  font-weight: 400;
 }
 .site-footer .footer-links {
   display: flex;
@@ -707,8 +720,13 @@ body.menu-open { overflow: hidden; }
   .icon-btn svg { width: 18px; height: 18px; }
   .btn-primary, .btn-ghost, .btn-accent { min-height: 44px; }
   .esc-btn { min-height: 44px; padding: 0 12px; }
-  .code-block .code-head { height: 40px; }
-  .code-block .code-head .copy { padding: 8px 10px; }
+  .code-block .code-head { height: 44px; }
+  .code-block .code-head .copy {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 10px;
+  }
   .code-block pre {
     overscroll-behavior-inline: contain;
     white-space: pre-wrap;
@@ -732,6 +750,15 @@ body.menu-open { overflow: hidden; }
     -webkit-line-clamp: 2;
   }
 }
+@media (max-width: 600px) {
+  code:not(pre code) { overflow-wrap: anywhere; }
+  .table-scroll-hint {
+    display: block;
+    margin: 0 0 6px;
+    color: var(--muted);
+    font: 500 11.5px/1.4 var(--font-mono);
+  }
+}
 @media (max-width: 720px) {
   .search-overlay {
     padding: 12px;
@@ -744,7 +771,8 @@ body.menu-open { overflow: hidden; }
   .nav .btn-ghost { display: none; }
   .nav-inner { gap: 12px; padding: 0 16px; }
   .nav-right { gap: 6px; }
-  .site-footer .wrap { align-items: flex-start; }
+  .site-footer .footer-identity { grid-template-columns: 1fr; gap: 6px; }
+  .site-footer .footer-note { grid-column: auto; max-width: 42ch; }
   .site-footer .footer-links {
     width: 100%;
     margin-left: 0;
@@ -761,6 +789,9 @@ body.menu-open { overflow: hidden; }
 }
 @media (max-width: 560px) {
   .brand-name span { display: none; }
+}
+@media (max-width: 380px) {
+  .nav .gh-stars { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

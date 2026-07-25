@@ -1,32 +1,58 @@
 ---
 import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
+import { getPortableWorkflowNames } from '../lib/skillNames';
+
+const adaptedWorkflows = getPortableWorkflowNames().length;
 ---
 
-<DocPage title="Install" description="How to install the phxagents plugin in Claude Code." active="docs">
+<DocPage title="Install" description="Install phxagents v3 for Claude Code, Amp, Codex, Pi, or OpenCode." active="docs">
   <div class="page-head">
-        <h1>Install phxagents</h1>
+        <h1>Install phxagents v{stats.version}</h1>
         <p class="lede">
-          A 30-second installation that adds <strong>{stats.skills} skills</strong> and <strong>{stats.agents} agents</strong> to your Claude Code sessions for Elixir &amp; Phoenix work. Codex, OpenCode and Pi adapters land in v3.0 — track <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/pull/46" rel="noopener">PR #46</a>.
+          One canonical set of <strong>{stats.skills} Elixir &amp; Phoenix skills</strong>, packaged for five AI coding runtimes. Claude Code installs the full plugin with <strong>{stats.agents} named agents and hooks</strong>; Amp, Codex, Pi and OpenCode install generated, runtime-native skill editions.
         </p>
       </div>
 
       <div class="docs-body">
-        <h2>Requirements</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Tool</th><th>Version</th><th>Why</th></tr></thead>
-            <tbody>
-              <tr><td data-label="Tool"><code>elixir</code></td><td data-label="Version">≥ 1.15</td><td data-label="Why">Pattern-matched function heads, ExUnit improvements</td></tr>
-              <tr><td data-label="Tool"><code>phoenix</code></td><td data-label="Version">1.7 or 1.8</td><td data-label="Why">Scope-aware codegen (1.8), <code>core_components</code> assumed</td></tr>
-              <tr><td data-label="Tool"><code>claude</code></td><td data-label="Version">≥ 1.0.50</td><td data-label="Why">Plugin manifest format v2</td></tr>
-              <tr><td data-label="Tool"><code>git</code></td><td data-label="Version">≥ 2.30</td><td data-label="Why">Required by <code>/phx:review</code> diff scanning</td></tr>
-            </tbody>
-          </table>
+        <div class="runtime-heading">
+          <h2>Choose your runtime</h2>
+          <a class="cmd-inline" href="/compatibility/">Compare capabilities →</a>
+        </div>
+        <div class="runtime-list">
+          <a href="#claude-code">
+            <span class="runtime-mark">CC</span>
+            <span><strong>Claude Code</strong><small>Full canonical plugin · skills, agents, hooks and permissions</small></span>
+            <code>/phx:*</code>
+          </a>
+          <a href="/install/amp/">
+            <span class="runtime-mark">A</span>
+            <span><strong>Amp</strong><small>Generated Agent Skills · project-local or global</small></span>
+            <code>skill: invoke</code>
+          </a>
+          <a href="/install/codex/">
+            <span class="runtime-mark">CX</span>
+            <span><strong>Codex</strong><small>Native skills plugin · optional trust-gated safety hook</small></span>
+            <code>$elixir-phoenix:*</code>
+          </a>
+          <a href="/install/pi/">
+            <span class="runtime-mark">π</span>
+            <span><strong>Pi</strong><small>Native Git skills package</small></span>
+            <code>/skill:*</code>
+          </a>
+          <a href="/install/opencode/">
+            <span class="runtime-mark">OC</span>
+            <span><strong>OpenCode</strong><small>Generated skills via sparse Git checkout</small></span>
+            <code>skill tool</code>
+          </a>
+        </div>
+        <div class="callout info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
+          <div><strong>Using Amp, Codex, Pi or OpenCode?</strong> Choose it above to open its complete guide. Continue below only to install the full Claude Code plugin.</div>
         </div>
 
-        <h2 id="install">Installation</h2>
-        <p>Run these in Claude Code, one at a time:</p>
+        <h2 id="claude-code">Claude Code — install the full plugin</h2>
+        <p>Run these inside Claude Code, one at a time:</p>
 
         <div class="code-block">
           <div class="code-head">
@@ -44,15 +70,42 @@ import { stats } from '../data/stats';
           <pre>/plugin install elixir-phoenix</pre>
         </div>
 
-        <p>The plugin auto-loads relevant skills based on the file you’re editing. No configuration required.</p>
+        <p>A fresh v3 install automatically pulls the small <code>ecto</code> and <code>lv</code> compatibility namespaces that preserve <code>/ecto:*</code> and <code>/lv:*</code> commands. Run <code>/reload-plugins</code> in an open session before using the new skills, agents and hooks.</p>
+
+        <h2>Updating from v2.x</h2>
+        <p>Install the new command-compatibility dependencies before updating the main plugin:</p>
+
+        <div class="code-block">
+          <div class="code-head">
+            <span>Terminal</span>
+            <button class="copy" data-copy>Copy</button>
+          </div>
+          <pre>claude plugin marketplace update oliver-kriska
+claude plugin install ecto@oliver-kriska
+claude plugin install lv@oliver-kriska
+claude plugin update elixir-phoenix@oliver-kriska</pre>
+        </div>
+
+        <p>Restart Claude Code afterward. Confirm that <code>/phx:help</code>, <code>/ecto:n1-check</code>, and <code>/lv:assigns</code> appear before continuing work.</p>
 
         <h2>What gets installed</h2>
         <ul>
-          <li><strong>{stats.agents} specialist agents</strong> — orchestrators, reviewers, architects</li>
-          <li><strong>{stats.skills} skills</strong> with progressive disclosure (Iron Laws inline, references on demand)</li>
-          <li>Hooks that auto-format Elixir, verify Iron Laws, detect debug statements</li>
-          <li><a href="/tidewave-mcp/">Tidewave MCP integration</a> for runtime introspection — live SQL, Ecto schemas, version-exact docs</li>
+          <li><strong>Every runtime:</strong> all {stats.skills} canonical skills, complete bundled resources, and {adaptedWorkflows} fully adapted workflows.</li>
+          <li><strong>Claude Code:</strong> {stats.agents} specialist agents, lifecycle and enforcement hooks, root instructions, permissions, and full workflow orchestration.</li>
+          <li><strong>Amp, Codex, Pi, OpenCode:</strong> generated skill distributions with native names and invocation. Named Claude agents and its broad hook set are not silently emulated.</li>
+          <li><strong>Tidewave MCP:</strong> supported when your project and client already expose it; registration remains external to every edition.</li>
         </ul>
+
+        <h2>After install</h2>
+        <p>In Claude Code, run <code>/phx:intro</code> for a guided walkthrough. In another runtime, load <code>phx-plan</code>, <code>phx-investigate</code>, or <code>phx-review</code> with the native syntax shown in its install guide.</p>
+
+        <div class="code-block">
+          <div class="code-head">
+            <span>Claude Code</span>
+            <button class="copy" data-copy>Copy</button>
+          </div>
+          <pre>/phx:plan Add a unique constraint on the email column</pre>
+        </div>
 
         <h2 id="security">Security &amp; trust</h2>
         <p>
@@ -62,7 +115,8 @@ import { stats } from '../data/stats';
           a static security scanner for AI-agent skills. The scan runs with <strong>zero data egress</strong>.
         </p>
         <ul>
-          <li><strong>65 / 75 components SAFE</strong> on a raw static scan; <strong>75 / 75</strong> after reviewed baselines.</li>
+          <li><strong>The baseline-aware repository scan passes</strong> after reviewed false-positive baselines. The current raw totals and every baseline decision live in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.</li>
+          <li>Lower-scoring <strong>CAUTION</strong> components remain documented rather than being hidden behind baselines.</li>
           <li>The few higher-scoring components are <strong>documented false positives</strong> — a static scanner flags the safety-enforcing and security-auditing skills precisely because they name dangerous patterns in order to <em>forbid or detect</em> them (one flagged line literally reads <code>NEVER bypass security checks for speed</code>).</li>
           <li><strong>No data exfiltration</strong>, <strong>read-only review agents</strong> (source edits disallowed), and <strong>auditable bash hooks</strong>.</li>
         </ul>
@@ -70,31 +124,6 @@ import { stats } from '../data/stats';
           Read the full report, line-by-line triage, and a reproduce-it-yourself command in
           <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.
         </p>
-
-        <h2>After install</h2>
-        <p>Run <code>/phx:intro</code> for a guided walkthrough, or jump straight in:</p>
-
-        <div class="code-block">
-          <div class="code-head">
-            <span>Terminal</span>
-            <button class="copy" data-copy>Copy</button>
-          </div>
-          <pre>/phx:plan Add a unique constraint on the email column</pre>
-        </div>
-
-        <h2>Client support</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Client</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td data-label="Client">Claude Code</td><td data-label="Status"><span class="cstat shipped">shipped (v{stats.version})</span></td></tr>
-              <tr><td data-label="Client">Amp</td><td data-label="Status"><a href="/amp/"><span class="cstat shipped">skills edition available</span></a></td></tr>
-              <tr><td data-label="Client">Codex</td><td data-label="Status"><span class="cstat pending">v3.0 · in review</span></td></tr>
-              <tr><td data-label="Client">OpenCode</td><td data-label="Status"><span class="cstat pending">v3.0 · in review</span></td></tr>
-              <tr><td data-label="Client">Pi</td><td data-label="Status"><span class="cstat pending">v3.0 · in review</span></td></tr>
-            </tbody>
-          </table>
-        </div>
   </div>
 </DocPage>
 
@@ -141,87 +170,79 @@ import { stats } from '../data/stats';
     line-height: 1.65;
   }
   .docs-body li { margin: 4px 0; }
-  .table-wrap {
-    margin: 14px 0 22px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+  .runtime-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
   }
-  .docs-body table {
-    width: 100%;
-    min-width: 480px;
-    border-collapse: collapse;
-    margin: 0;
-    font-size: 13.5px;
-  }
-  .docs-body th, .docs-body td {
-    padding: 10px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  .docs-body th {
-    font-weight: 500;
-    font-size: 11.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    background: var(--surface-2);
-    color: var(--muted);
-    font-family: var(--font-mono);
-  }
-  .docs-body tr:last-child td { border-bottom: 0; }
-  .cstat {
+  .runtime-heading h2 { margin-bottom: 0; }
+  .runtime-heading .cmd-inline {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    font-size: 13px;
-    font-weight: 500;
-  }
-  .cstat::before {
-    content: "";
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--dot, currentColor);
+    min-height: 36px;
     flex: none;
   }
-  .cstat.shipped { color: var(--accent-fg); --dot: var(--accent); }
-  .cstat.pending { color: var(--warn-fg); --dot: var(--warn); }
+  .runtime-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 14px 0 22px;
+  }
+  .runtime-list > a {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--fg-soft);
+    text-decoration: none;
+    transition: border-color 140ms ease, background 140ms ease;
+  }
+  .runtime-list > a:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .runtime-list > a:first-child { grid-column: 1 / -1; }
+  .runtime-mark {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--accent-fg);
+    font: 600 10px/1 var(--font-mono);
+  }
+  .runtime-list > a > span:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .runtime-list strong {
+    color: var(--fg);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .runtime-list small {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .runtime-list code {
+    color: var(--accent-fg);
+    font-size: 10.5px;
+    white-space: nowrap;
+  }
 
   @media (max-width: 600px) {
-    .table-wrap { overflow: visible; }
-    .docs-body table { min-width: 0; }
-    .docs-body thead {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-    .docs-body tbody,
-    .docs-body tr,
-    .docs-body td { display: block; }
-    .docs-body tr {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-    .docs-body tr:last-child { border-bottom: 0; }
-    .docs-body td {
-      display: grid;
-      grid-template-columns: 72px minmax(0, 1fr);
-      gap: 12px;
-      padding: 4px 0;
-      border: 0;
-    }
-    .docs-body td::before {
-      content: attr(data-label);
-      color: var(--muted);
-      font: 500 10.5px/1.55 var(--font-mono);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
+    .runtime-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+    .runtime-heading .cmd-inline { min-height: 44px; }
+    .runtime-list { grid-template-columns: 1fr; }
+    .runtime-list > a:first-child { grid-column: auto; }
   }
 </style>

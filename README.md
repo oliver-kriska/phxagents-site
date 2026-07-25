@@ -2,7 +2,8 @@
 
 Documentation site for the
 [phxagents plugin](https://github.com/oliver-kriska/claude-elixir-phoenix) —
-Iron Laws and specialist Elixir/Phoenix guidance for Claude Code and Amp.
+Iron Laws and specialist Elixir/Phoenix guidance for Claude Code, Amp, Codex,
+Pi, and OpenCode.
 
 Live at **[phxagents.dev](https://phxagents.dev)**.
 
@@ -14,15 +15,15 @@ code.** The plugin lives in
 This repo:
 
 1. Clones the plugin repo at build time (`scripts/clone-source.sh`)
-2. Reads skills, agents, references, the Amp guide, and release data from the
+2. Reads skills, agents, references, runtime guides, and release data from the
    cloned source
 3. Generates a static Astro site with auto-derived pages, counts, and stats
 4. Deploys to Cloudflare Pages on push to `main` or a repository dispatch from
    the plugin repo
 
 **You should never hand-edit content that exists in the plugin repo.** Skill
-pages, agent pages, the Amp guide, homepage stat counters, and version data are
-derived at build time. Edit those in the plugin repo.
+pages, agent pages, runtime guides, homepage stat counters, and version data
+are derived at build time. Edit those in the plugin repo.
 
 ## Stack
 
@@ -53,7 +54,8 @@ phxagents-site/
     │   ├── stats.ts             build-time counts derived from filesystem
     │   └── release.ts           latest GitHub release fetcher
     ├── pages/
-    │   ├── amp.astro            renders plugin-source/docs/amp.md
+    │   ├── install/             generated Amp, Codex, Pi, and OpenCode guides
+    │   ├── compatibility.astro  renders the upstream runtime capability matrix
     │   ├── skills/              auto-generated skill pages from plugin repo
     │   ├── agents/              auto-generated agent pages from plugin repo
     │   ├── og/                  build-time Open Graph images
@@ -93,7 +95,7 @@ npm run dev
 ```
 
 The symlink lives at `./plugin-source` and is gitignored. Edits to skills,
-agents, references, and `docs/amp.md` in the plugin repo are available to the
+agents, references, and runtime guides in the plugin repo are available to the
 local site build without copying content between repositories.
 
 ### Daily workflow
@@ -142,14 +144,16 @@ count, name, and link on this site is derived at build time:
 
 | Site value | Source |
 | --- | --- |
-| Plugin version | `.claude-plugin/plugin.json` |
+| Plugin version | `plugins/elixir-phoenix/.claude-plugin/plugin.json` |
 | Skill count | filesystem (glob count) |
 | Agent count | filesystem (glob count) |
 | Reference count | filesystem (glob count) |
 | Iron Laws count | parsed from `CLAUDE.md` (Phase A) → `laws.yaml` (Phase C) |
 | Skill pages | `plugins/elixir-phoenix/skills/*/SKILL.md` |
 | Agent pages | `plugins/elixir-phoenix/agents/*.md` |
-| Amp installation and usage guide | `docs/amp.md` |
+| Runtime compatibility matrix | `docs/runtime-support.md` |
+| Runtime installation and usage guides | `docs/{amp,codex,pi,opencode}.md` |
+| Claude and generated command names | `scripts/port_lib/skill_transforms.py` |
 | Hero tagline | `plugin.json.description` |
 | Latest release | GitHub Releases API at build (cached) |
 
@@ -166,9 +170,10 @@ Site presentation and integration code:
 - `src/styles/global.css` — design tokens and shared styles
 - `public/` and `src/assets/` — static brand assets
 
-Canonical skill, agent, reference, and Amp guide content belongs in the plugin
-repository. The `/amp/` page deliberately fails its build if `docs/amp.md` is
-missing rather than falling back to a duplicated site copy.
+Canonical skill, agent, reference, compatibility, and runtime-guide content
+belongs in the plugin repository. The corresponding site routes deliberately
+fail their build when upstream content is missing rather than falling back to a
+duplicated site copy.
 
 ## Deployment
 
@@ -190,11 +195,15 @@ repository needs the Cloudflare account and API-token secrets documented in
 
 ## Client documentation
 
-| Client | Status |
-| --- | --- |
-| Claude Code | Full plugin documentation |
-| Amp | Generated 51-skill edition at `/amp/` |
-| Codex, OpenCode, Pi | Broader adapter work remains in review upstream |
+| Runtime | Distribution | Guide |
+| --- | --- | --- |
+| Claude Code | Full plugin: canonical skills, specialist agents, hooks, commands, MCP, and orchestration | [`/install/`](/install/) |
+| Amp | Generated canonical skill distribution | [`/install/amp/`](/install/amp/) |
+| Codex | Generated canonical skill distribution | [`/install/codex/`](/install/codex/) |
+| Pi | Generated canonical skill distribution | [`/install/pi/`](/install/pi/) |
+| OpenCode | Generated canonical skill distribution | [`/install/opencode/`](/install/opencode/) |
+
+See the canonical capability matrix at [`/compatibility/`](/compatibility/).
 
 Full architecture and rationale:
 `.claude/research/2026-05-08-phxagents-website-architecture.md` in the plugin

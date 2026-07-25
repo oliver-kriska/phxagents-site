@@ -1,20 +1,28 @@
 ---
 import { getEntry, render } from 'astro:content';
 import DocPage from '../layouts/DocPage.astro';
+import PageToc from './PageToc.astro';
 
-const title = 'Use the Elixir/Phoenix Skills with Amp';
-const description =
-  'Install and use the phxagents Elixir, Phoenix, LiveView, Ecto, Oban, testing, and security skills as first-class Amp Agent Skills.';
-const pageUrl = 'https://phxagents.dev/amp/';
+interface Props {
+  entryId: 'amp' | 'codex' | 'pi' | 'opencode' | 'runtime-support';
+  title: string;
+  description: string;
+  pageUrl: string;
+  breadcrumb: string;
+  wide?: boolean;
+}
 
-const entry = await getEntry('upstreamDocs', 'amp');
+const { entryId, title, description, pageUrl, breadcrumb, wide = false } = Astro.props;
+const entry = await getEntry('upstreamDocs', entryId);
+
 if (!entry) {
   throw new Error(
-    'Missing canonical Amp documentation at plugin-source/docs/amp.md. Clone or link the plugin source before building.'
+    `Missing canonical runtime documentation at plugin-source/docs/${entryId}.md. Clone or link the plugin source before building.`
   );
 }
-const { Content } = await render(entry);
 
+const { Content, headings } = await render(entry);
+const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/docs/${entryId}.md`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -22,7 +30,7 @@ const jsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
-        { '@type': 'ListItem', position: 2, name: 'Amp', item: pageUrl },
+        { '@type': 'ListItem', position: 2, name: breadcrumb, item: pageUrl },
       ],
     },
     {
@@ -41,31 +49,64 @@ const jsonLd = {
 };
 ---
 
-<DocPage title="Amp" seoTitle={`${title} — phxagents`} description={description} active="docs">
+<DocPage title={breadcrumb} seoTitle={`${title} — phxagents`} description={description} active="runtimes">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <div class="page-head">
-    <h1>{title}</h1>
+    <div>
+      <h1>{title}</h1>
+      <p>{description}</p>
+    </div>
+    <a class="btn-ghost" href={sourceUrl} rel="noopener">View source</a>
   </div>
-  <div class="docs-body">
-    <Content />
+  <div class:list={["upstream-layout", { wide }]}>
+    <div class="upstream-content">
+      <PageToc headings={headings} variant="mobile" forceVisible={wide} />
+      <div class:list={["docs-body", { wide }]}>
+        <Content />
+      </div>
+    </div>
+    {!wide && <PageToc headings={headings} variant="desktop" />}
   </div>
 </DocPage>
 
 <style>
+  .page-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 0 0 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
   .page-head h1 {
     font-size: clamp(28px, 3.4vw, 38px);
     line-height: 1.1;
     letter-spacing: -0.02em;
-    margin: 0 0 32px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
+    margin: 0;
     font-weight: 600;
     color: var(--fg);
+    text-wrap: balance;
   }
+  .page-head p {
+    margin: 8px 0 0;
+    color: var(--fg-soft);
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 640px;
+  }
+  .page-head .btn-ghost { flex: none; }
+  .upstream-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) 180px;
+    gap: 32px;
+    align-items: start;
+  }
+  .upstream-layout.wide { display: block; }
+  .upstream-content { min-width: 0; }
   .docs-body { max-width: 720px; }
-  /* The Markdown H1 is shifted to H2 by the site's standard processor. Keep it
-     in the accessibility tree while the page header above supplies the sole H1. */
+  .docs-body.wide { max-width: 920px; }
   .docs-body :global(h2:first-child) {
     position: absolute;
     width: 1px;
@@ -98,7 +139,7 @@ const jsonLd = {
     color: var(--fg-soft);
     line-height: 1.65;
     font-size: 14.5px;
-    max-width: 640px;
+    max-width: 680px;
   }
   .docs-body :global(ul), .docs-body :global(ol) {
     margin: 0 0 16px;
@@ -106,7 +147,7 @@ const jsonLd = {
     color: var(--fg-soft);
     font-size: 14.5px;
     line-height: 1.65;
-    max-width: 640px;
+    max-width: 680px;
   }
   .docs-body :global(li) { margin: 4px 0; }
   .docs-body :global(a) {
@@ -128,20 +169,33 @@ const jsonLd = {
     overflow-x: auto;
   }
   .docs-body :global(pre.has-copy) { padding-right: 58px; }
-  .docs-body :global(.table-wrap) {
+  .docs-body :global(blockquote) {
     margin: 14px 0 22px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--info);
+    border-radius: var(--radius);
+    background: var(--info-soft);
+    color: var(--fg-soft);
+  }
+  .docs-body :global(blockquote p:last-child) { margin-bottom: 0; }
+  .docs-body :global(.table-wrap) {
+    margin: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
     border: 1px solid var(--border);
     border-radius: var(--radius);
   }
+  .docs-body :global(.table-region) { margin: 14px 0 22px; }
   .docs-body :global(table) {
     width: 100%;
-    min-width: 480px;
+    min-width: 560px;
     border-collapse: collapse;
     margin: 0;
     font-size: 13.5px;
   }
+  .docs-body.wide :global(table) { min-width: 820px; }
   .docs-body :global(th), .docs-body :global(td) {
     padding: 10px 14px;
     text-align: left;
@@ -158,6 +212,18 @@ const jsonLd = {
     font-family: var(--font-mono);
   }
   .docs-body :global(tr:last-child td) { border-bottom: 0; }
+  .docs-body :global(h3), .docs-body :global(h4) { position: relative; }
+  :global(.heading-anchor) {
+    margin-left: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 120ms;
+  }
+  :global(.docs-body h3:hover .heading-anchor),
+  :global(.docs-body h4:hover .heading-anchor),
+  :global(.heading-anchor:focus-visible) { opacity: 1; }
   :global(.code-copy) {
     position: absolute;
     top: 8px;
@@ -172,4 +238,24 @@ const jsonLd = {
     transition: color 120ms, border-color 120ms;
   }
   :global(.code-copy:hover) { color: var(--fg); border-color: var(--border-strong); }
+  @media (max-width: 1180px) {
+    .upstream-layout { display: block; }
+    .upstream-content:not(:has(.docs-body.wide)) { max-width: 760px; }
+  }
+  @media (max-width: 900px) {
+    :global(.code-copy) {
+      top: 4px;
+      right: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+    }
+  }
+  @media (max-width: 600px) {
+    .page-head { display: block; }
+    .page-head .btn-ghost { margin-top: 16px; min-height: 44px; }
+  }
 </style>

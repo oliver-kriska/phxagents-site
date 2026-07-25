@@ -1,15 +1,4 @@
-// phxagents.dev shared client behavior — theme, search palette, mobile menu, GH stars, copy.
-
-// Theme — apply ASAP to avoid flash
-(function () {
-  try {
-    const saved = localStorage.getItem('phx.theme');
-    const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefers)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  } catch (e) {}
-})();
+// phxagents.dev shared client behavior — theme controls, search, navigation, and copy.
 
 function applyTheme(t) {
   if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
@@ -324,54 +313,6 @@ document.addEventListener('click', function (e) {
   });
 })();
 
-// GitHub stars widget — deferred to idle to keep critical path light
-(function () {
-  const widgets = document.querySelectorAll('[data-gh-stars]');
-  if (!widgets.length) return;
-  const idle = window.requestIdleCallback || function (cb) { return setTimeout(cb, 400); };
-  idle(initGhStars);
-
-  function initGhStars() {
-  const REPO = 'oliver-kriska/claude-elixir-phoenix';
-  const CACHE_KEY = 'phx.gh.stars.v1';
-  const CACHE_TTL = 1000 * 60 * 30;
-
-  function format(n) {
-    if (n >= 10000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
-    return String(n);
-  }
-  function render(count) {
-    widgets.forEach((w) => {
-      const out = w.querySelector('[data-gh-count]');
-      if (out) out.textContent = format(count);
-      w.setAttribute('data-loaded', 'true');
-    });
-  }
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Date.now() - parsed.t < CACHE_TTL) {
-        render(parsed.v);
-        return;
-      }
-    }
-  } catch (e) {}
-
-  fetch('https://api.github.com/repos/' + REPO, { headers: { Accept: 'application/vnd.github+json' } })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((data) => {
-      if (!data || typeof data.stargazers_count !== 'number') return;
-      try {
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ v: data.stargazers_count, t: Date.now() }));
-      } catch (e) {}
-      render(data.stargazers_count);
-    })
-    .catch(() => {});
-  }
-})();
-
 // Copy buttons — aria-live so the "Copy" -> "Copied" text swap is announced.
 document.querySelectorAll('[data-copy]').forEach((btn) => btn.setAttribute('aria-live', 'polite'));
 document.addEventListener('click', function (e) {
@@ -399,8 +340,8 @@ document.addEventListener('click', function (e) {
     .catch(() => {});
 });
 
-// Detail-page enhancements: copy buttons, local table of contents, and heading anchors.
-// Runs only where doc content exists (skill/agent pages); no-op elsewhere.
+// Detail-page enhancements: copy buttons and heading anchors. The local table
+// of contents is rendered at build time from Astro's heading data.
 (function () {
   const body = document.querySelector('.docs-body');
   if (!body) return;
@@ -433,24 +374,6 @@ document.addEventListener('click', function (e) {
   });
 
   const headings = Array.from(body.querySelectorAll('h3[id], h4[id]'));
-  const tocLists = document.querySelectorAll('[data-page-toc-list]');
-  if (headings.length && tocLists.length) {
-    const escapeTocHtml = (value) => String(value).replace(/[&<>"']/g, (c) =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-    );
-    const html = headings
-      .map((h) => {
-        const label = h.textContent.trim();
-        return '<li data-level="' + h.tagName.slice(1) + '"><a href="#' +
-          escapeTocHtml(h.id) + '">' + escapeTocHtml(label) + '</a></li>';
-      })
-      .join('');
-    tocLists.forEach((list) => { list.innerHTML = html; });
-    document.querySelectorAll('[data-page-toc], [data-mobile-page-toc]').forEach((toc) => {
-      toc.hidden = false;
-    });
-  }
-
   // Hover/focus-revealed anchor link on each section heading (ids emitted at build).
   headings.forEach((h) => {
     if (h.querySelector('.heading-anchor')) return;

@@ -1,6 +1,6 @@
 {
   "name": "phxagents-site",
-  "description": "Documentation site for the phxagents plugin — Iron Laws and specialist agents for Elixir/Phoenix in Claude Code, Codex, OpenCode, and Pi.",
+  "description": "Documentation for phxagents — Elixir/Phoenix skills across Claude Code, Amp, Codex, Pi, and OpenCode.",
   "type": "module",
   "version": "0.1.0",
   "private": true,

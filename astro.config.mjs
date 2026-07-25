@@ -29,10 +29,10 @@ function rehypeShiftHeadings() {
 }
 
 /**
- * Wrap every rendered markdown `<table>` in `<div class="table-wrap">` so
+ * Wrap every rendered markdown `<table>` in a keyboard-scrollable region so
  * skill/agent tables can scroll horizontally on narrow viewports instead of
- * forcing the whole page wider (same pattern as the hand-authored tables in
- * install.astro / tidewave-mcp.astro — see DocsLayout.astro's matching CSS).
+ * forcing the whole page wider. The outer shell carries a mobile visual cue
+ * without placing it inside the scrolling region.
  */
 function rehypeWrapTables() {
   const wrap = (/** @type {any} */ node) => {
@@ -42,8 +42,29 @@ function rehypeWrapTables() {
         return {
           type: 'element',
           tagName: 'div',
-          properties: { className: ['table-wrap'] },
-          children: [child],
+          properties: { className: ['table-region'] },
+          children: [
+            {
+              type: 'element',
+              tagName: 'div',
+              properties: {
+                className: ['table-scroll-hint'],
+                ariaHidden: 'true',
+              },
+              children: [{ type: 'text', value: 'Scroll horizontally to view all columns' }],
+            },
+            {
+              type: 'element',
+              tagName: 'div',
+              properties: {
+                className: ['table-wrap'],
+                tabIndex: 0,
+                role: 'region',
+                ariaLabel: 'Scrollable table',
+              },
+              children: [child],
+            },
+          ],
         };
       }
       wrap(child);
@@ -55,22 +76,25 @@ function rehypeWrapTables() {
   };
 }
 
-/**
- * The canonical Amp guide lives in plugin-source/docs/amp.md, where its README
- * link is relative to the plugin repository. On the site that relative URL
- * would point at a page that does not exist, so map only that source link to
- * its public GitHub destination. Other links, including Amp's manual, remain
- * untouched.
- */
+/** Map links between canonical runtime guides to their public site routes. */
 function rehypeUpstreamDocLinks() {
+  const routes = {
+    'runtime-support.md': '/compatibility/',
+    'amp.md': '/install/amp/',
+    'codex.md': '/install/codex/',
+    'pi.md': '/install/pi/',
+    'opencode.md': '/install/opencode/',
+    '../README.md#claude-code': '/install/#claude-code',
+  };
   const rewrite = (/** @type {any} */ node) => {
-    if (
-      node.type === 'element' &&
-      node.tagName === 'a' &&
-      node.properties?.href === '../README.md'
-    ) {
-      node.properties.href =
-        'https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/README.md';
+    if (node.type === 'element' && node.tagName === 'a') {
+      const href = node.properties?.href;
+      if (typeof href === 'string' && routes[href]) {
+        node.properties.href = routes[href];
+      } else if (href === '../README.md') {
+        node.properties.href =
+          'https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/README.md';
+      }
     }
     if (node.children) for (const child of node.children) rewrite(child);
   };
@@ -81,6 +105,9 @@ function rehypeUpstreamDocLinks() {
 
 export default defineConfig({
   site: 'https://phxagents.dev',
+  redirects: {
+    '/amp': '/install/amp/',
+  },
   // Astro 7 changed the default to 'jsx', which strips newline-only whitespace
   // between inline elements (JSX semantics) — that glued words like
   // "dedicated<a>…" in prose. `true` restores v6 HTML whitespace collapsing.

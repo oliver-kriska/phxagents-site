@@ -1,6 +1,9 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import DocPage from '../layouts/DocPage.astro';
+import PageToc from './PageToc.astro';
 import { serpDescription, serpTitle } from '../lib/seo';
+import { getSkillIdentity } from '../lib/skillNames';
 
 interface PagerEntry {
   name: string;
@@ -18,6 +21,7 @@ interface Props {
   model?: string;
   tools?: string;
   sourceUrl: string;
+  headings: MarkdownHeading[];
   prev?: PagerEntry | null;
   next?: PagerEntry | null;
 }
@@ -33,10 +37,12 @@ const {
   model,
   tools,
   sourceUrl,
+  headings,
   prev,
   next,
 } = Astro.props;
-const displayName = kind === 'skill' && name.includes(':') ? '/' + name : name;
+const skillIdentity = kind === 'skill' ? getSkillIdentity(slug, name) : null;
+const displayName = skillIdentity?.isCommand ? '/' + skillIdentity.claudeName : name;
 function pagerLabel(entryName: string): string {
   if (kind === 'agent') return entryName;
   return entryName.includes(':') ? '/' + entryName : entryName;
@@ -45,9 +51,9 @@ const synopsis = argumentHint ? `${displayName} ${argumentHint}` : displayName;
 const pillKind =
   kind === 'agent'
     ? 'pill-warn'
-    : name.startsWith('lv:')
+    : skillIdentity?.group === 'lv'
       ? 'pill-violet'
-      : name.startsWith('ecto:')
+      : skillIdentity?.group === 'ecto'
         ? 'pill-info'
         : 'pill-accent';
 // Model-tier hues intentionally avoid pill-violet: that hue already means
@@ -56,6 +62,34 @@ const pillKind =
 const modelPillClass =
   model === 'opus' ? 'pill-warn' : model === 'haiku' ? 'pill-info' : 'pill-accent';
 const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?type=skill';
+const generatedName = skillIdentity?.portableName ?? name.replace(/:/g, '-');
+const runtimeInvocations = kind === 'skill' ? [
+  {
+    name: 'Claude Code',
+    href: '/install/#claude-code',
+    command: skillIdentity?.isCommand ? `/${skillIdentity.claudeName}` : `use ${name}`,
+  },
+  {
+    name: 'Amp',
+    href: '/install/amp/',
+    command: `skill: invoke → ${generatedName}`,
+  },
+  {
+    name: 'Codex',
+    href: '/install/codex/',
+    command: `$elixir-phoenix:${generatedName}`,
+  },
+  {
+    name: 'Pi',
+    href: '/install/pi/',
+    command: `/skill:${generatedName}`,
+  },
+  {
+    name: 'OpenCode',
+    href: '/install/opencode/',
+    command: `skill tool → name: "${generatedName}"`,
+  },
+] : [];
 
 // Structured data: breadcrumb trail + a per-entity TechArticle so each skill/agent
 // is a distinct entity. Mirrors the visible crumbs and the SoftwareApplication
@@ -122,6 +156,24 @@ const detailJsonLd = {
       </div>
     )}
 
+    {kind === 'skill' && (
+      <section class="runtime-invocations" aria-labelledby="invoke-heading">
+        <div class="runtime-invocations-head">
+          <h2 id="invoke-heading">Invoke in v3</h2>
+          <a href="/compatibility/">Compare runtime support →</a>
+        </div>
+        <div class="runtime-invocation-grid">
+          {runtimeInvocations.map((runtime) => (
+            <a href={runtime.href} class="runtime-invocation">
+              <span>{runtime.name}</span>
+              <code>{runtime.command}</code>
+            </a>
+          ))}
+        </div>
+        <p class="runtime-note">Claude Code includes the full custom-agent and hook layer. Generated runtimes load the same skill knowledge with runtime-native invocation.</p>
+      </section>
+    )}
+
     <div class="actions">
       <a class="btn-ghost" href={sourceUrl} rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -136,10 +188,7 @@ const detailJsonLd = {
 
   <div class="entity-layout">
     <div class="entity-content">
-      <details class="mobile-toc" data-mobile-page-toc hidden>
-        <summary>On this page</summary>
-        <ol data-page-toc-list></ol>
-      </details>
+      <PageToc headings={headings} variant="mobile" />
 
       <div class="docs-body">
         <slot />
@@ -163,10 +212,7 @@ const detailJsonLd = {
       )}
     </div>
 
-    <aside class="page-toc" aria-label="On this page" data-page-toc hidden>
-      <p>On this page</p>
-      <ol data-page-toc-list></ol>
-    </aside>
+    <PageToc headings={headings} variant="desktop" />
   </div>
 </DocPage>
 
@@ -178,71 +224,6 @@ const detailJsonLd = {
     align-items: start;
   }
   .entity-content { min-width: 0; }
-  .page-toc {
-    position: sticky;
-    top: calc(var(--nav-h) + 24px);
-    padding-left: 16px;
-    border-left: 1px solid var(--border);
-    max-height: calc(100vh - var(--nav-h) - 48px);
-    overflow-y: auto;
-  }
-  .page-toc p {
-    margin: 0 0 8px;
-    color: var(--fg);
-    font: 600 11px/1.4 var(--font-mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .page-toc ol,
-  .mobile-toc ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .page-toc li + li { margin-top: 2px; }
-  .page-toc li[data-level="4"] { padding-left: 12px; }
-  .page-toc a {
-    display: block;
-    padding: 4px 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.4;
-    text-decoration: none;
-  }
-  .page-toc a:hover { color: var(--fg); }
-  .mobile-toc { display: none; }
-  .page-toc[hidden],
-  .mobile-toc[hidden] { display: none; }
-  .mobile-toc summary {
-    min-height: 44px;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: var(--fg);
-    font: 600 12px/1.4 var(--font-mono);
-  }
-  .mobile-toc summary::after {
-    content: "+";
-    margin-left: auto;
-    color: var(--muted);
-    font-size: 16px;
-    font-weight: 400;
-  }
-  .mobile-toc[open] summary::after { content: "−"; }
-  .mobile-toc ol {
-    padding: 4px 12px 12px;
-    border-top: 1px solid var(--border);
-  }
-  .mobile-toc li[data-level="4"] { padding-left: 14px; }
-  .mobile-toc a {
-    display: flex;
-    align-items: center;
-    min-height: 40px;
-    color: var(--fg-soft);
-    font-size: 13px;
-    text-decoration: none;
-  }
 
   .crumbs {
     display: flex;
@@ -315,6 +296,72 @@ const detailJsonLd = {
     margin: 0;
     overflow-x: auto;
   }
+  .runtime-invocations {
+    margin-top: 20px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .runtime-invocations-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .runtime-invocations-head h2 {
+    margin: 0;
+    color: var(--fg);
+    font: 600 11px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .runtime-invocations-head a {
+    color: var(--muted);
+    font-size: 11.5px;
+  }
+  .runtime-invocations-head a:hover { color: var(--accent-fg); }
+  .runtime-invocation-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .runtime-invocation {
+    min-width: 0;
+    padding: 10px;
+    border-right: 1px solid var(--border);
+    text-decoration: none;
+    transition: background 120ms;
+  }
+  .runtime-invocation:last-child { border-right: 0; }
+  .runtime-invocation:hover { background: var(--accent-soft); color: inherit; }
+  .runtime-invocation span {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font: 500 10.5px/1.4 var(--font-mono);
+  }
+  .runtime-invocation code {
+    display: block;
+    padding: 0;
+    color: var(--fg);
+    background: none;
+    border: 0;
+    font-size: 10.5px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .runtime-note {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
 
   /* Markdown body — headings are shifted +1 at render time (rehypeShiftHeadings
      in astro.config.mjs) so the layout title above is the page's only visible
@@ -383,12 +430,14 @@ const detailJsonLd = {
     overflow-x: auto;
   }
   .docs-body :global(.table-wrap) {
-    margin: 14px 0 22px;
+    margin: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
     border: 1px solid var(--border);
     border-radius: var(--radius);
   }
+  .docs-body :global(.table-region) { margin: 14px 0 22px; }
   .docs-body :global(table) {
     width: 100%;
     min-width: 480px;
@@ -505,13 +554,17 @@ const detailJsonLd = {
   @media (max-width: 1180px) {
     .entity-layout { display: block; }
     .entity-content { max-width: 760px; }
-    .page-toc { display: none; }
-    .mobile-toc {
-      display: block;
-      margin: 0 0 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+  }
+  @media (max-width: 900px) {
+    :global(.code-copy) {
+      top: 4px;
+      right: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
     }
   }
   @media (max-width: 600px) {
@@ -519,6 +572,22 @@ const detailJsonLd = {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
+    .runtime-invocations { padding: 12px; }
+    .runtime-invocations-head { align-items: flex-start; flex-direction: column; gap: 4px; }
+    .runtime-invocation-grid { grid-template-columns: 1fr; }
+    .runtime-invocation {
+      display: grid;
+      grid-template-columns: 80px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      min-height: 52px;
+      padding: 10px 12px;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .runtime-invocation:last-child { border-bottom: 0; }
+    .runtime-invocation span { margin: 0; font-size: 12px; }
+    .runtime-invocation code { font-size: 12px; line-height: 1.5; }
     .pager { grid-template-columns: 1fr; }
     .pager-link.next { text-align: left; }
   }

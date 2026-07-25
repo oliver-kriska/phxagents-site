@@ -22,7 +22,7 @@ export async function getStaticPaths() {
 }
 
 const { entry, prev, next } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 const { name, description, effort, model } = entry.data;
 const rawTools = entry.data.tools;
 const tools = Array.isArray(rawTools)
@@ -45,6 +45,7 @@ const nextNav = next ? { name: next.name, href: `/agents/${next.slug}/` } : null
   model={model}
   tools={tools}
   sourceUrl={sourceUrl}
+  headings={headings}
   prev={prevNav}
   next={nextNav}
 >

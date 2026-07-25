@@ -32,9 +32,13 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
       <div class="docs-nav-group">
         <ul>
           <li><a href="/install/" aria-current={currentPath === '/install/' ? 'page' : undefined}>Install</a></li>
+          <li><a href="/compatibility/" aria-current={currentPath === '/compatibility/' ? 'page' : undefined}>Runtime support</a></li>
+          <li><a href="/install/amp/" aria-current={currentPath === '/install/amp/' ? 'page' : undefined}>Amp</a></li>
+          <li><a href="/install/codex/" aria-current={currentPath === '/install/codex/' ? 'page' : undefined}>Codex</a></li>
+          <li><a href="/install/pi/" aria-current={currentPath === '/install/pi/' ? 'page' : undefined}>Pi</a></li>
+          <li><a href="/install/opencode/" aria-current={currentPath === '/install/opencode/' ? 'page' : undefined}>OpenCode</a></li>
           <li><a href="/iron-laws/" aria-current={currentPath === '/iron-laws/' ? 'page' : undefined}>Iron Laws</a></li>
           <li><a href="/tidewave-mcp/" aria-current={currentPath === '/tidewave-mcp/' ? 'page' : undefined}>Tidewave MCP</a></li>
-          <li><a href="/amp/" aria-current={currentPath === '/amp/' ? 'page' : undefined}>Amp</a></li>
           <li><a href="/changelog/" aria-current={currentPath === '/changelog/' ? 'page' : undefined}>Changelog</a></li>
           <li><a href="/catalog/" aria-current={currentPath === '/catalog/' ? 'page' : undefined}>Catalog</a></li>
         </ul>
@@ -83,9 +87,9 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
         </div>
       ))}
     </aside>
-    <main class="docs-main">
+    <div class="docs-main">
       <slot />
-    </main>
+    </div>
   </div>
 </Default>
 
@@ -99,7 +103,8 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
     padding: 32px 24px 64px;
   }
   .docs-main { min-width: 0; max-width: 760px; }
-  .docs-main:has(.entity-layout) { max-width: none; }
+  .docs-main:has(.entity-layout),
+  .docs-main:has(.upstream-layout) { max-width: none; }
 
   .docs-nav {
     position: sticky;
@@ -217,5 +222,6 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
       overflow-y: auto;
     }
     .docs-nav[data-open="true"] { transform: translateX(0); }
+    .docs-nav-group ul a { min-height: 44px; }
   }
 </style>

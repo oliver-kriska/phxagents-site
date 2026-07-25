@@ -61,5 +61,7 @@ export function serpDescription(raw: string): string {
  * artifact lets the right reader self-select and the wrong one skip it.
  */
 export function serpTitle(displayName: string, kind: 'skill' | 'agent'): string {
-  return `${displayName} ${kind} for Claude Code — phxagents`;
+  return kind === 'skill'
+    ? `${displayName} skill for AI coding agents — phxagents`
+    : `${displayName} agent for Claude Code — phxagents`;
 }

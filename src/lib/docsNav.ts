@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { getSkillIdentity } from './skillNames';
 
 const ROOT = process.cwd();
 const PLUGIN_BASE = path.join(ROOT, 'plugin-source', 'plugins', 'elixir-phoenix');
@@ -53,8 +54,9 @@ function loadSkills(): NavItem[] {
   for (const slug of safeReadDir(dir)) {
     const skillFile = path.join(dir, slug, 'SKILL.md');
     if (!fs.existsSync(skillFile)) continue;
-    const name = readFrontmatterName(skillFile) ?? slug;
-    items.push({ name, href: `/skills/${slug}/` });
+    const declaredName = readFrontmatterName(skillFile) ?? slug;
+    const { claudeName } = getSkillIdentity(slug, declaredName);
+    items.push({ name: claudeName, href: `/skills/${slug}/` });
   }
   return items;
 }

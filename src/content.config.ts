@@ -49,12 +49,12 @@ const references = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-// Canonical narrative documentation sourced from the plugin repository. Keeping
-// this as a collection means a missing upstream file fails the Amp page build
+// Canonical runtime documentation sourced from the plugin repository. Keeping
+// these as a collection means a missing upstream guide fails the site build
 // instead of falling back to a stale, hand-maintained copy in this repository.
 const upstreamDocs = defineCollection({
   loader: glob({
-    pattern: 'amp.md',
+    pattern: '{amp,codex,pi,opencode,runtime-support}.md',
     base: './plugin-source/docs',
   }),
   schema: z.object({}).passthrough(),

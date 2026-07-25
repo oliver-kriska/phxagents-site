@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { renderOgImage, type OgInput } from '../../lib/og';
 import { stats } from '../../data/stats';
+import { getSkillIdentity } from '../../lib/skillNames';
 
 /**
  * Build-time Open Graph images. One PNG per page at dist/og/<slug>.png.
@@ -26,10 +27,31 @@ export async function getStaticPaths() {
       slug: 'install',
       data: {
         title: 'Install phxagents',
-        subtitle: `Add ${stats.skills} skills and ${stats.agents} agents to your AI editor in 30 seconds.`,
+        subtitle: `Elixir and Phoenix skills for Claude Code, Amp, Codex, Pi, and OpenCode.`,
         kind: 'docs',
       },
     },
+    {
+      slug: 'compatibility',
+      data: {
+        title: 'Runtime compatibility',
+        subtitle: 'Compare installation, invocation, adapted workflows, and deferred capabilities across five AI coding runtimes.',
+        kind: 'docs',
+      },
+    },
+    ...[
+      ['amp', 'Amp Agent Skills'],
+      ['codex', 'Codex skills plugin'],
+      ['pi', 'Pi skills package'],
+      ['opencode', 'OpenCode skills'],
+    ].map(([runtime, label]) => ({
+      slug: `install/${runtime}`,
+      data: {
+        title: `Install for ${runtime === 'opencode' ? 'OpenCode' : runtime === 'codex' ? 'Codex' : runtime === 'amp' ? 'Amp' : 'Pi'}`,
+        subtitle: `Install all ${stats.skills} canonical phxagents skills as a generated ${label}.`,
+        kind: 'docs' as const,
+      },
+    })),
     {
       slug: 'catalog',
       data: { title: 'Catalog', subtitle: 'All skills and agents, searchable and filterable.', kind: 'docs' },
@@ -57,18 +79,19 @@ export async function getStaticPaths() {
     {
       slug: 'amp',
       data: {
-        title: 'Elixir & Phoenix skills for Amp',
-        subtitle: 'Install and use the phxagents skill set as first-class Amp Agent Skills.',
+        title: 'Install for Amp',
+        subtitle: 'Moved to phxagents.dev/install/amp/.',
         kind: 'docs',
       },
     },
     ...skills.map((entry) => {
       const slug = entry.id.replace(/\/SKILL$/i, '');
       const name = entry.data.name as string;
+      const identity = getSkillIdentity(slug, name);
       return {
         slug: `skills/${slug}`,
         data: {
-          title: name.includes(':') ? `/${name}` : name,
+          title: identity.isCommand ? `/${identity.claudeName}` : name,
           subtitle: entry.data.description as string,
           kind: 'skill' as const,
         },
