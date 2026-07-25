@@ -247,7 +247,7 @@ document.addEventListener('click', function (e) {
     if (els.input) els.input.value = '';
     if (els.results) els.results.innerHTML = '<div class="search-empty">Loading…</div>';
     loadCorpus().then(() => {
-      render('', els.results, els.status);
+      render(els.input ? els.input.value : '', els.results, els.status);
       setTimeout(() => els.input && els.input.focus(), 30);
     });
   }
