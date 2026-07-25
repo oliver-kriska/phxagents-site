@@ -21,7 +21,14 @@ export async function getStaticPaths() {
   const agents = await getCollection('agents');
 
   const paths: OgPath[] = [
-    { slug: 'home', data: { title: 'phxagents', subtitle: stats.description, kind: 'docs' } },
+    {
+      slug: 'home',
+      data: {
+        title: 'phxagents v3',
+        subtitle: `${stats.skills} Phoenix skills: full Claude Code plugin plus generated editions for Amp, Codex, Pi, and OpenCode.`,
+        kind: 'docs',
+      },
+    },
     { slug: 'default', data: { title: 'phxagents', subtitle: stats.description, kind: 'docs' } },
     {
       slug: 'install',
@@ -72,7 +79,7 @@ export async function getStaticPaths() {
       slug: 'tidewave-mcp',
       data: {
         title: 'Tidewave MCP for Phoenix',
-        subtitle: 'Runtime debugging, live SQL, and Ecto introspection for Claude Code via Tidewave MCP.',
+        subtitle: 'Runtime debugging, live SQL, and Ecto introspection for phxagents across supported MCP clients.',
         kind: 'docs',
       },
     },

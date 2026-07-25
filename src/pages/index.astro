@@ -8,7 +8,9 @@ const release = await getLatestRelease();
 const releaseTag = `v${stats.version}`;
 const releaseMatchesManifest = release?.tag_name === releaseTag;
 const releaseUrl = releaseMatchesManifest ? release!.html_url : '/changelog/';
-const releaseStateLabel = releaseMatchesManifest ? 'five runtimes shipped' : 'five runtime editions';
+const releaseStateLabel = releaseMatchesManifest
+  ? 'full Claude plugin · four generated editions'
+  : 'five runtime editions';
 const adaptedWorkflows = getPortableWorkflowNames().length;
 const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to Claude Code, Amp, Codex, Pi, and OpenCode, with ${adaptedWorkflows} workflows adapted for every runtime.`;
 
@@ -18,7 +20,7 @@ const jsonLd = {
   name: 'phxagents',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'macOS, Linux, Windows',
-  description: stats.description,
+  description: metaDescription,
   url: 'https://phxagents.dev',
   softwareVersion: stats.version,
   license: 'https://opensource.org/licenses/MIT',
@@ -74,9 +76,9 @@ const jsonLd = {
             <div class="title">phxagents v3 · runtime map</div>
           </div>
           <div class="term-body">
-            <div class="term-line"><span class="prompt">v3</span><span class="cmd">one canonical source → five native distributions</span></div>
+            <div class="term-line"><span class="prompt">v3</span><span class="cmd">one canonical skill set → five runtime editions</span></div>
             <div class="term-out">
-<span class="dim">canonical</span>  <span class="info">Claude Code</span>  /phx:review
+<span class="dim">full</span>       <span class="info">Claude Code</span>  /phx:review
 <span class="dim">generated</span>  <span class="info">Amp</span>          skill: invoke → phx-review
 <span class="dim">generated</span>  <span class="info">Codex</span>        $elixir-phoenix:phx-review
 <span class="dim">generated</span>  <span class="info">Pi</span>           /skill:phx-review
@@ -151,9 +153,9 @@ const jsonLd = {
           <span class="feature-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
           </span>
-          <h3>Iron&nbsp;Laws still hold</h3>
-          <p>{stats.ironLaws} non-negotiable Elixir and Phoenix rules remain the shared engineering judgment: no Repo calls in loops, bare rescue, untyped Oban args or missing authorization.</p>
-          <div class="meta">guardrails before generated code</div>
+          <h3>Client payloads are untrusted</h3>
+          <p>New LiveView guidance treats <code>phx-value-*</code>, form and hook payloads as user-controlled. Exposed IDs are not flaws by themselves; every event must authorize against server-side state.</p>
+          <div class="meta">client boundary · server-side authorization</div>
         </article>
 
         <article class="feature">

@@ -4,7 +4,7 @@ import { stats } from '../data/stats';
 
 const title = 'Tidewave MCP';
 const description =
-  'How to use Tidewave MCP with phxagents and Phoenix — runtime debugging, live SQL queries, Ecto schema introspection, and version-exact hex docs inside Claude Code.';
+  'Use Tidewave MCP with phxagents and Phoenix across Claude Code, Codex, OpenCode, Amp, and Pi — runtime tools, client setup, and local fallbacks.';
 const pageUrl = 'https://phxagents.dev/tidewave-mcp/';
 
 // Structured data: Breadcrumb + a TechArticle for the Tidewave MCP guide, plus
@@ -42,7 +42,7 @@ const jsonLd = {
           acceptedAnswer: {
             '@type': 'Answer',
             text:
-              'Tidewave MCP is a Model Context Protocol server (from Dashbit) that exposes a running Phoenix application’s runtime to AI editors and coding agents — live SQL queries, code evaluation, Ecto schema and source lookup, logs, and version-exact hex docs. phxagents teaches Claude Code to prefer these runtime tools over guessing from Bash.',
+              'Tidewave MCP is a Model Context Protocol server (from Dashbit) that exposes a running Phoenix application’s runtime to AI editors and coding agents — live SQL queries, code evaluation, Ecto schema and source lookup, logs, and version-exact hex docs. phxagents teaches supported runtimes to prefer these tools when the client exposes them, while preserving local fallbacks.',
           },
         },
         {
@@ -51,7 +51,7 @@ const jsonLd = {
           acceptedAnswer: {
             '@type': 'Answer',
             text:
-              'Install the elixir-phoenix plugin in Claude Code and add Tidewave to your Phoenix app. When the mcp__tidewave__ tools are available in a dev session, phxagents’ tidewave-integration skill activates and routes runtime questions — docs, SQL, schema introspection — through Tidewave instead of shelling out.',
+              'Install the phxagents edition for your runtime, add Tidewave to the Phoenix app, and register the project-specific HTTP endpoint with your client. Claude Code, Codex, and OpenCode have documented registration paths; Tidewave remains externally configured for Amp and Pi. Every adapted workflow retains a local fallback when the connection is absent.',
           },
         },
         {
@@ -78,8 +78,8 @@ const jsonLd = {
       <strong>Tidewave MCP</strong> gives your AI editor runtime intelligence for a running Phoenix
       app — live SQL, code evaluation, Ecto schema introspection, and version-exact hex docs over the
       Model Context Protocol. <a href="/install/">phxagents</a> ships a dedicated
-      <a href="/skills/tidewave-integration/">Tidewave integration skill</a> so Claude Code prefers
-      these runtime tools over guessing from <code>Bash</code>.
+      <a href="/skills/tidewave-integration/">Tidewave integration skill</a> in every v3 edition, so
+      the agent can prefer runtime evidence over shell-based guesses when its client exposes the connection.
     </p>
   </div>
 
@@ -94,17 +94,18 @@ const jsonLd = {
       <code>mix.lock</code> versions.
     </p>
     <p>
-      phxagents wires this into the Claude Code workflow with the
-      <a href="/skills/tidewave-integration/"><code>tidewave-integration</code> skill</a>. When the
-      <code>mcp__tidewave__</code> tools are present in a dev session, the plugin routes runtime
-      questions through Tidewave automatically.
+      Claude Code receives the full Tidewave-aware plugin; Amp, Codex, Pi and OpenCode receive the
+      same <a href="/skills/tidewave-integration/"><code>tidewave-integration</code> skill</a> in their
+      generated editions. Installing any edition exposes no fixed-port server and registers no MCP
+      endpoint. When a client makes Tidewave tools available in a dev session, the skill can use them;
+      adapted workflows keep a complete local fallback when it cannot.
     </p>
 
     <h2 id="tools">Runtime tools phxagents uses</h2>
-    <p>Each Tidewave MCP tool has a Bash fallback the plugin only reaches for when Tidewave is unavailable:</p>
+    <p>The names below are how Claude Code exposes the tools. Other MCP clients may label them differently, but the capabilities and local fallbacks are the same:</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Task</th><th>Tidewave MCP tool</th><th>Fallback</th></tr></thead>
+        <thead><tr><th>Task</th><th>Claude Code tool name</th><th>Fallback</th></tr></thead>
         <tbody>
           <tr><td>Version-exact hex docs</td><td><code>mcp__tidewave__get_docs</code></td><td><code>web_fetch hexdocs.pm/…</code></td></tr>
           <tr><td>Evaluate code in the app</td><td><code>mcp__tidewave__project_eval</code></td><td><code>mix run -e "…"</code></td></tr>
@@ -131,9 +132,56 @@ const jsonLd = {
   -d '&lbrace;"jsonrpc":"2.0","id":1,"method":"ping"&rbrace;'</pre>
     </div>
     <p>
-      Inside Claude Code, run <code>/mcp</code> to verify the <code>mcp__tidewave__</code> tools are
-      connected. Once they are, phxagents&rsquo; runtime workflows light up with no extra
-      configuration.
+      Exposing that HTTP server and registering it with an MCP client are separate steps. phxagents
+      never silently registers a fixed port. Replace <code>$PORT</code> below with the port used by
+      the current Phoenix project.
+    </p>
+
+    <h3>Claude Code</h3>
+    <div class="code-block">
+      <div class="code-head">
+        <span>Register and verify</span>
+        <button class="copy" data-copy>Copy</button>
+      </div>
+      <pre>claude mcp add --transport http tidewave \
+  http://localhost:$PORT/tidewave/mcp
+
+# Then run /mcp inside Claude Code</pre>
+    </div>
+
+    <h3>Codex</h3>
+    <div class="code-block">
+      <div class="code-head">
+        <span>Register and inspect</span>
+        <button class="copy" data-copy>Copy</button>
+      </div>
+      <pre>codex mcp add tidewave --url http://localhost:$PORT/tidewave/mcp
+codex mcp list</pre>
+    </div>
+    <p>Start Codex and use <code>/mcp</code> to verify the tools are connected; <code>codex mcp list</code> confirms configuration only.</p>
+
+    <h3>OpenCode</h3>
+    <p>Add the endpoint to the project&rsquo;s <code>opencode.json</code> or the global <code>~/.config/opencode/opencode.json</code>:</p>
+    <div class="code-block">
+      <div class="code-head">
+        <span>opencode.json</span>
+        <button class="copy" data-copy>Copy</button>
+      </div>
+      <pre>&lbrace;
+  "mcp": &lbrace;
+    "tidewave": &lbrace;
+      "type": "remote",
+      "url": "http://localhost:$PORT/tidewave/mcp",
+      "enabled": true
+    &rbrace;
+  &rbrace;
+&rbrace;</pre>
+    </div>
+
+    <p>
+      <strong>Amp and Pi:</strong> the generated package does not configure Tidewave. Treat MCP as
+      an external runtime capability and follow your client&rsquo;s current setup. The skills remain usable
+      without it. See the <a href="/compatibility/">runtime capability matrix</a> for the support boundary.
     </p>
 
     <h2 id="safety">Dev only — never in production</h2>
@@ -148,7 +196,7 @@ const jsonLd = {
     <h2>Learn more</h2>
     <ul>
       <li><a href="/skills/tidewave-integration/">tidewave-integration skill</a> — the full reference phxagents loads on demand</li>
-      <li><a href="/install/">Install phxagents</a> — add {stats.skills} skills and {stats.agents} agents to Claude Code</li>
+      <li><a href="/install/">Install phxagents</a> — add {stats.skills} skills to your runtime; Claude Code also gets {stats.agents} agents and hooks</li>
       <li><a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/plugins/elixir-phoenix/skills/tidewave-integration/SKILL.md" rel="noopener">SKILL.md source on GitHub</a></li>
       <li><a href="https://tidewave.ai" rel="noopener">tidewave.ai</a> — the Tidewave runtime intelligence product</li>
     </ul>
@@ -190,6 +238,12 @@ const jsonLd = {
     color: var(--fg);
   }
   .docs-body h2:first-of-type { padding-top: 0; border-top: 0; margin-top: 0; }
+  .docs-body h3 {
+    margin: 24px 0 10px;
+    color: var(--fg);
+    font-size: 16px;
+    font-weight: 600;
+  }
   .docs-body p {
     margin: 0 0 14px;
     color: var(--fg-soft);
