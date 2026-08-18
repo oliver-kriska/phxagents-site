@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { stats } from '../data/stats';
 import { getStargazersCount, formatStars } from '../data/release';
+import { researchReports } from '../data/research';
 
 interface Props {
   title: string;
@@ -22,6 +23,12 @@ const starsLabel = formatStars(stargazersCount);
 const starsLoaded = stargazersCount != null;
 const fullTitle = seoTitle ?? (title === 'phxagents' ? title : `${title} — phxagents`);
 const canonical = `https://phxagents.dev${Astro.url.pathname.replace(/\/+$/, '/')}`;
+// A research report is an article, not a site page. Derived from the path so a
+// second report inherits the type and dateline without any per-page wiring.
+const researchReport = researchReports.find(
+  (report) => Astro.url.pathname.replace(/\/+$/, '') === `/research/${report.slug}`
+);
+
 const onInstallPage = Astro.url.pathname.startsWith('/install/');
 const primaryNavAction = onInstallPage
   ? { href: '/catalog/', label: 'Browse skills' }
@@ -89,13 +96,19 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
 
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={researchReport ? 'article' : 'website'} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="phxagents" />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={fullTitle} />
+    {researchReport && (
+      <>
+        <meta property="article:published_time" content={researchReport.datePublished} />
+        <meta property="article:author" content="https://github.com/oliver-kriska" />
+      </>
+    )}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
