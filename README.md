@@ -108,8 +108,9 @@ npm run preview           # preview the production build
 
 ## Production build
 
-The production build runs `scripts/clone-source.sh` first, which fetches a
-shallow clone of the plugin repo:
+The production build runs `scripts/clone-source.sh` first, which fetches a full
+clone of the plugin repo. Full history lets the build derive each documentation
+page's real `dateModified` value instead of stamping the daily build time:
 
 ```bash
 npm run build             # clones plugin repo to ./plugin-source then builds
@@ -127,7 +128,7 @@ plugin repo GitHub Action fires for imported content changes
 repository_dispatch → phxagents-site deploy workflow
         ↓
 GitHub Actions runs:
-   sh scripts/clone-source.sh        (git clone --depth 1)
+   sh scripts/clone-source.sh        (full plugin history for per-file dates)
    astro build                        (renders site from cloned content)
    wrangler pages deploy dist         (direct upload)
         ↓

@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import DocsLayout from '../../components/DocsLayout.astro';
 import { getSkillIdentity } from '../../lib/skillNames';
+import { getPluginSourceDate } from '../../lib/sourceDates';
 
 export async function getStaticPaths() {
   const skills = await getCollection('skills');
@@ -50,7 +51,12 @@ const argumentHint = Array.isArray(rawHint)
   ? String(rawHint)
   : undefined;
 const slug = entry.id.replace(/\/SKILL$/i, '');
-const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/plugins/elixir-phoenix/skills/${slug}/SKILL.md`;
+const sourcePath = `plugins/elixir-phoenix/skills/${slug}/SKILL.md`;
+const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/${sourcePath}`;
+const dateModified = getPluginSourceDate(
+  sourcePath,
+  entry.data.dateModified ?? entry.data.updated ?? entry.data.date
+);
 const prevNav = prev ? { name: prev.name, href: `/skills/${prev.slug}/` } : null;
 const nextNav = next ? { name: next.name, href: `/skills/${next.slug}/` } : null;
 ---
@@ -64,6 +70,7 @@ const nextNav = next ? { name: next.name, href: `/skills/${next.slug}/` } : null
   effort={effort}
   argumentHint={argumentHint}
   sourceUrl={sourceUrl}
+  dateModified={dateModified}
   headings={headings}
   prev={prevNav}
   next={nextNav}

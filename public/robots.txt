@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+# LLM-readable documentation: https://phxagents.dev/llms.txt
 Sitemap: https://phxagents.dev/sitemap-index.xml

@@ -10,11 +10,16 @@ if [ -L "$TARGET_DIR" ]; then
 fi
 
 if [ -d "$TARGET_DIR" ]; then
-  echo "[clone-source] $TARGET_DIR exists — refreshing"
-  cd "$TARGET_DIR" && git fetch --depth 1 origin main && git reset --hard origin/main
+  echo "[clone-source] $TARGET_DIR exists — refreshing full history"
+  if [ "$(git -C "$TARGET_DIR" rev-parse --is-shallow-repository)" = "true" ]; then
+    git -C "$TARGET_DIR" fetch --unshallow origin main
+  else
+    git -C "$TARGET_DIR" fetch origin main
+  fi
+  git -C "$TARGET_DIR" reset --hard origin/main
 else
-  echo "[clone-source] cloning $REPO_URL"
-  git clone --depth 1 --branch main "$REPO_URL" "$TARGET_DIR"
+  echo "[clone-source] cloning $REPO_URL with full history for per-page dates"
+  git clone --branch main "$REPO_URL" "$TARGET_DIR"
 fi
 
 echo "[clone-source] done"

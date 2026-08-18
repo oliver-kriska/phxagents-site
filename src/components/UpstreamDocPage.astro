@@ -2,6 +2,7 @@
 import { getEntry, render } from 'astro:content';
 import DocPage from '../layouts/DocPage.astro';
 import PageToc from './PageToc.astro';
+import { getPluginSourceDate } from '../lib/sourceDates';
 
 interface Props {
   entryId: 'amp' | 'codex' | 'pi' | 'opencode' | 'runtime-support';
@@ -22,7 +23,12 @@ if (!entry) {
 }
 
 const { Content, headings } = await render(entry);
-const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/docs/${entryId}.md`;
+const sourcePath = `docs/${entryId}.md`;
+const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/${sourcePath}`;
+const dateModified = getPluginSourceDate(
+  sourcePath,
+  entry.data.dateModified ?? entry.data.updated ?? entry.data.date
+);
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -41,6 +47,7 @@ const jsonLd = {
       description,
       url: pageUrl,
       inLanguage: 'en',
+      dateModified,
       author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
       publisher: { '@id': 'https://phxagents.dev/#org' },
       isPartOf: { '@id': 'https://phxagents.dev/#website' },
@@ -62,6 +69,11 @@ const jsonLd = {
   <div class:list={["upstream-layout", { wide }]}>
     <div class="upstream-content">
       <PageToc headings={headings} variant="mobile" forceVisible={wide} />
+      {Astro.slots.has('intro') && (
+        <div class="page-intro">
+          <slot name="intro" />
+        </div>
+      )}
       <div class:list={["docs-body", { wide }]}>
         <Content />
       </div>
@@ -105,6 +117,33 @@ const jsonLd = {
   }
   .upstream-layout.wide { display: block; }
   .upstream-content { min-width: 0; }
+  .page-intro {
+    max-width: 680px;
+    margin: 0 0 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-intro :global(h2) {
+    margin: 0 0 10px;
+    color: var(--fg);
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+  .page-intro :global(h3) {
+    margin: 24px 0 8px;
+    color: var(--fg);
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .page-intro :global(p) {
+    max-width: 680px;
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .page-intro :global(p:last-child) { margin-bottom: 0; }
   .docs-body { max-width: 720px; }
   .docs-body.wide { max-width: 920px; }
   .docs-body :global(h2:first-child) {

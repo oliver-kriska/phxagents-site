@@ -21,6 +21,7 @@ interface Props {
   model?: string;
   tools?: string;
   sourceUrl: string;
+  dateModified: string;
   headings: MarkdownHeading[];
   prev?: PagerEntry | null;
   next?: PagerEntry | null;
@@ -37,6 +38,7 @@ const {
   model,
   tools,
   sourceUrl,
+  dateModified,
   headings,
   prev,
   next,
@@ -62,6 +64,7 @@ const pillKind =
 const modelPillClass =
   model === 'opus' ? 'pill-warn' : model === 'haiku' ? 'pill-info' : 'pill-accent';
 const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?type=skill';
+const markdownUrl = `/${kind === 'agent' ? 'agents' : 'skills'}/${slug}.md`;
 const generatedName = skillIdentity?.portableName ?? name.replace(/:/g, '-');
 const runtimeInvocations = kind === 'skill' ? [
   {
@@ -115,6 +118,7 @@ const detailJsonLd = {
       ...(description ? { description } : {}),
       url: pageUrl,
       inLanguage: 'en',
+      dateModified,
       author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
       publisher: { '@id': 'https://phxagents.dev/#org' },
       isPartOf: { '@id': 'https://phxagents.dev/#website' },
@@ -175,6 +179,7 @@ const detailJsonLd = {
     )}
 
     <div class="actions">
+      <a class="btn-ghost" href={markdownUrl}>View as Markdown</a>
       <a class="btn-ghost" href={sourceUrl} rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         View source on GitHub
