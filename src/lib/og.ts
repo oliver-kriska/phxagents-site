@@ -41,12 +41,29 @@ const MUTED = '#6e7b8a';
 const BORDER = '#283039';
 const ACCENT = '#2dd4a7'; // teal — skills + default
 const AMBER = '#e3b341'; // agents
-const VIOLET = '#a78bfa'; // docs
+const VIOLET = '#a78bfa'; // docs + research
+
+// Semantic tones for research stat strips. Hex forms of the dark-theme
+// --accent-fg / --warn-fg / --rp-crit tokens, so a figure keeps the same
+// reading on the card as it has on the page it links to.
+const TONE = {
+  good: '#9be39d',
+  warn: '#e9ab2b',
+  crit: '#ff8e86',
+} as const;
 
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
-export type OgKind = 'skill' | 'agent' | 'docs';
+export type OgKind = 'skill' | 'agent' | 'docs' | 'research';
+
+export interface OgStat {
+  /** The measured figure, verbatim from the report. */
+  value: string;
+  /** What it measures — kept short enough to survive the cell width. */
+  label: string;
+  tone?: keyof typeof TONE;
+}
 
 export interface OgInput {
   /** The big card title — page name (e.g. "/phx:plan", "elixir-reviewer"). */
@@ -55,10 +72,19 @@ export interface OgInput {
   subtitle?: string;
   /** Drives the accent color + the corner label. */
   kind?: OgKind;
+  /**
+   * Research cards replace the subtitle block with the report's own headline
+   * figures — a preview that carries findings rather than a description.
+   */
+  stats?: OgStat[];
+  /** Overrides the right-hand footer line (research uses the sample sizes). */
+  footnote?: string;
 }
 
 function accentFor(kind: OgKind): string {
-  return kind === 'agent' ? AMBER : kind === 'docs' ? VIOLET : ACCENT;
+  if (kind === 'agent') return AMBER;
+  if (kind === 'docs' || kind === 'research') return VIOLET;
+  return ACCENT;
 }
 
 function titleSize(title: string): number {
@@ -80,8 +106,58 @@ function el(type: string, style: Record<string, unknown>, children?: unknown): a
   return { type, props: { style, children } };
 }
 
-function card({ title, subtitle, kind = 'docs' }: OgInput) {
+/**
+ * A miniature of the report page's own hero strip: four measured figures in
+ * their semantic tones. Cell widths are fixed because satori resolves layout
+ * without a real cascade, so `1fr` columns cannot be relied on to divide the
+ * 1056px content box evenly.
+ */
+function statStrip(stats: OgStat[]): any {
+  const cells = stats.slice(0, 4);
+  return el(
+    'div',
+    {
+      display: 'flex',
+      marginTop: 30,
+      border: `1px solid ${BORDER}`,
+      borderRadius: 12,
+    },
+    cells.map((stat, i) =>
+      el(
+        'div',
+        {
+          display: 'flex',
+          flexDirection: 'column',
+          width: Math.floor(1054 / cells.length),
+          padding: '18px 20px 20px',
+          borderRight: i === cells.length - 1 ? '0' : `1px solid ${BORDER}`,
+        },
+        [
+          el(
+            'div',
+            {
+              display: 'flex',
+              fontSize: 42,
+              fontWeight: 700,
+              lineHeight: 1.1,
+              color: stat.tone ? TONE[stat.tone] : FG,
+            },
+            stat.value
+          ),
+          el(
+            'div',
+            { display: 'flex', fontSize: 16, fontWeight: 400, lineHeight: 1.4, marginTop: 10, color: FG_SOFT },
+            stat.label
+          ),
+        ]
+      )
+    )
+  );
+}
+
+function card({ title, subtitle, kind = 'docs', stats, footnote }: OgInput) {
   const accent = accentFor(kind);
+  const hasStats = Array.isArray(stats) && stats.length > 0;
   return el(
     'div',
     {
@@ -140,7 +216,7 @@ function card({ title, subtitle, kind = 'docs' }: OgInput) {
               ),
             ]
           ),
-          // Main: title + subtitle
+          // Main: title, then either a description or the report's figures
           el('div', { display: 'flex', flexDirection: 'column' }, [
             el('div', { display: 'flex', alignItems: 'flex-start' }, [
               el('div', { display: 'flex', fontSize: titleSize(title), fontWeight: 700, color: accent, marginRight: 18 }, '›'),
@@ -153,10 +229,19 @@ function card({ title, subtitle, kind = 'docs' }: OgInput) {
             subtitle
               ? el(
                   'div',
-                  { display: 'flex', fontSize: 27, fontWeight: 400, color: FG_SOFT, lineHeight: 1.45, marginTop: 24, maxWidth: 980 },
-                  clamp(subtitle)
+                  {
+                    display: 'flex',
+                    fontSize: hasStats ? 22 : 27,
+                    fontWeight: 400,
+                    color: FG_SOFT,
+                    lineHeight: 1.45,
+                    marginTop: hasStats ? 18 : 24,
+                    maxWidth: 980,
+                  },
+                  clamp(subtitle, hasStats ? 78 : 116)
                 )
               : el('div', { display: 'flex' }, ''),
+            hasStats ? statStrip(stats!) : el('div', { display: 'flex' }, ''),
           ]),
           // Footer: url + tagline
           el(
@@ -172,7 +257,7 @@ function card({ title, subtitle, kind = 'docs' }: OgInput) {
             },
             [
               el('div', { display: 'flex' }, 'phxagents.dev'),
-              el('div', { display: 'flex' }, 'Elixir & Phoenix for AI editors'),
+              el('div', { display: 'flex' }, footnote ?? 'Elixir & Phoenix for AI editors'),
             ]
           ),
         ]

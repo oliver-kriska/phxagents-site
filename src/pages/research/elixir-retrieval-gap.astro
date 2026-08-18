@@ -4,10 +4,9 @@ import { getResearchReport } from '../../data/research';
 
 const report = getResearchReport('elixir-retrieval-gap');
 
-const title = "Elixir's retrieval gap";
 // The <h1> keeps the full headline; the <title> is the click surface and gets
 // truncated near 60 characters in results, so it carries a shorter form.
-const { seoTitle, description } = report;
+const { seoTitle, description, title } = report;
 const pageUrl = 'https://phxagents.dev/research/elixir-retrieval-gap/';
 const markdownUrl = `/research/${report.slug}.md`;
 
@@ -68,7 +67,7 @@ const jsonLd = {
           </p>
           <div class="rp-meta">
             <span><time datetime="2026-08-18">18 August 2026</time></span>
-            <span class="numeric">85 resources · 283 packages · 287 repositories</span>
+            <span class="numeric">{report.sample}</span>
             <span>~12 min read</span>
           </div>
           <div class="rp-actions">
@@ -77,22 +76,12 @@ const jsonLd = {
         </div>
 
         <div class="rp-stats numeric">
-          <div class="rp-stat">
-            <div class="n c-crit">69.3%</div>
-            <div class="lbl">of Hex package download volume is invisible to markdown retrieval</div>
-          </div>
-          <div class="rp-stat">
-            <div class="n c-good">1</div>
-            <div class="lbl">AI-specific crawler block in the entire ecosystem — Ruby had six</div>
-          </div>
-          <div class="rp-stat">
-            <div class="n c-warn">26%</div>
-            <div class="lbl">of ex_doc packages expose markdown, seven months after it became the default</div>
-          </div>
-          <div class="rp-stat">
-            <div class="n c-warn">3.5%</div>
-            <div class="lbl">of top repositories ship agent rules — a mechanism Ruby has not built</div>
-          </div>
+          {report.heroStats.map((stat) => (
+            <div class="rp-stat">
+              <div class={`n c-${stat.tone}`}>{stat.value}</div>
+              <div class="lbl">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </header>

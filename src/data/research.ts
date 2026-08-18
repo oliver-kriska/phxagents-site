@@ -21,14 +21,36 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const RESEARCH_DIR = path.join(ROOT, 'src', 'data', 'research');
 
+export type ResearchTone = 'good' | 'warn' | 'crit';
+
+export interface ResearchStat {
+  /** The measured figure, verbatim. */
+  value: string;
+  /** Full label, as the page's hero strip shows it. */
+  label: string;
+  /** Compressed form for the OG card, whose cells are only ~230px wide. */
+  cardLabel: string;
+  tone: ResearchTone;
+}
+
 export interface ResearchReport {
   slug: string;
   /** Nav/search label. Deliberately shorter than the report's own headline. */
   name: string;
+  /** Short display headline — the page's hero title and the OG card title. */
+  title: string;
+  /** What was measured, as one line. Shown under the hero and on the card. */
+  sample: string;
   description: string;
   /** Shown in the `<title>`; kept under ~60 chars so it survives a SERP. */
   seoTitle: string;
   datePublished: string;
+  /**
+   * The report's headline figures, rendered by both the page hero and the
+   * Open Graph card so a shared preview cannot quote a number the page no
+   * longer carries.
+   */
+  heroStats: ResearchStat[];
   /** Markdown body, verbatim — served at /research/<slug>.md. */
   body: string;
 }
@@ -44,10 +66,38 @@ export const researchReports: ResearchReport[] = [
   {
     slug: 'elixir-retrieval-gap',
     name: 'Elixir SEO/AIO research',
+    title: "Elixir's retrieval gap",
+    sample: '85 resources · 283 packages · 287 repositories',
     description:
       'Independent SEO/AEO/GEO audit of 85 Elixir ecosystem resources, 283 Hex packages and 287 repositories — why 69.3% of Hex download volume is invisible to markdown retrieval.',
     seoTitle: "Elixir's retrieval gap: an ecosystem audit — phxagents",
     datePublished: '2026-08-18',
+    heroStats: [
+      {
+        value: '69.3%',
+        label: 'of Hex package download volume is invisible to markdown retrieval',
+        cardLabel: 'of Hex download volume is invisible to markdown',
+        tone: 'crit',
+      },
+      {
+        value: '1',
+        label: 'AI-specific crawler block in the entire ecosystem — Ruby had six',
+        cardLabel: 'AI-specific crawler block ecosystem-wide',
+        tone: 'good',
+      },
+      {
+        value: '26%',
+        label: 'of ex_doc packages expose markdown, seven months after it became the default',
+        cardLabel: 'of ex_doc packages expose markdown',
+        tone: 'warn',
+      },
+      {
+        value: '3.5%',
+        label: 'of top repositories ship agent rules — a mechanism Ruby has not built',
+        cardLabel: 'of top repositories ship agent rules',
+        tone: 'warn',
+      },
+    ],
     body: readBody('elixir-retrieval-gap'),
   },
 ];

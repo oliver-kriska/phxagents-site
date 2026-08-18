@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { renderOgImage, type OgInput } from '../../lib/og';
 import { stats } from '../../data/stats';
+import { researchReports } from '../../data/research';
 import { getSkillIdentity } from '../../lib/skillNames';
 
 /**
@@ -91,15 +92,22 @@ export async function getStaticPaths() {
         kind: 'docs',
       },
     },
-    {
-      slug: 'research/elixir-retrieval-gap',
+    // Research cards trade the description for the report's own headline
+    // figures, so a link preview arrives carrying findings.
+    ...researchReports.map((report) => ({
+      slug: `research/${report.slug}`,
       data: {
-        title: "Elixir's retrieval gap",
-        subtitle:
-          'Independent audit of 85 ecosystem resources, 283 Hex packages and 287 repositories.',
-        kind: 'docs',
+        title: report.title,
+        subtitle: 'Independent ecosystem audit — 18 August 2026',
+        kind: 'research' as const,
+        stats: report.heroStats.map((stat) => ({
+          value: stat.value,
+          label: stat.cardLabel,
+          tone: stat.tone,
+        })),
+        footnote: report.sample,
       },
-    },
+    })),
     ...skills.map((entry) => {
       const slug = entry.id.replace(/\/SKILL$/i, '');
       const name = entry.data.name as string;
