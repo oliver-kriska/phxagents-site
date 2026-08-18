@@ -23,3 +23,6 @@ pnpm-debug.log*
 # plugin source — cloned at build (CI) or symlinked (local dev)
 plugin-source
 .claude/research/
+
+# social assets — kept local, mirrors the plugin repo (scratchpad/ ignored there)
+social/
