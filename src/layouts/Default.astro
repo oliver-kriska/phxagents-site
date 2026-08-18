@@ -35,6 +35,7 @@ const ogSlug = ogPath === '' ? 'home' : ogPath;
 const ogHasCard =
   ['home', 'install', 'compatibility', 'catalog', 'iron-laws', 'changelog', 'tidewave-mcp', 'amp'].includes(ogSlug) ||
   ogSlug.startsWith('install/') ||
+  ogSlug.startsWith('research/') ||
   ogSlug.startsWith('skills/') ||
   ogSlug.startsWith('agents/');
 const ogImage = new URL(`/og/${ogHasCard ? ogSlug : 'default'}.png`, Astro.site).href;
@@ -213,6 +214,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
           <a href="/catalog/">Catalog</a>
           <a href="/changelog/">Changelog</a>
           <a href="/iron-laws/">Iron Laws</a>
+          <a href="/research/elixir-retrieval-gap/">Elixir SEO/AIO research</a>
           <a href="https://github.com/oliver-kriska/claude-elixir-phoenix">GitHub</a>
         </div>
       </div>

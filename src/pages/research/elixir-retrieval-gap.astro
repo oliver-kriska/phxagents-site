@@ -1,0 +1,1570 @@
+---
+import Default from '../../layouts/Default.astro';
+import { getResearchReport } from '../../data/research';
+
+const report = getResearchReport('elixir-retrieval-gap');
+
+const title = "Elixir's retrieval gap";
+// The <h1> keeps the full headline; the <title> is the click surface and gets
+// truncated near 60 characters in results, so it carries a shorter form.
+const { seoTitle, description } = report;
+const pageUrl = 'https://phxagents.dev/research/elixir-retrieval-gap/';
+const markdownUrl = `/research/${report.slug}.md`;
+
+const sections = [
+  { id: 'three-layers', label: 'The three layers' },
+  { id: 'retrieval-scorecard', label: 'Retrieval scorecard' },
+  { id: 'package-rollout', label: 'Package rollout' },
+  { id: 'injection-layer', label: 'The injection layer' },
+  { id: 'training-corpus', label: 'Training corpus' },
+  { id: 'what-to-do', label: 'What to do' },
+  { id: 'method-limits', label: 'Method & limits' },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: "Elixir's retrieval gap", item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'Report',
+      '@id': `${pageUrl}#report`,
+      headline: "Elixir's retrieval gap is a rollout problem, not an access problem",
+      name: "Elixir's retrieval gap is a rollout problem, not an access problem",
+      description,
+      url: pageUrl,
+      inLanguage: 'en',
+      datePublished: report.datePublished,
+      dateModified: report.datePublished,
+      author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
+      publisher: { '@id': 'https://phxagents.dev/#org' },
+      isPartOf: { '@id': 'https://phxagents.dev/#website' },
+      about: ['Elixir', 'Hex', 'ex_doc', 'AI agent documentation retrieval'],
+    },
+  ],
+};
+---
+
+<Default title={title} description={description} seoTitle={seoTitle}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <article class="report">
+    <header class="rp-hero">
+      <div class="wrap">
+        <div class="rp-hero-in">
+          <p class="rp-eyebrow">Independent ecosystem audit</p>
+          <h1>Elixir's retrieval gap is a rollout problem, not an access problem.</h1>
+          <p class="rp-standfirst">
+            In August 2026 Evil Martians published a
+            <a href="https://ruby.evilmartians.com/" rel="noopener">scorecard of 93 Ruby ecosystem
+            resources</a>, measuring whether AI agents can actually reach Ruby's documentation. On the
+            announcement thread, someone asked for the same study for Elixir. This is that study — and the
+            answer is not the one the Ruby findings would lead you to expect.
+          </p>
+          <div class="rp-meta">
+            <span><time datetime="2026-08-18">18 August 2026</time></span>
+            <span class="numeric">85 resources · 283 packages · 287 repositories</span>
+            <span>~12 min read</span>
+          </div>
+          <div class="rp-actions">
+            <a class="btn-ghost" href={markdownUrl}>View as Markdown</a>
+          </div>
+        </div>
+
+        <div class="rp-stats numeric">
+          <div class="rp-stat">
+            <div class="n c-crit">69.3%</div>
+            <div class="lbl">of Hex package download volume is invisible to markdown retrieval</div>
+          </div>
+          <div class="rp-stat">
+            <div class="n c-good">1</div>
+            <div class="lbl">AI-specific crawler block in the entire ecosystem — Ruby had six</div>
+          </div>
+          <div class="rp-stat">
+            <div class="n c-warn">26%</div>
+            <div class="lbl">of ex_doc packages expose markdown, seven months after it became the default</div>
+          </div>
+          <div class="rp-stat">
+            <div class="n c-warn">3.5%</div>
+            <div class="lbl">of top repositories ship agent rules — a mechanism Ruby has not built</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="rp-brief">
+      <div class="wrap">
+        <div class="rp-sec-head rp-brief-head">
+          <p class="rp-sec-num">In brief</p>
+          <h2>Five findings</h2>
+        </div>
+        <ol class="rp-findings">
+          <li>
+            <span class="rp-kf" aria-hidden="true">K01</span>
+            <p><strong>Elixir is not blocked.</strong> 98% of resources allow AI crawlers and exactly one
+            applies an AI-specific block. The crawler-unblocking campaign Ruby needs would be wasted effort
+            here.</p>
+          </li>
+          <li>
+            <span class="rp-kf" aria-hidden="true">K02</span>
+            <p><strong>The tooling already exists; the rollout does not.</strong> ex_doc has emitted markdown
+            and <code>llms.txt</code> by default since January 2026, yet only 26% of ex_doc packages expose
+            them — 69.3% of download volume is unreachable as markdown.</p>
+          </li>
+          <li>
+            <span class="rp-kf" aria-hidden="true">K03</span>
+            <p><strong>Three distinct causes, all mechanical.</strong> Stale documentation builds (59% of
+            volume), an explicit one-line opt-out in <code>mix.exs</code> (6%), and a hardcoded default in
+            <code>rebar3_ex_doc</code> that excludes every Erlang package.</p>
+          </li>
+          <li>
+            <span class="rp-kf" aria-hidden="true">K04</span>
+            <p><strong>Elixir built the mechanism Ruby is still asking for.</strong> <code>usage_rules</code>
+            delivers version-pinned guidance straight into an agent's context with no crawler involved — and
+            only 3.5% of repositories use it.</p>
+          </li>
+          <li>
+            <span class="rp-kf" aria-hidden="true">K05</span>
+            <p><strong>Retrieval advantage does not survive the quality gate.</strong> Elixir leads Ruby on
+            four of five retrieval criteria, yet ties it exactly on training-corpus quality. Being reachable
+            and being retained are different things.</p>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="rp-shell">
+        <nav class="rp-toc" aria-label="Contents">
+          <details class="rp-toc-box" open>
+            <summary>Contents</summary>
+            <ol>
+              {sections.map((section) => (
+                <li><a href={`#${section.id}`}>{section.label}</a></li>
+              ))}
+            </ol>
+          </details>
+        </nav>
+
+        <div class="rp-main">
+          <section id="three-layers">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 01</p>
+              <h2>Three layers, not two</h2>
+              <p class="rp-lede">
+                Ruby's scorecard measures whether an agent can fetch your docs, and whether they reach the
+                model's weights. Applied to Elixir, that framing produces a table of green checks and misses
+                the layer Elixir is strongest in.
+              </p>
+            </div>
+
+            <div class="rp-layers">
+              <div class="rp-layer">
+                <div class="rp-layer-n">1</div>
+                <div class="rp-layer-body">
+                  <h3>Retrieval</h3>
+                  <p class="rp-layer-q">Can an agent fetch your documentation at request time?</p>
+                  <div class="rp-tags">
+                    <span class="rp-tag">robots · sitemap · llms.txt · content negotiation · .md</span>
+                    <span class="rp-tag g">latency: seconds</span>
+                    <span class="rp-tag">serves whatever <code>latest</code> says</span>
+                  </div>
+                </div>
+              </div>
+              <div class="rp-layer">
+                <div class="rp-layer-n">2</div>
+                <div class="rp-layer-body">
+                  <h3>Training</h3>
+                  <p class="rp-layer-q">Will your documentation reach the model's weights at all?</p>
+                  <div class="rp-tags">
+                    <span class="rp-tag">Common Crawl · The Stack · quality filters</span>
+                    <span class="rp-tag c">latency: months to years</span>
+                    <span class="rp-tag c">quality gate 19/93</span>
+                  </div>
+                </div>
+              </div>
+              <div class="rp-layer hot">
+                <div class="rp-layer-n">3</div>
+                <div class="rp-layer-body">
+                  <h3>Injection</h3>
+                  <p class="rp-layer-q">Do your rules arrive in the agent's context with no fetch and no training?</p>
+                  <div class="rp-tags">
+                    <span class="rp-tag">usage-rules.md · AGENTS.md · MCP</span>
+                    <span class="rp-tag g">latency: zero</span>
+                    <span class="rp-tag g">pinned to the resolved dependency</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rp-prose">
+              <p>
+                Layer 3 dominates for a library, and the reason is structural rather than aesthetic: it is
+                pinned to the dependency version that was actually resolved. Layer 1 serves whatever
+                <code>latest</code> says. Layer 2 serves whatever was true when the crawl ran, routinely a
+                year ago.
+              </p>
+              <blockquote class="rp-pull">
+                Only Layer 3 can tell an agent <strong>“you are on Phoenix 1.8, here are 1.8's rules.”</strong>
+              </blockquote>
+              <p>
+                That is precisely the failure every Elixir developer recognises when a model writes Phoenix
+                1.7 idioms into a 1.8 project. It is a Layer 3 problem, and no amount of Layer 1 work will
+                fix it.
+              </p>
+            </div>
+          </section>
+
+          <section id="retrieval-scorecard">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 02</p>
+              <h2>Elixir leads Ruby on four of five retrieval criteria</h2>
+              <p class="rp-lede">
+                Eighty-five curated ecosystem resources — core language and runtime docs, frameworks,
+                libraries, tooling, community sites, learning platforms and blogs — scored on the same six
+                criteria Ruby used.
+              </p>
+            </div>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 1</b> — Retrieval criteria, Elixir versus the published Ruby snapshot</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Retrieval criteria, Elixir versus Ruby">
+                <table>
+                  <thead>
+                    <tr><th>Criterion</th><th class="num">Elixir (85)</th><th class="num">Ruby (93)</th><th>Verdict</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>robots.txt allows AI</td><td class="num">83 · 98%</td><td class="num">87 · 94%</td><td class="c-good">Elixir ahead</td></tr>
+                    <tr><td>Crawlable (AI agent actually served)</td><td class="num">81 · 95%</td><td class="num">—</td><td class="c-mute">not scored by Ruby</td></tr>
+                    <tr><td>Sitemap</td><td class="num">62 · 73%</td><td class="num">56 · 60%</td><td class="c-good">Elixir ahead</td></tr>
+                    <tr><td>llms.txt</td><td class="num">33 · 39%</td><td class="num">51 · 55%</td><td class="c-crit">Elixir behind</td></tr>
+                    <tr><td>Content negotiation</td><td class="num">26 · 31%</td><td class="num">16 · 17%</td><td class="c-good">Elixir ahead</td></tr>
+                    <tr><td>.md routes</td><td class="num">27 · 32%</td><td class="num">23 · 25%</td><td class="c-good">Elixir ahead</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <div class="rp-prose">
+              <p>The shape of the single gap is more informative than the gap itself.</p>
+              <blockquote class="rp-pull">
+                Ruby's wins are <strong>hand-written</strong>. Elixir's are <strong>generated</strong>. Each
+                ecosystem did the work the other didn't.
+              </blockquote>
+              <p>
+                <code>llms.txt</code> is a file a human sits down and authors, and 55% of Ruby projects did
+                exactly that. Content negotiation and <code>.md</code> routes arrive free from ex_doc, with
+                nobody deciding anything at all.
+              </p>
+
+              <div class="rp-note good">
+                <span class="rp-note-k">Finding</span>
+                <p><strong>Elixir does not need Ruby's crawler-access campaign.</strong> Exactly one resource
+                blocks AI agents specifically: <code>r/elixir</code>, where a browser receives 200 and GPTBot
+                receives 403. Two disallow AI agents in robots.txt: Exercism and <code>r/elixir</code>. Ruby
+                had six blockers, including RubyDoc.info refusing ccbot, gptbot, claudebot and
+                google-extended.</p>
+              </div>
+
+              <div class="rp-note crit">
+                <span class="rp-note-k">Caveat — this cuts against the headline</span>
+                <p>A separate audit, run over its own 93-resource list, measured the training-corpus layer and
+                found Elixir clearing the FineWeb-Edu quality gate on <strong>19/93 resources — exactly tied
+                with Ruby</strong>. Leading on four of five retrieval criteria does not mean the corpus keeps
+                your pages. Section 05 covers this.</p>
+              </div>
+            </div>
+
+            <h3 class="rp-subhead">Mean score by tier</h3>
+            <div class="rp-bars numeric">
+              <div class="rp-bar-row"><span class="rp-bar-lab">Core</span><div class="rp-bar-track"><div class="rp-bar-fill" style="width:76.7%"></div></div><span class="rp-bar-val">4.60</span></div>
+              <div class="rp-bar-row"><span class="rp-bar-lab">Framework</span><div class="rp-bar-track"><div class="rp-bar-fill" style="width:72.5%"></div></div><span class="rp-bar-val">4.35</span></div>
+              <div class="rp-bar-row"><span class="rp-bar-lab">Library</span><div class="rp-bar-track"><div class="rp-bar-fill" style="width:68.8%"></div></div><span class="rp-bar-val">4.13</span></div>
+              <div class="rp-bar-row"><span class="rp-bar-lab">Tools</span><div class="rp-bar-track"><div class="rp-bar-fill mid" style="width:58.3%"></div></div><span class="rp-bar-val">3.50</span></div>
+              <div class="rp-bar-row"><span class="rp-bar-lab">Blogs</span><div class="rp-bar-track"><div class="rp-bar-fill mid" style="width:48.0%"></div></div><span class="rp-bar-val">2.88</span></div>
+              <div class="rp-bar-row"><span class="rp-bar-lab">Learning</span><div class="rp-bar-track"><div class="rp-bar-fill low" style="width:40.5%"></div></div><span class="rp-bar-val">2.43</span></div>
+              <div class="rp-bar-row"><span class="rp-bar-lab">Community</span><div class="rp-bar-track"><div class="rp-bar-fill low" style="width:34.7%"></div></div><span class="rp-bar-val">2.08</span></div>
+            </div>
+            <p class="rp-caption">Score out of 6 · the further from the core, the worse it gets</p>
+
+            <div class="rp-prose">
+              <div class="rp-note crit">
+                <span class="rp-note-k">Finding</span>
+                <p><strong>The community tier scoring worst is the expensive one.</strong> Forums, Elixir
+                School, Exercism and the podcasts hold the <em>idiomatic, problem-shaped</em> answers — the
+                content that teaches a model to write a language well rather than merely to name it. It is the
+                least retrievable tier in the ecosystem.</p>
+              </div>
+              <p>
+                Everything Elixir core publishes through a current ex_doc scores a perfect 6/6: the language
+                docs, getting-started, Mix, IEx, Logger, EEx, ExUnit, ExDoc. The toolchain works. That is the
+                whole point.
+              </p>
+            </div>
+          </section>
+
+          <section id="package-rollout">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 03</p>
+              <h2>Three causes, all of them mechanical</h2>
+              <p class="rp-lede">
+                ex_doc v0.40.0, released 20 January 2026, introduced the Markdown formatter and generates
+                <code>llms.txt</code> by default. This is precisely the fix Evil Martians ask of rdoc —
+                <em>“one change that lifts every gem at once.”</em> Elixir shipped it seven months ago.
+              </p>
+            </div>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 2</b> — 283 Hex packages by 90-day downloads</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="283 Hex packages by 90-day downloads">
+                <table>
+                  <thead>
+                    <tr><th>Classification</th><th class="num">Packages</th><th class="num">Downloads / 90d</th><th class="num">Volume</th><th>Fix</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td class="c-good">Compliant — llms.txt + markdown</td><td class="num">68</td><td class="num">103,819,142</td><td class="num">28.8%</td><td>—</td></tr>
+                    <tr><td class="c-warn">Cause A — explicit formatter opt-out</td><td class="num">19</td><td class="num">21,175,906</td><td class="num">5.9%</td><td>one line</td></tr>
+                    <tr><td class="c-crit">Cause B — stale docs (ex_doc &lt; 0.40.0)</td><td class="num">170</td><td class="num">212,913,511</td><td class="num">59.2%</td><td>republish</td></tr>
+                    <tr><td>Not ex_doc</td><td class="num">26</td><td class="num">21,998,591</td><td class="num">6.1%</td><td>n/a</td></tr>
+                    <tr class="total"><td>Total documented</td><td class="num">283</td><td class="num">359,907,150</td><td class="num">100%</td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <div class="rp-prose">
+              <h3>Cause A — an explicit list silently opts you out</h3>
+              <p>
+                Any project that pinned a <code>formatters:</code> list before January 2026 keeps exactly that
+                list. The new default never applies. Nothing warns you, because the option was always legal
+                and still is. The docs build, they look correct, and they are invisible.
+              </p>
+
+              <div class="code-block">
+                <div class="code-head">
+                  <span>mix.exs</span>
+                  <button class="copy" data-copy type="button">Copy</button>
+                </div>
+                <pre><code>defp docs do
+  [
+    <span class="del">formatters: ["html", "epub"],</span>
+    <span class="add">formatters: ["html", "markdown", "epub"],</span>
+    ...
+  ]
+end</code></pre>
+              </div>
+
+              <p>
+                Fourteen of the nineteen were confirmed by reading <code>mix.exs</code> directly, including
+                <code>phoenix</code>, <code>oban</code>, <code>credo</code>, <code>guardian</code>,
+                <code>oauth2</code>, <code>reactor</code> and <code>stripity_stripe</code>. The controls —
+                ecto, plug, req, elixir — set no <code>formatters:</code> key at all, inherit the default, and
+                score. Same ex_doc version, opposite outcome, one line of difference.
+              </p>
+
+              <div class="rp-note">
+                <span class="rp-note-k">Scale</span>
+                <p><strong>Phoenix is the highest-volume opted-out package</strong>, at 4,024,850 downloads
+                per 90 days. The pin predates the Markdown formatter, so this reads as inertia rather than
+                intent — which is exactly why a one-line change fixes it.</p>
+              </div>
+
+              <h3>Cause B — stale docs, no code change required</h3>
+              <p>
+                170 packages simply have not republished documentation since January 2026. This is
+                dependency-graph bedrock: <code>telemetry</code> (5.67M downloads/90d), <code>mime</code>
+                (4.78M), <code>decimal</code> (4.76M), <code>hpax</code>, <code>nimble_options</code>,
+                <code>phoenix_pubsub</code>, <code>websock</code>. Packages an agent meets constantly and can
+                never read as markdown.
+              </p>
+
+              <div class="rp-note good">
+                <span class="rp-note-k">Testable</span>
+                <p><strong>“Isn't this just stale docs?” — mostly yes, and that is checkable.</strong>
+                <code>llms.txt</code> is baked into the docs tarball at build time, not served by the
+                platform: <strong>0 of 225</strong> packages built with a pre-0.40 ex_doc serve it, while
+                <strong>75 of 94</strong> built with a current ex_doc do. A republish genuinely fixes
+                <strong>225 of the 244 non-compliant packages — 92%</strong>. The remaining 19 are not
+                explained by age. That is the whole argument for ordering the republish sweep above the pull
+                requests.</p>
+              </div>
+
+              <h3>Cause C — the Erlang side is excluded upstream</h3>
+              <p>Splitting the same 283 packages by build tool exposes a cause invisible in the aggregate.</p>
+            </div>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 3</b> — Compliance by build tool</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Compliance by build tool">
+                <table>
+                  <thead>
+                    <tr><th>Build tool</th><th class="num">Packages</th><th class="num">Compliant</th><th class="num">Rate</th><th class="num">Downloads / 90d</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>mix</td><td class="num">201</td><td class="num">65</td><td class="num c-warn">32%</td><td class="num">268,912,475</td></tr>
+                    <tr><td>rebar3</td><td class="num">66</td><td class="num">2</td><td class="num c-crit">3%</td><td class="num">85,477,837</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <div class="rp-prose">
+              <p>
+                <code>rebar3_ex_doc</code> hardcodes its default formatter list to
+                <code>["-f", "html", "-f", "epub"]</code>, and its <code>--formatter</code> help text offers
+                only <em>“html” or “epub”</em> — markdown is never mentioned. Every Erlang package documented
+                through the plugin is excluded regardless of which ex_doc version it pulls in.
+              </p>
+              <p>
+                Two packages escape by passing the formatter explicitly. <code>observer_cli</code> sets
+                <code>&lbrace;ex_doc, "--formatter html --formatter markdown --formatter epub"&rbrace;</code>.
+                That workaround is proof the capability is present and only the default is wrong.
+              </p>
+              <div class="rp-note good">
+                <span class="rp-note-k">Highest leverage in this report</span>
+                <p>One default change in <code>rebar3_ex_doc</code> would lift roughly <strong>64 packages and
+                about 85 million downloads per 90 days</strong> — the Erlang ecosystem's exact equivalent of
+                the rdoc change Ruby is asking for.</p>
+              </div>
+            </div>
+          </section>
+
+          <section id="injection-layer">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 04</p>
+              <h2>Elixir built the mechanism Ruby is still asking for</h2>
+              <p class="rp-lede">
+                <a href="https://hex.pm/packages/usage_rules" rel="noopener"><code>usage_rules</code></a> has
+                been shipping since May 2025 and draws 223,557 downloads per 90 days. A package ships
+                <code>usage-rules.md</code>, or a <code>usage-rules/</code> directory, and
+                <code>mix usage_rules.sync</code> consolidates the rules of your actually-resolved
+                dependencies into <code>AGENTS.md</code>, <code>CLAUDE.md</code>, or agent skills.
+              </p>
+            </div>
+
+            <div class="rp-prose">
+              <p>
+                Ruby's study lists the equivalent — <em>“establish shared gem/agent convention”</em> and
+                <em>“create a unified Rails MCP server”</em> — under things <strong>to build</strong>. Elixir
+                has had one in production for fifteen months.
+              </p>
+            </div>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 4</b> — Agent-rule adoption across 287 repositories</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Agent-rule adoption across 287 repositories">
+                <table>
+                  <thead>
+                    <tr><th>Signal</th><th class="num">Repos</th><th class="num">Share</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>usage-rules.md</code> or <code>usage-rules/</code></td><td class="num">10</td><td class="num c-crit">3.5%</td></tr>
+                    <tr><td><code>AGENTS.md</code></td><td class="num">11</td><td class="num c-crit">3.8%</td></tr>
+                    <tr><td><code>CLAUDE.md</code></td><td class="num">9</td><td class="num c-crit">3.1%</td></tr>
+                    <tr><td><code>llms.txt</code> committed in the repo</td><td class="num">0</td><td class="num">0%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <div class="rp-prose">
+              <p class="rp-small">
+                Shipping agent rules today: <code>ash</code>, <code>igniter</code>, <code>reactor</code>,
+                <code>spark</code>, <code>mimic</code>, <code>nebulex</code>, <code>ex_phone_number</code>,
+                <code>mdex</code>, <code>sobelow</code>, and <code>phoenix</code>.
+              </p>
+              <div class="rp-note crit">
+                <span class="rp-note-k">The inversion</span>
+                <p><strong>Phoenix ships <code>usage-rules/</code></strong> containing <code>ecto.md</code>,
+                <code>elixir.md</code>, <code>html.md</code> and <code>liveview.md</code> — and ships no
+                <code>llms.txt</code> and no markdown output. It is on the wrong side of Layer 1 and the right
+                side of Layer 3. A pure Layer 1 scorecard grades Phoenix as failing, which is exactly the
+                misleading result a straight port of Ruby's methodology produces.</p>
+              </div>
+            </div>
+          </section>
+
+          <section id="training-corpus">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 05</p>
+              <h2>Reachable is not the same as retained</h2>
+              <p class="rp-lede">
+                The training-corpus layer is the most expensive and least actionable part of Ruby's scorecard,
+                and the primary instrument here does not cover it. A separate audit measured it across its own
+                93-resource list; those results are reproduced with attribution.
+              </p>
+            </div>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 5</b> — Training-corpus presence and quality</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Training-corpus presence and quality">
+                <table>
+                  <thead>
+                    <tr><th>Signal</th><th class="num">Elixir</th><th class="num">Ruby</th><th>Reading</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Common Crawl <code>CC-MAIN-2026-30</code></td><td class="num">89/93</td><td class="num">—</td><td class="c-good">broad presence</td></tr>
+                    <tr><td>The Stack v3 (mapped repos)</td><td class="num">77/83</td><td class="num">—</td><td class="c-good">code channel strong</td></tr>
+                    <tr><td>FineWeb-Edu quality gate</td><td class="num">19/93</td><td class="num">19/93</td><td class="c-crit">tied — no advantage</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <div class="rp-prose">
+              <blockquote class="rp-pull">
+                Elixir's documentation is broadly present in the open crawl. Only about a fifth of sampled
+                pages clear an open training-quality proxy — <strong>exactly matching Ruby.</strong>
+              </blockquote>
+              <p>
+                Whatever advantage the retrieval layer confers, it does not survive into corpus retention on
+                this measure. The practical implication is a fourth kind of work, distinct from republishing
+                or one-line changes: <strong>improve the first 300–500 words of important guides</strong> —
+                lead with a concrete problem and a worked explanation rather than navigation and API chrome —
+                then remeasure with the same classifier.
+              </p>
+              <div class="rp-note">
+                <span class="rp-note-k">Attribution &amp; limits</span>
+                <p>These three rows come from the separate audit described above and were not re-verified by
+                the instrument behind the rest of this report. Its 93-resource list differs in composition
+                from the 85-resource list used everywhere else, so <strong>the denominators must not be
+                combined</strong>. Common Crawl, The Stack and FineWeb-Edu are open proxies for what a private
+                model vendor ingests — presence is observational and proves nothing about training.</p>
+              </div>
+            </div>
+          </section>
+
+          <section id="what-to-do">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 06</p>
+              <h2>What to do, ordered by leverage</h2>
+              <p class="rp-lede">
+                Ordered by reach relative to effort, not by scorecard column. The first three are mechanical
+                and uncontroversial; together they address the large majority of the measured gap.
+              </p>
+            </div>
+
+            <ol class="rp-plan">
+              <li>
+                <span class="rp-step-n" aria-hidden="true">01</span>
+                <div class="rp-step-body">
+                  <h3>Change the <code>rebar3_ex_doc</code> default formatter list</h3>
+                  <p>Add <code>markdown</code> to the default alongside html and epub, and mention it in the
+                  <code>--formatter</code> help. The highest ratio of reach to effort available, and it fixes
+                  the tier currently sitting at 3%.</p>
+                  <div class="rp-tags">
+                    <span class="rp-tag">~64 packages</span>
+                    <span class="rp-tag">~85M downloads/90d</span>
+                    <span class="rp-tag g">one upstream PR</span>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">02</span>
+                <div class="rp-step-body">
+                  <h3>Run a documentation republish sweep</h3>
+                  <p>Every one of these needs only <code>mix hex.publish docs</code> built with a current
+                  ex_doc. Best done as a coordinated community push, or by having Hex warn at publish time
+                  when docs come from a pre-0.40 ex_doc.</p>
+                  <div class="rp-tags">
+                    <span class="rp-tag">170 packages</span>
+                    <span class="rp-tag">59.2% of volume</span>
+                    <span class="rp-tag g">zero code changes</span>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">03</span>
+                <div class="rp-step-body">
+                  <h3>Open the one-line <code>formatters:</code> pull requests</h3>
+                  <p>Start with <strong>phoenix</strong>, then oban, credo, guardian, oauth2, reactor,
+                  rewrite, stripity_stripe, amqp, digital_token, glob_ex, oban_met, oban_web,
+                  opentelemetry_absinthe.</p>
+                  <div class="rp-tags">
+                    <span class="rp-tag">14 verified</span>
+                    <span class="rp-tag g">one line each</span>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">04</span>
+                <div class="rp-step-body">
+                  <h3>Publish a site-level <code>hexdocs.pm/llms.txt</code></h3>
+                  <p>An index of every package's <code>llms.txt</code>. It does not exist today, and it is the
+                  single highest-leverage missing artifact found anywhere in this study — one file that makes
+                  the whole package graph discoverable in a single fetch.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">05</span>
+                <div class="rp-step-body">
+                  <h3>Drive Layer 3 adoption past 3.5%</h3>
+                  <p>The strategic one. If <code>usage-rules.md</code> were as ordinary as a README, an agent
+                  working in any Elixir project would receive correct, version-pinned idioms with no crawler
+                  and no corpus lag. Nothing in Ruby competes with this, and the tooling already ships.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">06</span>
+                <div class="rp-step-body">
+                  <h3>Raise the opening 300–500 words of the guides that matter</h3>
+                  <p>The one action aimed at Layer 2 rather than Layer 1. Elixir ties Ruby at 19/93 on the
+                  FineWeb-Edu gate, so reachability is not the binding constraint there. Lead with a concrete
+                  problem and a worked explanation instead of navigation and API chrome, then remeasure.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">07</span>
+                <div class="rp-step-body">
+                  <h3>Fix the community tier</h3>
+                  <p>Elixir School, Thinking Elixir, ElixirWeekly and the forums average
+                  <strong>2.08/6</strong> while holding the ecosystem's most idiomatic content. The cheap wins
+                  are sitemaps and <code>.md</code> routes, not a rewrite.</p>
+                </div>
+              </li>
+              <li>
+                <span class="rp-step-n" aria-hidden="true">08</span>
+                <div class="rp-step-body">
+                  <h3>Leave robots.txt alone</h3>
+                  <p>98% of resources already allow AI crawlers. Importing Ruby's unblocking campaign would
+                  address a problem this ecosystem does not have; the effort belongs in steps 01 to 03.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section id="method-limits">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 07</p>
+              <h2>Method, traps and limits</h2>
+              <p class="rp-lede">
+                Every figure is a live HTTP probe plus the public Hex and GitHub APIs, collected on 18 August
+                2026. No API keys, no paid tooling, nothing that cannot be re-run by anyone reading this.
+                Ruby's comparison figures come from the Evil Martians scorecard, measured June 2026.
+              </p>
+            </div>
+
+            <div class="rp-prose">
+              <div class="rp-note">
+                <span class="rp-note-k">Independence</span>
+                <p>This is an independent analysis. It is not affiliated with, commissioned by, or endorsed by
+                the Elixir core team, the Erlang Ecosystem Foundation, or any of the projects named in it.</p>
+              </div>
+
+              <div class="rp-note publisher">
+                <span class="rp-note-k">Publisher's note</span>
+                <p>This report is published on phxagents.dev, which ships an Elixir/Phoenix agent-rules
+                package. The disclosed interest is in a conclusion, not a measurement: Section 06 step 05
+                argues for wider Layer 3 adoption, and that is the category the package sits in. No
+                measurement here touches it. Being a GitHub-distributed Claude Code plugin rather than a Hex
+                package or a documentation resource, it falls outside all three sampling frames by
+                construction, and appears in none of the 85 resources, 283 packages or 287 repositories.</p>
+              </div>
+
+              <details class="rp-details">
+                <summary>Four measurement traps — each makes the ecosystem look worse than it is</summary>
+                <div class="rp-details-in">
+                  <p>
+                    If you reproduce this study, these four will change your answer. Each was hit and
+                    corrected during this measurement; before-and-after figures are given so you can tell
+                    whether your own run is affected.
+                  </p>
+                  <ul>
+                    <li><strong>Truncated gzip produces phantom transport errors.</strong> Reading a capped
+                      number of bytes from a gzip stream leaves it truncated, and a strict decompressor raises
+                      an error that is easily caught as a failed request. Uncorrected this reports
+                      <em>crawlable 8/85</em> and <em>sitemap 13/85</em>; corrected, 81/85 and 62/85. Use an
+                      incremental decompressor that tolerates partial streams.</li>
+                    <li><strong>Probing <code>llms.txt</code> only at the site root.</strong> On documentation
+                      hosts the file is namespaced per project (<code>hexdocs.pm/ecto/llms.txt</code>), so
+                      root-only probing scores those resources as missing: <em>7% versus 39%</em> depending on
+                      whether every ancestor path is checked. The same applies to content negotiation — a
+                      package root may return its <code>llms.txt</code> as <code>text/plain</code>, so the
+                      probe must target a real documentation page or it reports near-zero.</li>
+                    <li><strong>Conflating “blocked” with “dead URL”.</strong> Without a browser user-agent
+                      control, a 404 or blanket bot-protection reads as an AI-specific block. Three of five
+                      apparent blocks here turned out not to be AI policy at all. “Blocked” should mean: a
+                      browser is served and the AI agent is not.</li>
+                    <li><strong>Counting matching lines instead of matches.</strong> Sitemaps are frequently
+                      emitted as a single line with no newlines, so a naive line count reports one URL where
+                      there are 88.</li>
+                  </ul>
+                  <p>
+                    Two tempting explanations are also wrong, and worth ruling out early: the gap does
+                    <em>not</em> track ex_doc version (Phoenix runs a current 0.40.3), and it does <em>not</em>
+                    track the per-package hexdocs subdomain (every package redirects there). The actual cause
+                    only becomes visible on reading <code>mix.exs</code>.
+                  </p>
+                  <p><strong>The general rule:</strong> a probe that fails closed produces alarming,
+                    publishable, wrong numbers — and every trap above fails in the alarming direction. Verify
+                    each headline against a hand-measured control before believing it.</p>
+                </div>
+              </details>
+
+              <details class="rp-details">
+                <summary>Limits of this study</summary>
+                <div class="rp-details-in">
+                  <ul>
+                    <li>The 85 resources are a <strong>curated list, not a census</strong>. Category membership
+                      is a judgement call, and adding more blogs would lower the mean.</li>
+                    <li>The package tier is the <strong>top 300 by 90-day downloads</strong>. Ranking by
+                      all-time downloads gives 22% rather than 26%, because it over-weights dormant Erlang
+                      transitive dependencies.</li>
+                    <li>Layer 3 detection reads the <strong>repository root</strong> via the GitHub API, so
+                      monorepo packages whose rules file sits in a subdirectory are missed. <strong>3.5% is a
+                      floor, not a ceiling.</strong></li>
+                    <li>The Layer 2 figures come from a <strong>separate audit over a different 93-resource
+                      list</strong> and were not re-verified by the instrument used for everything else here.
+                      Its denominators are not interchangeable, and its own retrieval columns are superseded
+                      by Table 1.</li>
+                    <li><code>llms.txt</code> and content negotiation are <strong>the same signal</strong> in
+                      Elixir — one formatter emits both, measured at 50/50 agreement on a balanced sample. In
+                      Ruby they are independent, because each project solved them separately.</li>
+                    <li>MCP availability (Tidewave, ElixirLS, <code>usage_rules.search_docs</code>) is named
+                      but <strong>not measured</strong>.</li>
+                    <li>No claim is made here about <strong>whether models actually write better Elixir</strong>
+                      as a result. That is the outcome metric and the honest next study. Ruby's work does not
+                      measure it either — the widely-quoted “0 out of 1,267 solutions across 13 models” is
+                      Chad Fowler's <code>whichlang</code> benchmark, which measures language <em>choice</em>,
+                      not correctness.</li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <footer class="rp-colophon">
+      <div class="wrap">
+        <div class="rp-colo-mast">
+          <span class="t">Elixir's retrieval gap is a rollout problem, not an access problem.</span>
+          <span class="rp-eyebrow">Colophon · 18 August 2026</span>
+        </div>
+
+        <div class="rp-colo-grid">
+          <div class="rp-colo-col">
+            <p class="rp-eyebrow">How this report was made</p>
+            <p>
+              The measurements were produced by <strong>two AI coding agents — Claude Code and Amp</strong> —
+              each running its own instrumentation over its own resource list, then cross-checking the other's
+              figures. That redundancy was not ceremonial. The two disagreed on several results, and
+              <strong>every disagreement was settled by re-measuring rather than by averaging</strong>; a
+              number of the figures published here changed as a consequence, and the four measurement traps
+              documented in Section 07 are what the process caught.
+            </p>
+            <dl class="rp-credits">
+              <div><dt>Measurement &amp; analysis</dt><dd>Claude Code · Amp</dd></div>
+              <div><dt>Direction &amp; editorial</dt><dd>Oliver Kriška</dd></div>
+              <div><dt>Instruments</dt><dd>private in-house tooling <em>— built for recurring SEO, AEO and GEO audits across a portfolio of sites</em></dd></div>
+              <div><dt>Collected</dt><dd>18 August 2026 <em>— live HTTP probes, Hex API, GitHub API</em></dd></div>
+            </dl>
+          </div>
+
+          <div class="rp-colo-col">
+            <p class="rp-eyebrow">Sources &amp; prior art</p>
+            <p class="rp-src">
+              ruby.evilmartians.com — Ruby LLM visibility scorecard, Evil Martians / Irina Nazarova<br />
+              github.com/chad/whichlang — origin of the 0/1,267 figure<br />
+              ex_doc CHANGELOG v0.40.0 and lib/mix/tasks/docs.ex<br />
+              github.com/ash-project/usage_rules · hex.pm/packages/usage_rules<br />
+              github.com/starbelly/rebar3_ex_doc — src/rebar3_ex_doc.erl<br />
+              github.com/mjrusso/hex2txt — third-party hex package to llms.txt converter<br />
+              hex.pm API · GitHub API · live HTTP probes
+            </p>
+          </div>
+        </div>
+
+        <p class="rp-colo-foot">
+          <strong>The instruments are proprietary; the findings are not.</strong> Every figure in this report
+          is a live HTTP request or a public API call, and Section 07 describes the method in enough detail to
+          reproduce the study with nothing more than a scripting language and an internet connection — no API
+          keys and no paid tooling. The underlying data — the 85-resource scorecard, the 283-package census
+          and the 287-repository agent-rules scan — is available on request.
+        </p>
+      </div>
+    </footer>
+  </article>
+</Default>
+
+<style is:global>
+  /* ===========================================================
+     Research report — long-form editorial layout on site tokens.
+     Scoped under .report so nothing leaks into docs pages.
+     =========================================================== */
+  .report {
+    /* Text-safe semantic colours. --danger/--warn from global.css are tuned
+       for fills and borders; at 13-15px body sizes they need a darker light
+       value and a lighter dark value to clear WCAG AA. */
+    --rp-good: var(--accent-fg);
+    --rp-warn: var(--warn-fg);
+    --rp-crit: oklch(45% 0.19 25);
+    /* accent-fg is deliberately near-black in light mode; on the diff below it
+       would not read as green next to the red del line, so the added line gets
+       a mid-tone green of its own. */
+    --rp-add: oklch(45% 0.15 145);
+    --rp-measure: 68ch;
+    font-size: 15.5px;
+    line-height: 1.7;
+  }
+  [data-theme='dark'] .report {
+    --rp-crit: oklch(78% 0.15 25);
+    --rp-add: var(--accent-fg);
+  }
+
+  .report .c-good { color: var(--rp-good); }
+  .report .c-warn { color: var(--rp-warn); }
+  .report .c-crit { color: var(--rp-crit); }
+  .report .c-mute { color: var(--muted); }
+
+  .report .rp-eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .report a:not(.rp-toc a) {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .report a:hover { color: var(--accent); }
+
+  /* ---------- hero ---------- */
+  .rp-hero {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 56px 0 40px;
+  }
+  .rp-hero-in {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 72ch;
+  }
+  .rp-hero h1 {
+    margin: 0;
+    font-size: clamp(30px, 4.4vw, 50px);
+    line-height: 1.06;
+    letter-spacing: -0.028em;
+    font-weight: 600;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .rp-standfirst {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--fg-soft);
+  }
+  .rp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    padding-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .rp-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* Outranks the prose-link rule above, which is (0,2,1) because of its :not(). */
+  .report .rp-actions .btn-ghost {
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .report .rp-actions .btn-ghost:hover { border-color: var(--border-strong); }
+
+  .rp-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .rp-stat {
+    padding: 20px 22px 22px;
+    border-right: 1px solid var(--border);
+  }
+  .rp-stat:last-child { border-right: 0; }
+  .rp-stat .n {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .rp-stat .lbl {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--fg-soft);
+  }
+
+  /* ---------- in brief ---------- */
+  .rp-brief {
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 44px 0 48px;
+  }
+  .rp-brief-head { margin-bottom: 20px; }
+  /* The K0n / step numbering is real text, not a CSS counter: generated
+     `content:` cannot be selected or copied, and a reader quoting a finding
+     should get its label with it. The <ol> already conveys order, so the
+     visible number is aria-hidden to avoid announcing it twice. */
+  .rp-findings {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 78ch;
+    border-top: 1px solid var(--border-strong);
+  }
+  .rp-findings li {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .rp-kf {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--accent-fg);
+    padding-top: 4px;
+  }
+  .rp-findings p { margin: 0; color: var(--fg-soft); }
+  .rp-findings strong { color: var(--fg); font-weight: 600; }
+
+  /* ---------- shell + contents ---------- */
+  /* minmax(0, 1fr), not 1fr: the tables carry a min-width so they scroll
+     rather than squash, and an `auto` grid minimum would let that min-content
+     widen the whole column and scroll the page sideways instead. */
+  .rp-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 0 0 24px;
+  }
+  .rp-main { min-width: 0; }
+  .rp-toc { padding: 24px 0 0; }
+  .rp-toc-box {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .rp-toc-box > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    cursor: pointer;
+    color: var(--fg);
+    font: 600 11px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    list-style: none;
+  }
+  .rp-toc-box > summary::-webkit-details-marker { display: none; }
+  .rp-toc-box > summary::after {
+    content: '+';
+    margin-left: auto;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .rp-toc-box[open] > summary::after { content: '−'; }
+  .rp-toc ol {
+    list-style: none;
+    counter-reset: rp-toc;
+    margin: 0;
+    padding: 4px 8px 10px;
+    border-top: 1px solid var(--border);
+  }
+  .rp-toc a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+  .rp-toc a::before {
+    counter-increment: rp-toc;
+    content: counter(rp-toc, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--border-strong);
+    flex: none;
+  }
+  .rp-toc a:hover { background: var(--surface-2); color: var(--fg); }
+  .rp-toc a[aria-current='true'] {
+    color: var(--accent-fg);
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  .rp-toc a[aria-current='true']::before { color: var(--accent); }
+
+  @media (min-width: 1000px) {
+    .rp-shell {
+      grid-template-columns: 236px minmax(0, 1fr);
+      gap: 56px;
+      align-items: start;
+    }
+    .rp-toc {
+      position: sticky;
+      top: calc(var(--nav-h) + 24px);
+      max-height: calc(100vh - var(--nav-h) - 48px);
+      overflow-y: auto;
+      padding: 52px 0 0;
+    }
+    .rp-toc-box { border: 0; background: transparent; }
+    .rp-toc-box > summary { pointer-events: none; padding: 0 0 6px; min-height: 0; }
+    .rp-toc-box > summary::after,
+    .rp-toc-box[open] > summary::after { content: ''; }
+    .rp-toc ol { padding: 0; border-top: 0; }
+    .rp-toc a { min-height: 0; padding: 6px 9px; }
+  }
+
+  /* ---------- sections ---------- */
+  .rp-main > section {
+    padding: 52px 0;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: calc(var(--nav-h) + 16px);
+  }
+  .rp-main > section:last-of-type { border-bottom: 0; }
+  .rp-sec-head {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 26px;
+    max-width: 72ch;
+  }
+  .rp-sec-num {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-fg);
+  }
+  .rp-sec-head h2 {
+    margin: 0;
+    font-size: clamp(21px, 2.4vw, 29px);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .rp-lede {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.62;
+    color: var(--fg-soft);
+    max-width: 68ch;
+  }
+  .rp-subhead {
+    margin: 40px 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .rp-prose {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: var(--rp-measure);
+    margin-top: 24px;
+  }
+  .rp-prose:first-child { margin-top: 0; }
+  .rp-prose > p { margin: 0; color: var(--fg-soft); }
+  .rp-prose strong { color: var(--fg); font-weight: 600; }
+  .rp-prose h3 {
+    margin: 12px 0 -4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+  .rp-small { font-size: 14px; color: var(--muted) !important; }
+  .rp-caption {
+    margin: 10px 0 0;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  .rp-pull {
+    margin: 4px 0;
+    padding: 2px 0 2px 22px;
+    border-left: 3px solid var(--accent);
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--fg);
+    max-width: 60ch;
+  }
+  .rp-pull strong { font-weight: 600; }
+
+  /* ---------- layer cards ---------- */
+  .rp-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rp-layer {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    position: relative;
+    overflow: hidden;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .rp-layer::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--border-strong);
+  }
+  .rp-layer.hot::before { background: var(--accent); }
+  .rp-layer.hot { border-color: color-mix(in oklab, var(--accent) 35%, var(--border)); }
+  .rp-layer-n {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--border-strong);
+  }
+  .rp-layer.hot .rp-layer-n { color: var(--accent); }
+  .rp-layer-body { display: flex; flex-direction: column; gap: 8px; }
+  .rp-layer-body h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--fg); }
+  .rp-layer-q { margin: 0; color: var(--fg-soft); max-width: 60ch; }
+
+  .rp-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  /* inline-block, not inline-flex: a flex container drops the whitespace text
+     nodes around an inline <code> child, gluing "whatever latest says" into
+     one word. */
+  .rp-tag {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--fg-soft);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+  .rp-tag code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+  .rp-tag.g {
+    color: var(--rp-good);
+    background: var(--accent-soft);
+    border-color: color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+  .rp-tag.c {
+    color: var(--rp-crit);
+    background: var(--danger-soft);
+    border-color: color-mix(in oklab, var(--danger) 30%, transparent);
+  }
+
+  /* ---------- tables ---------- */
+  .rp-figure { margin: 0 0 4px; }
+  .rp-figure figcaption {
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .rp-figure figcaption b { color: var(--fg-soft); font-weight: 600; }
+  .rp-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .rp-table-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .report table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .report th,
+  .report td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    color: var(--fg-soft);
+  }
+  .report th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface-2);
+  }
+  .report tbody tr:last-child td { border-bottom: 0; }
+  .report td:first-child { white-space: normal; min-width: 210px; color: var(--fg); }
+  .report td.num,
+  .report th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .report tr.total td { font-weight: 600; background: var(--surface-2); color: var(--fg); }
+
+  /* ---------- bars ---------- */
+  .rp-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: var(--rp-measure);
+  }
+  .rp-bar-row {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr) 42px;
+    gap: 14px;
+    align-items: center;
+  }
+  .rp-bar-lab {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--fg-soft);
+  }
+  .rp-bar-track {
+    height: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .rp-bar-fill { height: 100%; background: var(--accent); }
+  .rp-bar-fill.mid { background: var(--warn); }
+  .rp-bar-fill.low { background: var(--danger); }
+  .rp-bar-val {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--fg-soft);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- notes ---------- */
+  .rp-note {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .rp-note p { margin: 0; color: var(--fg-soft); }
+  .rp-note strong { color: var(--fg); }
+  .rp-note-k {
+    display: block;
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .rp-note.good { background: var(--accent-soft); border-left-color: var(--accent); }
+  .rp-note.good .rp-note-k { color: var(--rp-good); }
+  .rp-note.warn { background: var(--warn-soft); border-left-color: var(--warn); }
+  .rp-note.warn .rp-note-k { color: var(--rp-warn); }
+  .rp-note.crit { background: var(--danger-soft); border-left-color: var(--danger); }
+  .rp-note.crit .rp-note-k { color: var(--rp-crit); }
+  /* Site voice, not the auditor's — tinted with the info hue that the report's
+     own notes never use, so the disclosure reads as added rather than quoted. */
+  .rp-note.publisher { background: var(--info-soft); border-left-color: var(--info); }
+  .rp-note.publisher .rp-note-k { color: var(--info-fg); }
+  .rp-note code { background: var(--surface); }
+
+  /* ---------- code diff ---------- */
+  .report .code-block { max-width: var(--rp-measure); }
+  .report .code-block pre { font-size: 12.5px; }
+  .report .code-block .del { color: var(--rp-crit); }
+  .report .code-block .add { color: var(--rp-add); }
+
+  /* ---------- plan ---------- */
+  .rp-plan {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    max-width: 74ch;
+  }
+  .rp-plan > li {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 18px;
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .rp-step-n {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    color: var(--accent-fg);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .rp-step-body { display: flex; flex-direction: column; gap: 8px; }
+  .rp-step-body h3 { margin: 0; font-size: 15.5px; font-weight: 600; color: var(--fg); }
+  .rp-step-body p { margin: 0; font-size: 14.5px; color: var(--fg-soft); }
+  .rp-step-body strong { color: var(--fg); }
+
+  /* ---------- details ---------- */
+  .rp-details {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .rp-details > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 48px;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--fg);
+    list-style: none;
+  }
+  .rp-details > summary::-webkit-details-marker { display: none; }
+  .rp-details > summary::after {
+    content: '+';
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .rp-details[open] > summary { border-bottom: 1px solid var(--border); }
+  .rp-details[open] > summary::after { content: '−'; }
+  .rp-details-in {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    font-size: 14px;
+  }
+  .rp-details-in p { margin: 0; color: var(--fg-soft); }
+  .rp-details-in strong { color: var(--fg); }
+  .rp-details-in ul {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--fg-soft);
+  }
+  .rp-details-in li { max-width: 66ch; line-height: 1.6; }
+
+  /* ---------- colophon ---------- */
+  .rp-colophon {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 0 56px;
+  }
+  .rp-colo-mast {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px 28px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .rp-colo-mast .t { font-size: 14.5px; font-weight: 600; color: var(--fg); }
+  .rp-colo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding-top: 36px;
+  }
+  @media (min-width: 900px) {
+    .rp-colo-grid { grid-template-columns: 1.35fr 1fr; gap: 60px; }
+  }
+  .rp-colo-col { display: flex; flex-direction: column; gap: 16px; }
+  .rp-colo-col > p:not(.rp-eyebrow):not(.rp-src) {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.68;
+    color: var(--fg-soft);
+    max-width: 62ch;
+  }
+  .rp-colo-col strong { color: var(--fg); font-weight: 600; }
+  .rp-credits {
+    margin: 0;
+    border-top: 1px solid var(--border);
+  }
+  .rp-credits > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (min-width: 520px) {
+    .rp-credits > div { grid-template-columns: 172px minmax(0, 1fr); gap: 18px; align-items: baseline; }
+  }
+  .rp-credits dt {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .rp-credits dd { margin: 0; font-size: 14px; color: var(--fg); line-height: 1.5; }
+  .rp-credits dd em { font-style: normal; color: var(--fg-soft); }
+  .rp-src {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--muted);
+    word-break: break-word;
+  }
+  .rp-colo-foot {
+    margin: 36px 0 0;
+    padding-top: 22px;
+    border-top: 1px solid var(--border-strong);
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 78ch;
+  }
+  .rp-colo-foot strong { color: var(--fg-soft); font-weight: 600; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px) {
+    .rp-stats { grid-template-columns: repeat(2, 1fr); }
+    .rp-stat:nth-child(2n) { border-right: 0; }
+    .rp-stat:nth-child(-n + 2) { border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 620px) {
+    .report { font-size: 15px; }
+    .rp-hero { padding-top: 36px; }
+    .rp-main > section { padding: 40px 0; }
+    .rp-stats { grid-template-columns: 1fr; }
+    .rp-stat { border-right: 0; border-bottom: 1px solid var(--border); }
+    .rp-stat:last-child { border-bottom: 0; }
+    .rp-layer, .rp-plan > li { grid-template-columns: 1fr; gap: 12px; }
+    .rp-bar-row { grid-template-columns: 84px minmax(0, 1fr) 38px; gap: 10px; }
+    .rp-pull { font-size: 16.5px; padding-left: 16px; }
+    .report .table-scroll-hint { display: block; }
+  }
+</style>
+
+<script>
+  // Clickable index: mark the section currently in view.
+  const links = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('.rp-toc a[href^="#"]')
+  );
+  const sections = links
+    .map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
+    .filter((el): el is HTMLElement => el !== null);
+
+  if (links.length > 0 && sections.length > 0 && 'IntersectionObserver' in window) {
+    const visible = new Set<string>();
+
+    const setActive = (id: string | null) => {
+      for (const link of links) {
+        const isCurrent = id !== null && decodeURIComponent(link.hash.slice(1)) === id;
+        if (isCurrent) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        }
+        // Highlight the topmost section still on screen, so scrolling up and
+        // down lands on the same entry rather than whichever fired last.
+        const topmost = sections.find((section) => visible.has(section.id));
+        if (topmost) setActive(topmost.id);
+      },
+      { rootMargin: '-15% 0px -70% 0px', threshold: 0 }
+    );
+
+    for (const section of sections) observer.observe(section);
+  }
+
+  // On narrow viewports the contents list is a collapsible box; close it once a
+  // section is chosen so the reader lands on the content, not the index.
+  const tocBox = document.querySelector<HTMLDetailsElement>('.rp-toc-box');
+  if (tocBox) {
+    const collapsible = window.matchMedia('(max-width: 999px)');
+    tocBox.open = !collapsible.matches;
+    for (const link of links) {
+      link.addEventListener('click', () => {
+        if (collapsible.matches) tocBox.open = false;
+      });
+    }
+    collapsible.addEventListener('change', (event) => {
+      tocBox.open = !event.matches;
+    });
+  }
+</script>

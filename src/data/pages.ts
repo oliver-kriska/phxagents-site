@@ -1,3 +1,5 @@
+import { researchReports } from './research';
+
 export type PageSection = 'Getting started' | 'Runtime guides' | 'Documentation';
 
 export interface PageItem {
@@ -90,4 +92,15 @@ export const pageItems: PageItem[] = [
     group: 'docs',
     llmsSection: 'Documentation',
   },
+  // Derived so the nav label, search entry and llms.txt line cannot drift apart.
+  ...researchReports.map(
+    (report): PageItem => ({
+      type: 'page',
+      name: report.name,
+      desc: report.description,
+      url: `/research/${report.slug}/`,
+      group: 'docs',
+      llmsSection: 'Documentation',
+    })
+  ),
 ];

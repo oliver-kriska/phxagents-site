@@ -91,6 +91,15 @@ export async function getStaticPaths() {
         kind: 'docs',
       },
     },
+    {
+      slug: 'research/elixir-retrieval-gap',
+      data: {
+        title: "Elixir's retrieval gap",
+        subtitle:
+          'Independent audit of 85 ecosystem resources, 283 Hex packages and 287 repositories.',
+        kind: 'docs',
+      },
+    },
     ...skills.map((entry) => {
       const slug = entry.id.replace(/\/SKILL$/i, '');
       const name = entry.data.name as string;

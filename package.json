@@ -10,8 +10,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "sh scripts/clone-source.sh && astro build",
-    "build:local": "astro build",
+    "build": "sh scripts/clone-source.sh && npm run build:local",
+    "build:local": "astro build && node scripts/verify-research-parity.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "dev:link": "sh scripts/dev-link.sh"

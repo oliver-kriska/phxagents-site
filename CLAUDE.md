@@ -24,7 +24,7 @@ npm run preview                                  # serve dist/ locally
 
 Node 22 LTS is required (pinned in `.nvmrc`, `.tool-versions`, and `package.json` engines). On Node 23+ install with `npm ci --ignore-scripts` because `sharp` doesn't yet ship prebuilds.
 
-There is no test suite, linter, or formatter wired up — the only verification is `npm run build:local` succeeding.
+There is no test suite, linter, or formatter wired up — the only verification is `npm run build:local` succeeding. That script runs `astro build` and then `scripts/verify-research-parity.mjs`, which fails the build if a research report's HTML page and its `.md` twin disagree on any figure.
 
 ## Architecture: zero-manual-update derivation
 
@@ -44,8 +44,10 @@ plugin-source/docs/runtime-support.md          → upstreamDocs collection → /
 plugin-source/scripts/port_lib/skill_transforms.py → src/lib/skillNames.ts → Claude and generated command names
 plugin-source/CLAUDE.md               → src/data/stats.ts → Iron Laws count (regex on "## Iron Laws Enforcement")
 
-skills + agents + upstreamDocs        → /llms-full.txt
-skills + agents + src/data/pages.ts   → /llms.txt
+skills + agents + upstreamDocs + research → /llms-full.txt
+skills + agents + src/data/pages.ts       → /llms.txt
+
+src/data/research/<slug>.md           → src/data/research.ts → /research/<slug>.md + /llms-full.txt + /llms.txt + /search.json
 ```
 
 Key files:
@@ -56,17 +58,19 @@ Key files:
 - `src/lib/sourceDates.ts` — derives `dateModified` from each plugin source file's last Git commit. `scripts/clone-source.sh` must retain full plugin history; a shallow clone without a frontmatter fallback fails rather than publishing fake freshness.
 - `src/lib/og.ts` — build-time Open Graph card generator. `satori` lays out a flexbox tree with embedded JetBrains Mono and emits SVG; `sharp` rasterizes it to PNG (no system-font dependency). satori only understands a CSS subset (hex/rgb, no oklch), so the palette is hardcoded hex.
 - `src/data/stats.ts` — same `process.cwd()` filesystem-read pattern; exposes `{ skills, agents, references, ironLaws, version, description, keywords }` to pages via import.
+- `src/data/research.ts` — site-owned long-form reports. Unlike everything above these are **not** plugin-derived: the prose lives in `src/data/research/<slug>.md` and that Markdown is the artifact, served verbatim at `/research/<slug>.md` and embedded in `/llms-full.txt`. The matching `.astro` page is the presentation layer over the same figures; `scripts/verify-research-parity.mjs` fails the build if the two disagree.
 - `src/data/release.ts` — fetches the latest GitHub release **and** stargazer count at build time; uses `GITHUB_TOKEN` env var if set (CI does this) to avoid rate limits. Results are memoized per build.
 
 ### Routes (all under `src/pages/`)
 
-- Narrative pages are **`.astro` files**, not MDX: `index.astro`, `install.astro`, `iron-laws.astro`, `changelog.astro`, `catalog.astro`, `tidewave-mcp.astro`, `404.astro`. (`iron-laws.astro` and `changelog.astro` use `marked` to render some inline markdown.)
+- Narrative pages are **`.astro` files**, not MDX: `index.astro`, `install.astro`, `iron-laws.astro`, `changelog.astro`, `catalog.astro`, `tidewave-mcp.astro`, `research/elixir-retrieval-gap.astro`, `404.astro`. (`iron-laws.astro` and `changelog.astro` use `marked` to render some inline markdown.)
 - `src/pages/install/[runtime].astro` and `src/pages/compatibility.astro` render canonical upstream Markdown through `UpstreamDocPage.astro`. Astro redirects the legacy `/amp/` URL to `/install/amp/`.
 - `src/pages/skills/[...slug].astro` and `src/pages/agents/[...slug].astro` — dynamic routes that render plugin markdown via `getCollection()` + `render()`, with prev/next nav. The skill route strips a trailing `/SKILL` segment from the collection ID (`pattern: '*/SKILL.md'` produces IDs like `oban/SKILL`).
 - `src/pages/skills/[slug].md.ts` and `src/pages/agents/[slug].md.ts` — additive raw-Markdown twins built from each collection entry's retained `body`.
-- `src/pages/llms.txt.ts` and `src/pages/llms-full.txt.ts` — generated LLM discovery index and concatenated full export. The full export deliberately excludes per-skill reference appendices to stay near 500 KB.
+- `src/pages/llms.txt.ts` and `src/pages/llms-full.txt.ts` — generated LLM discovery index and concatenated full export. The full export deliberately excludes per-skill reference appendices; it carries skills, agents, upstream runtime docs and research report bodies (~530 KB).
+- `src/pages/research/[slug].md.ts` — the raw-Markdown twin for each research report, the site-owned counterpart to the skill/agent `.md` routes.
 - `src/pages/og/[...slug].png.ts` — build-time endpoint emitting one OG PNG per page at `/og/<slug>.png` (home → `og/home.png`, `/skills/plan/` → `og/skills/plan.png`). `Default.astro` derives each page's `og:image` URL from its pathname; `default` is the fallback.
-- `src/pages/search.json.ts` — emits `/search.json`, a flat index of every skill/agent (type, name, desc, url, group). This is the search backend (Pagefind was removed with Starlight). Its ten page entries are shared with `/llms.txt` through `src/data/pages.ts`.
+- `src/pages/search.json.ts` — emits `/search.json`, a flat index of every skill/agent (type, name, desc, url, group). This is the search backend (Pagefind was removed with Starlight). Its page entries are shared with `/llms.txt` through `src/data/pages.ts`, which appends one entry per research report so the nav label, search entry and `llms.txt` line cannot drift.
 
 ### Layouts & shared client behavior
 
@@ -82,6 +86,7 @@ Key files:
 - `astro.config.mjs` — `site`, the `sitemap()` integration, `markdown.processor` (`unified()` from `@astrojs/markdown-remark`) carrying the `rehypeShiftHeadings` plugin (one-`<h1>`-per-page), `compressHTML: true` (restores v6 inline-whitespace collapsing — Astro 7's Rust compiler defaults to `'jsx'`, which strips newline-only whitespace between inline elements and would glue words like `dedicated<a>…`), and Shiki `langAlias` for `heex`/`eex`/`sface` (aliased to `html`)
 - The narrative `.astro` pages' prose (`index`, `install`, `iron-laws`, `changelog`, `catalog`, `tidewave-mcp`, and the site-owned comparison framing in `compatibility`). The Iron Laws *count*, version, and skill/agent *lists* on them are still derived via the `stats`/`getCollection` imports — only the surrounding copy is editable. Runtime guide and compatibility matrix bodies remain upstream-owned Markdown.
 - Footer text and the Plausible tag live in `src/layouts/Default.astro`.
+- `src/data/research/<slug>.md` and the matching `src/pages/research/<slug>.astro` — **edit both together**; the build's parity check rejects a change made to only one. Report metadata (nav label, `<title>`, description, date) lives once in `src/data/research.ts`.
 - `public/skills/index.html` and `public/agents/index.html` — static meta-refresh **redirect stubs** to `/catalog/?type=skill|agent`, carrying `noindex`. These are the `/skills/` and `/agents/` landing URLs.
 
 If you find yourself editing anything else by hand, you are probably duplicating plugin-repo content — change it there instead.
@@ -108,7 +113,7 @@ Full deployment details: `docs/cloudflare-setup.md`.
 - **Heex/EEx/Surface code blocks** — Shiki doesn't bundle these. `astro.config.mjs` aliases `heex`/`eex`/`sface` to `html` (matches hexdocs.pm). Don't register a real grammar — the alias is fine.
 - **Plausible analytics** — inline `<head>` script in `src/layouts/Default.astro`. Privacy-first, no cookies.
 - **Search** — custom: the `/search.json` endpoint + the client palette in `src/scripts/site.js`. `/` opens the modal (no Pagefind).
-- **LLM-readable outputs** — `/llms.txt` is a generated absolute-URL index; `/llms-full.txt` concatenates skills, agents, and upstream runtime docs; every skill and agent HTML page has an additive `.md` twin. Keep all of them collection-derived so removed upstream content cannot leave stale links.
+- **LLM-readable outputs** — `/llms.txt` is a generated absolute-URL index; `/llms-full.txt` concatenates skills, agents, upstream runtime docs, and research reports; every skill, agent and research HTML page has an additive `.md` twin. Keep all of them collection-derived so removed upstream content cannot leave stale links.
 - **Trailing slashes** — not configured (Astro default). Astro emits `dir/index.html`; Cloudflare Pages 308-redirects the no-slash variant to the trailing-slash URL.
 
 ## Research persistence

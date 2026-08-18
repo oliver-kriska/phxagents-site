@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { getMarkdownTitle, getRawBody } from '../lib/rawContent';
 import { getSkillIdentity } from '../lib/skillNames';
+import { researchReports } from '../data/research';
 
 interface FullEntry {
   source: string;
@@ -43,16 +44,26 @@ export const GET: APIRoute = async () => {
     };
   });
 
+  // Site-owned long-form research. Not plugin-derived, so it has no collection —
+  // but an agent fetching the full corpus should get the whole body, not just
+  // the /llms.txt link entry.
+  const researchEntries: FullEntry[] = researchReports.map((report) => ({
+    source: `research/${report.slug}.md`,
+    title: getMarkdownTitle(report.body, report.name),
+    body: report.body,
+  }));
+
   skillEntries.sort((a, b) => a.title.localeCompare(b.title));
   agentEntries.sort((a, b) => a.title.localeCompare(b.title));
   upstreamEntries.sort((a, b) => a.title.localeCompare(b.title));
+  researchEntries.sort((a, b) => a.title.localeCompare(b.title));
 
   const body = [
     '# phxagents — full documentation',
     '',
-    '> Canonical phxagents skills, agents, and runtime guides. Per-skill reference appendices are intentionally excluded.',
+    '> Canonical phxagents skills, agents, runtime guides, and research. Per-skill reference appendices are intentionally excluded.',
     '',
-    ...[...skillEntries, ...agentEntries, ...upstreamEntries].map(renderEntry),
+    ...[...skillEntries, ...agentEntries, ...upstreamEntries, ...researchEntries].map(renderEntry),
   ].join('\n');
 
   return new Response(body, {
