@@ -40,7 +40,7 @@ const primaryNavAction = onInstallPage
 const ogPath = Astro.url.pathname.replace(/^\/+|\/+$/g, '');
 const ogSlug = ogPath === '' ? 'home' : ogPath;
 const ogHasCard =
-  ['home', 'install', 'compatibility', 'catalog', 'iron-laws', 'changelog', 'tidewave-mcp', 'amp'].includes(ogSlug) ||
+  ['home', 'install', 'compatibility', 'catalog', 'iron-laws', 'changelog', 'tidewave-mcp', 'amp', 'research'].includes(ogSlug) ||
   ogSlug.startsWith('install/') ||
   ogSlug.startsWith('research/') ||
   ogSlug.startsWith('skills/') ||

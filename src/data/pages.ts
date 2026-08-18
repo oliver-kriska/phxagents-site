@@ -92,6 +92,14 @@ export const pageItems: PageItem[] = [
     group: 'docs',
     llmsSection: 'Documentation',
   },
+  {
+    type: 'page',
+    name: 'Research',
+    desc: 'Independent measurement of the Elixir ecosystem, published with method, limits and a raw Markdown twin.',
+    url: '/research/',
+    group: 'docs',
+    llmsSection: 'Documentation',
+  },
   // Derived so the nav label, search entry and llms.txt line cannot drift apart.
   ...researchReports.map(
     (report): PageItem => ({

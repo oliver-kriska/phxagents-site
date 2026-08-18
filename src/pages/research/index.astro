@@ -1,0 +1,284 @@
+---
+import Default from '../../layouts/Default.astro';
+import { researchReports } from '../../data/research';
+
+const title = 'Research';
+const description =
+  'Independent measurement of the Elixir ecosystem — live probes and public APIs, published with method, limits and a raw Markdown twin.';
+
+// Newest first, so the order holds when a second report lands.
+const reports = [...researchReports].sort((a, b) =>
+  b.datePublished.localeCompare(a.datePublished)
+);
+
+const dateFormat = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: 'Research', item: 'https://phxagents.dev/research/' },
+      ],
+    },
+    {
+      '@type': 'CollectionPage',
+      '@id': 'https://phxagents.dev/research/',
+      name: 'Research — phxagents',
+      description,
+      url: 'https://phxagents.dev/research/',
+      inLanguage: 'en',
+      isPartOf: { '@id': 'https://phxagents.dev/#website' },
+      hasPart: reports.map((report) => ({
+        '@type': 'Report',
+        name: report.title,
+        url: `https://phxagents.dev/research/${report.slug}/`,
+        datePublished: report.datePublished,
+      })),
+    },
+  ],
+};
+---
+
+<Default title={title} description={description} active="docs">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <main class="rx">
+    <div class="wrap">
+      <nav class="rx-crumbs" aria-label="Breadcrumb">
+        <a href="/">phxagents</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Research</span>
+      </nav>
+
+      <h1>Research</h1>
+      <p class="rx-lede">
+        Independent measurement of the Elixir ecosystem. Each report is published
+        with its method, its limits and the raw Markdown an agent would read —
+        not just the conclusion.
+      </p>
+
+      <ol class="rx-list">
+        {reports.map((report) => (
+          <li class="rx-item">
+            <h2>
+              <a href={`/research/${report.slug}/`}>{report.headline}</a>
+            </h2>
+            <p class="rx-meta numeric">
+              <time datetime={report.datePublished}>
+                {dateFormat.format(new Date(`${report.datePublished}T00:00:00Z`))}
+              </time>
+            </p>
+            <p class="rx-desc">{report.description}</p>
+            <p class="rx-links">
+              <a class="rx-read" href={`/research/${report.slug}/`}>
+                Read the report <span aria-hidden="true">→</span>
+              </a>
+              <a class="rx-md" href={`/research/${report.slug}.md`}>
+                <code>/research/{report.slug}.md</code>
+              </a>
+            </p>
+          </li>
+        ))}
+      </ol>
+
+      <section class="rx-standard" aria-labelledby="rx-standard-h">
+        <h2 id="rx-standard-h">How these are published</h2>
+        <ul>
+          <li>
+            Figures come from live HTTP probes and public APIs, collected on a stated
+            date. Anything measured by someone else is attributed to them.
+          </li>
+          <li>
+            Every report ships a raw Markdown twin — the same text the page renders,
+            served verbatim for agents and quoting. The build fails if the two ever
+            disagree on a figure.
+          </li>
+          <li>
+            Method and limits are published alongside the findings, in the report
+            rather than in a footnote nobody reaches.
+          </li>
+          <li>
+            Where a conclusion touches something this project sells, the interest is
+            disclosed in the report itself.
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</Default>
+
+<style is:global>
+  .rx {
+    padding: 40px 0 80px;
+  }
+  .rx .wrap {
+    max-width: 760px;
+  }
+
+  .rx-crumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .rx-crumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .rx-crumbs a:hover {
+    color: var(--fg);
+  }
+
+  .rx h1 {
+    font-size: clamp(30px, 3.4vw, 40px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+  .rx-lede {
+    margin: 14px 0 0;
+    max-width: 62ch;
+    font-size: 16.5px;
+    line-height: 1.55;
+    color: var(--fg-soft);
+  }
+
+  /* ---------- report list ---------- */
+  .rx-list {
+    list-style: none;
+    margin: 40px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .rx-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    padding: 22px 24px 20px;
+    transition: border-color 120ms ease;
+  }
+  .rx-item:hover {
+    border-color: var(--border-strong);
+  }
+  .rx-item h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+  .rx-item h2 a {
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .rx-item h2 a:hover {
+    color: var(--accent-fg);
+  }
+  .rx-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 0;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .rx-desc {
+    margin: 12px 0 0;
+    max-width: 68ch;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg-soft);
+  }
+  .rx-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0 0;
+  }
+  /* A ghost button here would fill with the same token the card already uses,
+     leaving only its border to separate it. A text link is flatter and avoids
+     pointing a second control at the URL the heading already links to. */
+  .rx-read {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent-fg);
+    text-decoration: none;
+  }
+  .rx-read:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .rx-md {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .rx-md code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+  .rx-md:hover {
+    color: var(--fg);
+  }
+
+  /* ---------- the standard ---------- */
+  .rx-standard {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .rx-standard h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .rx-standard ul {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 70ch;
+  }
+  .rx-standard li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg-soft);
+  }
+  .rx-standard li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 640px) {
+    .rx-item {
+      padding: 18px 18px 16px;
+    }
+  }
+</style>

@@ -53,6 +53,8 @@ export interface ResearchReport {
   heroStats: ResearchStat[];
   /** Markdown body, verbatim — served at /research/<slug>.md. */
   body: string;
+  /** The report's own H1 — its thesis. Derived from the body, never retyped. */
+  headline: string;
 }
 
 function readBody(slug: string): string {
@@ -61,6 +63,14 @@ function readBody(slug: string): string {
   if (body.trim() === '') throw new Error(`Empty research body: ${file}`);
   return body;
 }
+
+function readHeadline(body: string, slug: string): string {
+  const match = body.match(/^#\s+(.+)$/m);
+  if (!match) throw new Error(`Research body has no H1 headline: ${slug}`);
+  return match[1].trim();
+}
+
+const reportBody = readBody('elixir-retrieval-gap');
 
 export const researchReports: ResearchReport[] = [
   {
@@ -98,7 +108,8 @@ export const researchReports: ResearchReport[] = [
         tone: 'warn',
       },
     ],
-    body: readBody('elixir-retrieval-gap'),
+    body: reportBody,
+    headline: readHeadline(reportBody, 'elixir-retrieval-gap'),
   },
 ];
 

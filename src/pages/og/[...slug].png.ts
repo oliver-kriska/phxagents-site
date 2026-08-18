@@ -92,6 +92,15 @@ export async function getStaticPaths() {
         kind: 'docs',
       },
     },
+    {
+      slug: 'research',
+      data: {
+        title: 'Research',
+        subtitle:
+          'Independent measurement of the Elixir ecosystem — method, limits and raw Markdown published with every report.',
+        kind: 'docs',
+      },
+    },
     // Research cards trade the description for the report's own headline
     // figures, so a link preview arrives carrying findings.
     ...researchReports.map((report) => ({
