@@ -24,7 +24,7 @@ npm run preview                                  # serve dist/ locally
 
 Node 22 LTS is required (pinned in `.nvmrc`, `.tool-versions`, and `package.json` engines). On Node 23+ install with `npm ci --ignore-scripts` because `sharp` doesn't yet ship prebuilds.
 
-There is no test suite, linter, or formatter wired up — the only verification is `npm run build:local` succeeding. That script runs `astro build` and then `scripts/verify-research-parity.mjs`, which fails the build if a research report's HTML page and its `.md` twin disagree on any figure.
+There is no test suite, linter, or formatter wired up. Verification is `npm run build:local` succeeding (which also runs the research parity check) plus `npm run check` (`astro check`) for TypeScript/Astro diagnostics. `astro check` is **not** wired into the build: it reports six long-standing type errors in `astro.config.mjs`, `DocPage.astro`, `catalog.astro`, and `install/[runtime].astro`, so gating on it would block every deploy. Treat its output as "no *new* errors" rather than "zero errors". That script runs `astro build` and then `scripts/verify-research-parity.mjs`, which fails the build if a research report's HTML page and its `.md` twin disagree on any figure.
 
 ## Architecture: zero-manual-update derivation
 

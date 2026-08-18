@@ -12,6 +12,7 @@
     "start": "astro dev",
     "build": "sh scripts/clone-source.sh && npm run build:local",
     "build:local": "astro build && node scripts/verify-research-parity.mjs",
+    "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",
     "dev:link": "sh scripts/dev-link.sh"
@@ -28,5 +29,9 @@
   },
   "overrides": {
     "esbuild": "^0.28.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
   }
 }
