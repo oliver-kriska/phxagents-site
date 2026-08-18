@@ -96,7 +96,10 @@ for (const slug of SLUGS) {
   }
 
   const pageFigures = figures(htmlToText(html.slice(bodyStart, bodyEnd)));
-  const mdFigures = figures(md);
+  // Link targets are not visible text. htmlToText drops every href with the
+  // tags, so a Markdown URL carrying digits — a PR number, a version in a path
+  // — would read as a figure the page is missing. Compare what a reader sees.
+  const mdFigures = figures(md.replace(/\]\([^)\s]*(?:\s+"[^"]*")?\)/g, ']'));
 
   const missingFromMd = diff(pageFigures, mdFigures);
   const missingFromPage = diff(mdFigures, pageFigures);

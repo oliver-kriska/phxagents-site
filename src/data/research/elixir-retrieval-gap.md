@@ -1,6 +1,6 @@
 # Elixir's retrieval gap is a rollout problem, not an access problem
 
-*Independent ecosystem audit — 18 August 2026 — 85 resources · 283 packages · 287 repositories — ~12 min read*
+*Independent ecosystem audit — 18 August 2026 — 85 resources · 283 packages · 287 repositories — ~16 min read*
 
 In August 2026 Evil Martians published a [scorecard of 93 Ruby ecosystem resources](https://ruby.evilmartians.com/), measuring whether AI agents can actually reach Ruby's documentation. On the announcement thread, someone asked for the same study for Elixir. This is that study — and the answer is not the one the Ruby findings would lead you to expect.
 
@@ -228,6 +228,85 @@ Two tempting explanations are also wrong, and worth ruling out early: the gap do
 - `llms.txt` and content negotiation are **the same signal** in Elixir — one formatter emits both, measured at 50/50 agreement on a balanced sample. In Ruby they are independent, because each project solved them separately.
 - MCP availability (Tidewave, ElixirLS, `usage_rules.search_docs`) is named but **not measured**.
 - No claim is made here about **whether models actually write better Elixir** as a result. That is the outcome metric and the honest next study. Ruby's work does not measure it either — the widely-quoted "0 out of 1,267 solutions across 13 models" is Chad Fowler's `whichlang` benchmark, which measures language *choice*, not correctness.
+
+## Section 08 — Field test: submitting the one-line fix to 30 repositories
+
+Section 06 step 02 claims the explicit formatter opt-out is a one-line change worth submitting upstream. On 18 August 2026 that claim was tested against **30 forked repositories** carrying explicit ex_doc formatter pins, drawn from this study and a follow-up owner sweep. It largely holds — and it exposes a fourth package state that Section 03 does not separate.
+
+**Seventeen of the thirty** could take the intended change against their committed dependency state. All seventeen were built, tested and submitted. **Four merged inside the first hour.**
+
+**Table 6 — pull requests opened, 18 August 2026**
+
+| Package | Pull request | Status | Verification |
+| --- | --- | --- | --- |
+| `rebar3_ex_doc` | [jelly-beam/rebar3_ex_doc#130](https://github.com/jelly-beam/rebar3_ex_doc/pull/130) | Open | Adds Markdown to the plugin default and to the --formatter help. 19/19 CT, Dialyzer and fixture generation passed. |
+| `phoenix` | [phoenixframework/phoenix#6794](https://github.com/phoenixframework/phoenix/pull/6794) | **Merged in 13m 35s** | Merged, then republished docs pushed 4m 18s later. |
+| `credo` | [rrrene/credo#1308](https://github.com/rrrene/credo/pull/1308) | Open | Docs emitted Markdown and llms.txt; 1,850 tests and 21 doctests passed. |
+| `oauth2` | [ueberauth/oauth2#189](https://github.com/ueberauth/oauth2/pull/189) | Open | Docs, formatting, Credo and 55 tests passed. |
+| `guardian` | [ueberauth/guardian#750](https://github.com/ueberauth/guardian/pull/750) | Open | Preserves HTML and EPUB while adding Markdown; 284 tests passed. |
+| `amqp` | [pma/amqp#247](https://github.com/pma/amqp/pull/247) | Open | Warnings-as-errors compile and 67 tests against RabbitMQ 3 passed. |
+| `digital_token` | [ex-money/digital_token#8](https://github.com/ex-money/digital_token/pull/8) | **Merged in 36m 52s** | Maintainer republished the docs 2m 15s after merge. |
+| `stripity_stripe` | [beam-community/stripity-stripe#946](https://github.com/beam-community/stripity-stripe/pull/946) | Open | Docs, compile, Credo, Dialyzer and 364 tests passed. |
+| `reactor` | [ash-project/reactor#337](https://github.com/ash-project/reactor/pull/337) | Open | mix check --no-retry passed; cites ash as the in-organisation precedent. |
+| `opentelemetry_absinthe` | [open-telemetry/opentelemetry-erlang-contrib#787](https://github.com/open-telemetry/opentelemetry-erlang-contrib/pull/787) | Open | Docs, compile, format, 33 tests and Dialyzer passed. Blocked on EasyCLA identity, not on code. |
+| `cloak` | [danielberkompas/cloak#131](https://github.com/danielberkompas/cloak/pull/131) | Open | Docs and 71 tests passed. Semaphore fails before checkout on retired machine images. |
+| `configparser_ex` | [easco/configparser_ex#17](https://github.com/easco/configparser_ex/pull/17) | Open | No committed lock; docs emitted Markdown and 29 tests passed. |
+| `recase` | [wemake-services/recase#253](https://github.com/wemake-services/recase/pull/253) | **Merged in 53m 37s** | Five CI matrix jobs passed; approved, then merged 43 seconds later. |
+| `x509` | [voltone/x509#104](https://github.com/voltone/x509/pull/104) | Open | Docs, format and warnings-as-errors compile passed. One expired-certificate failure reproduces on upstream. |
+| `geo` | [felt/geo#253](https://github.com/felt/geo/pull/253) | Open | Docs emitted Markdown; 170 tests, 16 properties and 3 doctests passed. |
+| `geo_postgis` | [felt/geo_postgis#289](https://github.com/felt/geo_postgis/pull/289) | Open | Two PostGIS-version-sensitive failures reproduce unchanged on upstream. |
+| `phoenix_swoosh` | [swoosh/phoenix_swoosh#499](https://github.com/swoosh/phoenix_swoosh/pull/499) | **Merged in 2m 17s** | The fastest response in the campaign. Format and 38 tests passed. |
+
+**Merge speed.** Phoenix Swoosh merged in 2m 17s, Phoenix in 13m 35s, Digital Token in 36m 52s and Recase in 53m 37s — a median of 25m 14s across the four. No maintainer disputed the technical premise during the window. Two of the remaining thirteen carry red CI that is infrastructure rather than code: an EasyCLA identity check, and a Semaphore config requesting retired machine images.
+
+> Small, well-scoped ecosystem maintenance gets reviewed and merged in minutes here. That is a finding about the ecosystem, not a footnote about the campaign.
+
+**Merging is not shipping.** Of the four merged, only two have republished. `phoenix.hexdocs.pm/llms.txt` and `digital-token.hexdocs.pm/llms.txt` now return 200; `phoenix-swoosh.hexdocs.pm/llms.txt` and `recase.hexdocs.pm/llms.txt` still return 404. An accepted formatter change reaches an agent only after the docs are rebuilt and published — Cause B acting on Cause A's fix.
+
+### The fourth state — stale *and* pinned
+
+The other thirteen were withheld rather than submitted, because the one-line change was tested rather than assumed and it failed. Their committed ex_doc versions predate 0.40.0, so adding the formatter alone makes `mix docs` fail outright.
+
+**Table 7 — package states and their safe remediation**
+
+| State | Safe remediation |
+| --- | --- |
+| Current ex_doc, no explicit pin | Already inherits Markdown — publish docs. |
+| Current ex_doc + explicit pin | Add “markdown”. Genuinely one line. |
+| Old ex_doc, no explicit pin | Refresh ex_doc, republish. |
+| Old ex_doc + explicit pin | Refresh ex_doc **and** add the formatter. Neither alone is sufficient. |
+
+Section 03 splits the causes into an explicit opt-out and a stale build. A repository that commits its lockfile can be both at once, and then neither remedy works alone. **13 of the 30 (43%)** were in that fourth state or carried a further docs-configuration incompatibility.
+
+This does not revise Table 2. That census classifies 283 published packages by download volume; this is a 30-repository implementation sample selected for having explicit pins, and the two denominators are not interchangeable. What it revises is the *unit of work*: from a one-line pull request to a small dependency-aware maintenance change.
+
+**Table 8 — withheld after verification, with the committed ex_doc that blocked it**
+
+| Package | Committed ex_doc | Why the one-line change was withheld |
+| --- | --- | --- |
+| [`bunt`](https://github.com/rrrene/bunt) | 0.30.9 | Changed docs cannot load the Markdown formatter. |
+| [`nimble_options`](https://github.com/dashbitco/nimble_options) | 0.35.1 | Markdown worked only after a temporary update to ex_doc 0.40.3. |
+| [`open_api_spex`](https://github.com/open-api-spex/open_api_spex) | 0.37.3 | CI runs mix docs --warnings-as-errors, which the one-line change fails deterministically. |
+| [`logger_json`](https://github.com/Nebo15/logger_json) | 0.37.3 | Committed-lock docs fail with formatter module “markdown” not found. |
+| [`goth`](https://github.com/peburrows/goth) | 0.35.1 | Markdown generation passed only with a temporary ex_doc update. |
+| [`sourceror`](https://github.com/doorgan/sourceror) | 0.31.2 | Restored-lock mix check fails when docs try to load Markdown. |
+| [`typed_struct`](https://github.com/ejpcmac/typed_struct) | 0.38.4 | Committed-lock docs fail, and contributions target develop rather than main. |
+| [`saxy`](https://github.com/qcam/saxy) | 0.34.2 | Old ex_doc lacks Markdown; current ex_doc then rejects the existing assets string. |
+| [`toml`](https://github.com/bitwalker/toml-elixir) | 0.29.0 | Committed-lock docs fail. |
+| [`excellent_migrations`](https://github.com/artur-sulej/excellent_migrations) | 0.28.4 | Baseline docs already broken: preferred_cli_env selects :docs while ex_doc is dev-only. |
+| [`mint_web_socket`](https://github.com/elixir-mint/mint_web_socket) | 0.39.1 | One version before Markdown support; changed docs fail. |
+| [`joken_jwks`](https://github.com/joken-elixir/joken_jwks) | 0.36.1 | Docs fail. PR #102 already proposes the ex_doc 0.40.1 lock update. |
+| [`ex_twilio`](https://github.com/danielberkompas/ex_twilio) | 0.31.2 | Committed-lock docs fail. |
+
+**The amended rule.** An explicit formatter pin is a one-line fix only when the documentation build already resolves ex_doc 0.40 or newer. `mix.exs` permitting a current ex_doc is not sufficient — `mix.lock` decides. Verify on the committed branch with the restored lockfile:
+
+```sh
+mix deps.get
+mix docs
+test -f doc/llms.txt
+```
+
+Running `mix deps.update ex_doc` first proves future compatibility, not that the branch you are proposing builds.
 
 ## Colophon — 18 August 2026
 

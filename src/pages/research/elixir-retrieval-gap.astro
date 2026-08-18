@@ -18,6 +18,7 @@ const sections = [
   { id: 'training-corpus', label: 'Training corpus' },
   { id: 'what-to-do', label: 'What to do' },
   { id: 'method-limits', label: 'Method & limits' },
+  { id: 'field-test', label: 'Field test' },
 ];
 
 const jsonLd = {
@@ -69,7 +70,7 @@ const jsonLd = {
           <div class="rp-meta">
             <span><time datetime="2026-08-18">18 August 2026</time></span>
             <span class="numeric">{report.sample}</span>
-            <span>~12 min read</span>
+            <span>~16 min read</span>
           </div>
           <div class="rp-actions">
             <a class="btn-ghost" href={markdownUrl}>View as Markdown</a>
@@ -732,9 +733,144 @@ end</code></pre>
               </details>
             </div>
           </section>
+
+          <section id="field-test">
+            <div class="rp-sec-head">
+              <p class="rp-sec-num">Section 08</p>
+              <h2>Field test: submitting the one-line fix to 30 repositories</h2>
+              <p class="rp-lede">
+                Section 06 step 02 claims the explicit formatter opt-out is a one-line change worth
+                submitting upstream. On 18 August 2026 that claim was tested against <b>30 forked
+                repositories</b> carrying explicit ex_doc formatter pins, drawn from this study and a
+                follow-up owner sweep. It largely holds — and it exposes a fourth package state that
+                Section 03 does not separate.
+              </p>
+            </div>
+
+            <p><b>Seventeen of the thirty</b> could take the intended change against their committed
+              dependency state. All seventeen were built, tested and submitted.
+              <b class="c-good">Four merged inside the first hour.</b></p>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 6</b> — pull requests opened, 18 August 2026</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Pull requests opened, 18 August 2026">
+                <table>
+                  <thead>
+                    <tr><th>Package</th><th>Pull request</th><th>Status</th><th>Verification</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>rebar3_ex_doc</code></td><td><a href="https://github.com/jelly-beam/rebar3_ex_doc/pull/130" rel="noopener">jelly-beam/rebar3_ex_doc#130</a></td><td>Open</td><td>Adds Markdown to the plugin default and to the --formatter help. 19/19 CT, Dialyzer and fixture generation passed.</td></tr>
+                    <tr><td><code>phoenix</code></td><td><a href="https://github.com/phoenixframework/phoenix/pull/6794" rel="noopener">phoenixframework/phoenix#6794</a></td><td><b class="c-good">Merged in 13m 35s</b></td><td>Merged, then republished docs pushed 4m 18s later.</td></tr>
+                    <tr><td><code>credo</code></td><td><a href="https://github.com/rrrene/credo/pull/1308" rel="noopener">rrrene/credo#1308</a></td><td>Open</td><td>Docs emitted Markdown and llms.txt; 1,850 tests and 21 doctests passed.</td></tr>
+                    <tr><td><code>oauth2</code></td><td><a href="https://github.com/ueberauth/oauth2/pull/189" rel="noopener">ueberauth/oauth2#189</a></td><td>Open</td><td>Docs, formatting, Credo and 55 tests passed.</td></tr>
+                    <tr><td><code>guardian</code></td><td><a href="https://github.com/ueberauth/guardian/pull/750" rel="noopener">ueberauth/guardian#750</a></td><td>Open</td><td>Preserves HTML and EPUB while adding Markdown; 284 tests passed.</td></tr>
+                    <tr><td><code>amqp</code></td><td><a href="https://github.com/pma/amqp/pull/247" rel="noopener">pma/amqp#247</a></td><td>Open</td><td>Warnings-as-errors compile and 67 tests against RabbitMQ 3 passed.</td></tr>
+                    <tr><td><code>digital_token</code></td><td><a href="https://github.com/ex-money/digital_token/pull/8" rel="noopener">ex-money/digital_token#8</a></td><td><b class="c-good">Merged in 36m 52s</b></td><td>Maintainer republished the docs 2m 15s after merge.</td></tr>
+                    <tr><td><code>stripity_stripe</code></td><td><a href="https://github.com/beam-community/stripity-stripe/pull/946" rel="noopener">beam-community/stripity-stripe#946</a></td><td>Open</td><td>Docs, compile, Credo, Dialyzer and 364 tests passed.</td></tr>
+                    <tr><td><code>reactor</code></td><td><a href="https://github.com/ash-project/reactor/pull/337" rel="noopener">ash-project/reactor#337</a></td><td>Open</td><td>mix check --no-retry passed; cites ash as the in-organisation precedent.</td></tr>
+                    <tr><td><code>opentelemetry_absinthe</code></td><td><a href="https://github.com/open-telemetry/opentelemetry-erlang-contrib/pull/787" rel="noopener">open-telemetry/opentelemetry-erlang-contrib#787</a></td><td>Open</td><td>Docs, compile, format, 33 tests and Dialyzer passed. Blocked on EasyCLA identity, not on code.</td></tr>
+                    <tr><td><code>cloak</code></td><td><a href="https://github.com/danielberkompas/cloak/pull/131" rel="noopener">danielberkompas/cloak#131</a></td><td>Open</td><td>Docs and 71 tests passed. Semaphore fails before checkout on retired machine images.</td></tr>
+                    <tr><td><code>configparser_ex</code></td><td><a href="https://github.com/easco/configparser_ex/pull/17" rel="noopener">easco/configparser_ex#17</a></td><td>Open</td><td>No committed lock; docs emitted Markdown and 29 tests passed.</td></tr>
+                    <tr><td><code>recase</code></td><td><a href="https://github.com/wemake-services/recase/pull/253" rel="noopener">wemake-services/recase#253</a></td><td><b class="c-good">Merged in 53m 37s</b></td><td>Five CI matrix jobs passed; approved, then merged 43 seconds later.</td></tr>
+                    <tr><td><code>x509</code></td><td><a href="https://github.com/voltone/x509/pull/104" rel="noopener">voltone/x509#104</a></td><td>Open</td><td>Docs, format and warnings-as-errors compile passed. One expired-certificate failure reproduces on upstream.</td></tr>
+                    <tr><td><code>geo</code></td><td><a href="https://github.com/felt/geo/pull/253" rel="noopener">felt/geo#253</a></td><td>Open</td><td>Docs emitted Markdown; 170 tests, 16 properties and 3 doctests passed.</td></tr>
+                    <tr><td><code>geo_postgis</code></td><td><a href="https://github.com/felt/geo_postgis/pull/289" rel="noopener">felt/geo_postgis#289</a></td><td>Open</td><td>Two PostGIS-version-sensitive failures reproduce unchanged on upstream.</td></tr>
+                    <tr><td><code>phoenix_swoosh</code></td><td><a href="https://github.com/swoosh/phoenix_swoosh/pull/499" rel="noopener">swoosh/phoenix_swoosh#499</a></td><td><b class="c-good">Merged in 2m 17s</b></td><td>The fastest response in the campaign. Format and 38 tests passed.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <p><b>Merge speed.</b> Phoenix Swoosh merged in 2m 17s, Phoenix in 13m 35s, Digital Token in
+              36m 52s and Recase in 53m 37s — a median of 25m 14s across the four. No maintainer disputed
+              the technical premise during the window. Two of the remaining thirteen carry red CI that is
+              infrastructure rather than code: an EasyCLA identity check, and a Semaphore config requesting
+              retired machine images.</p>
+
+            <blockquote class="rp-quote"><p>Small, well-scoped ecosystem maintenance gets reviewed and
+              merged in minutes here. That is a finding about the ecosystem, not a footnote about the
+              campaign.</p></blockquote>
+
+            <p><b>Merging is not shipping.</b> Of the four merged, only two have republished.
+              <code>phoenix.hexdocs.pm/llms.txt</code> and <code>digital-token.hexdocs.pm/llms.txt</code> now
+              return 200; <code>phoenix-swoosh.hexdocs.pm/llms.txt</code> and
+              <code>recase.hexdocs.pm/llms.txt</code> still return 404. An accepted formatter change reaches
+              an agent only after the docs are rebuilt and published — Cause B acting on Cause A’s fix.</p>
+
+            <h3>The fourth state — stale <em>and</em> pinned</h3>
+
+            <p>The other thirteen were withheld rather than submitted, because the one-line change was
+              tested rather than assumed and it failed. Their committed ex_doc versions predate 0.40.0, so
+              adding the formatter alone makes <code>mix docs</code> fail outright.</p>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 7</b> — package states and their safe remediation</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Package states and their safe remediation">
+                <table>
+                  <thead><tr><th>State</th><th>Safe remediation</th></tr></thead>
+                  <tbody>
+                    <tr><td class="c-good">Current ex_doc, no explicit pin</td><td>Already inherits Markdown — publish docs.</td></tr>
+                    <tr><td class="c-good">Current ex_doc + explicit pin</td><td>Add “markdown”. Genuinely one line.</td></tr>
+                    <tr><td class="c-warn">Old ex_doc, no explicit pin</td><td>Refresh ex_doc, republish.</td></tr>
+                    <tr><td class="c-crit">Old ex_doc + explicit pin</td><td>Refresh ex_doc <b>and</b> add the formatter. Neither alone is sufficient.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <p>Section 03 splits the causes into an explicit opt-out and a stale build. A repository that
+              commits its lockfile can be both at once, and then neither remedy works alone.
+              <b>13 of the 30 (43%)</b> were in that fourth state or carried a further docs-configuration
+              incompatibility.</p>
+
+            <p>This does not revise Table 2. That census classifies 283 published packages by download
+              volume; this is a 30-repository implementation sample selected for having explicit pins, and
+              the two denominators are not interchangeable. What it revises is the <em>unit of work</em>:
+              from a one-line pull request to a small dependency-aware maintenance change.</p>
+
+            <figure class="rp-figure">
+              <figcaption><b>Table 8</b> — withheld after verification, with the committed ex_doc that blocked it</figcaption>
+              <p class="table-scroll-hint" aria-hidden="true">Scroll table →</p>
+              <div class="rp-table-wrap" tabindex="0" role="region" aria-label="Repositories withheld after verification">
+                <table>
+                  <thead><tr><th>Package</th><th class="num">Committed ex_doc</th><th>Why the one-line change was withheld</th></tr></thead>
+                  <tbody>
+                    <tr><td><a href="https://github.com/rrrene/bunt" rel="noopener"><code>bunt</code></a></td><td class="num">0.30.9</td><td>Changed docs cannot load the Markdown formatter.</td></tr>
+                    <tr><td><a href="https://github.com/dashbitco/nimble_options" rel="noopener"><code>nimble_options</code></a></td><td class="num">0.35.1</td><td>Markdown worked only after a temporary update to ex_doc 0.40.3.</td></tr>
+                    <tr><td><a href="https://github.com/open-api-spex/open_api_spex" rel="noopener"><code>open_api_spex</code></a></td><td class="num">0.37.3</td><td>CI runs mix docs --warnings-as-errors, which the one-line change fails deterministically.</td></tr>
+                    <tr><td><a href="https://github.com/Nebo15/logger_json" rel="noopener"><code>logger_json</code></a></td><td class="num">0.37.3</td><td>Committed-lock docs fail with formatter module “markdown” not found.</td></tr>
+                    <tr><td><a href="https://github.com/peburrows/goth" rel="noopener"><code>goth</code></a></td><td class="num">0.35.1</td><td>Markdown generation passed only with a temporary ex_doc update.</td></tr>
+                    <tr><td><a href="https://github.com/doorgan/sourceror" rel="noopener"><code>sourceror</code></a></td><td class="num">0.31.2</td><td>Restored-lock mix check fails when docs try to load Markdown.</td></tr>
+                    <tr><td><a href="https://github.com/ejpcmac/typed_struct" rel="noopener"><code>typed_struct</code></a></td><td class="num">0.38.4</td><td>Committed-lock docs fail, and contributions target develop rather than main.</td></tr>
+                    <tr><td><a href="https://github.com/qcam/saxy" rel="noopener"><code>saxy</code></a></td><td class="num">0.34.2</td><td>Old ex_doc lacks Markdown; current ex_doc then rejects the existing assets string.</td></tr>
+                    <tr><td><a href="https://github.com/bitwalker/toml-elixir" rel="noopener"><code>toml</code></a></td><td class="num">0.29.0</td><td>Committed-lock docs fail.</td></tr>
+                    <tr><td><a href="https://github.com/artur-sulej/excellent_migrations" rel="noopener"><code>excellent_migrations</code></a></td><td class="num">0.28.4</td><td>Baseline docs already broken: preferred_cli_env selects :docs while ex_doc is dev-only.</td></tr>
+                    <tr><td><a href="https://github.com/elixir-mint/mint_web_socket" rel="noopener"><code>mint_web_socket</code></a></td><td class="num">0.39.1</td><td>One version before Markdown support; changed docs fail.</td></tr>
+                    <tr><td><a href="https://github.com/joken-elixir/joken_jwks" rel="noopener"><code>joken_jwks</code></a></td><td class="num">0.36.1</td><td>Docs fail. PR #102 already proposes the ex_doc 0.40.1 lock update.</td></tr>
+                    <tr><td><a href="https://github.com/danielberkompas/ex_twilio" rel="noopener"><code>ex_twilio</code></a></td><td class="num">0.31.2</td><td>Committed-lock docs fail.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </figure>
+
+            <p><b>The amended rule.</b> An explicit formatter pin is a one-line fix only when the
+              documentation build already resolves ex_doc 0.40 or newer. <code>mix.exs</code> permitting a
+              current ex_doc is not sufficient — <code>mix.lock</code> decides. Verify on the committed
+              branch with the restored lockfile:</p>
+
+            <pre><code>mix deps.get
+mix docs
+test -f doc/llms.txt</code></pre>
+
+            <p>Running <code>mix deps.update ex_doc</code> first proves future compatibility, not that the
+              branch you are proposing builds.</p>
+          </section>
         </div>
       </div>
     </div>
+
 
     <footer class="rp-colophon">
       <div class="wrap">

@@ -1,5 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "// exclude": "plugin-source is the plugin repo, symlinked in and gitignored. Its TypeScript is checked in its own repo; scanning it here buries this site's diagnostics under 40 errors we cannot fix from this side.",
+  "exclude": ["dist", "plugin-source"]
 }
