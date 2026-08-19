@@ -1,4 +1,5 @@
 import { researchReports } from './research';
+import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
 
 export type PageSection = 'Getting started' | 'Runtime guides' | 'Documentation';
 
@@ -100,6 +101,18 @@ export const pageItems: PageItem[] = [
     group: 'docs',
     llmsSection: 'Documentation',
   },
+  // Hook documentation is upstream-owned prose; the registry supplies the one
+  // copy of each page's label and description that nav, search and llms.txt share.
+  ...hookDocPages.map(
+    (page): PageItem => ({
+      type: 'page',
+      name: page.slug === 'overview' ? 'Hooks' : `Hooks: ${page.navLabel}`,
+      desc: page.description,
+      url: hookDocUrl(page.slug),
+      group: 'docs',
+      llmsSection: page.slug === 'overview' ? 'Getting started' : 'Documentation',
+    })
+  ),
   // Derived so the nav label, search entry and llms.txt line cannot drift apart.
   ...researchReports.map(
     (report): PageItem => ({

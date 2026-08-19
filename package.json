@@ -11,7 +11,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "sh scripts/clone-source.sh && npm run build:local",
-    "build:local": "astro build && node scripts/verify-research-parity.mjs",
+    "build:local": "astro build && node scripts/verify-research-parity.mjs && node scripts/verify-hooks-parity.mjs",
     "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",

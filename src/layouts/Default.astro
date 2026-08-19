@@ -13,7 +13,7 @@ interface Props {
    * the bare name "oban". Pages that omit it keep the "<title> — phxagents" form.
    */
   seoTitle?: string;
-  active?: 'docs' | 'runtimes' | 'catalog' | 'changelog' | 'iron-laws' | 'home' | null;
+  active?: 'docs' | 'runtimes' | 'catalog' | 'changelog' | 'iron-laws' | 'hooks' | 'home' | null;
 }
 
 const { title, description = stats.description, seoTitle, active = null } = Astro.props;
@@ -40,8 +40,9 @@ const primaryNavAction = onInstallPage
 const ogPath = Astro.url.pathname.replace(/^\/+|\/+$/g, '');
 const ogSlug = ogPath === '' ? 'home' : ogPath;
 const ogHasCard =
-  ['home', 'install', 'compatibility', 'catalog', 'iron-laws', 'changelog', 'tidewave-mcp', 'amp', 'research'].includes(ogSlug) ||
+  ['home', 'install', 'compatibility', 'catalog', 'iron-laws', 'changelog', 'tidewave-mcp', 'amp', 'research', 'hooks'].includes(ogSlug) ||
   ogSlug.startsWith('install/') ||
+  ogSlug.startsWith('hooks/') ||
   ogSlug.startsWith('research/') ||
   ogSlug.startsWith('skills/') ||
   ogSlug.startsWith('agents/');
@@ -161,6 +162,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
           <a href="/compatibility/" aria-current={currentAttr('/compatibility/', active === 'runtimes')}>Runtimes</a>
           <a href="/catalog/" aria-current={currentAttr('/catalog/', active === 'catalog')}>Catalog</a>
           <a href="/iron-laws/" aria-current={currentAttr('/iron-laws/', active === 'iron-laws')}>Iron Laws</a>
+          <a href="/hooks/" aria-current={currentAttr('/hooks/', active === 'hooks')}>Hooks</a>
           <a href="/changelog/" aria-current={currentAttr('/changelog/', active === 'changelog')}>Changelog</a>
         </nav>
         <div class="nav-spacer"></div>
@@ -200,6 +202,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
         <a href="/compatibility/">Runtimes</a>
         <a href="/catalog/">Catalog</a>
         <a href="/iron-laws/">Iron Laws</a>
+        <a href="/hooks/">Hooks</a>
         <a href="/changelog/">Changelog</a>
         <a href="https://github.com/oliver-kriska/claude-elixir-phoenix" rel="noopener">GitHub</a>
       </nav>
@@ -227,6 +230,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
           <a href="/catalog/">Catalog</a>
           <a href="/changelog/">Changelog</a>
           <a href="/iron-laws/">Iron Laws</a>
+          <a href="/hooks/">Hooks</a>
           <a href="/research/elixir-retrieval-gap/">Elixir SEO/AIO research</a>
           <a href="https://github.com/oliver-kriska/claude-elixir-phoenix">GitHub</a>
         </div>

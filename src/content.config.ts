@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { hookDocIdForPath } from './lib/hookDocs';
 
 const PLUGIN_BASE = './plugin-source/plugins/elixir-phoenix';
 
@@ -60,4 +61,24 @@ const upstreamDocs = defineCollection({
   schema: z.object({}).passthrough(),
 });
 
-export const collections = { skills, agents, references, upstreamDocs };
+// Hook documentation, upstream-owned like the runtime guides but scattered
+// across the plugin repository rather than gathered under docs/: the overview
+// sits at the repo root, the deep dives under the hooks directory. Loading them
+// as a collection means a renamed or deleted upstream file fails the build
+// instead of silently publishing a stale copy — which matters more here than
+// elsewhere, since the plugin's CLAUDE.md now treats these files as the
+// public documentation and requires them to move with every hook change.
+const hookDocs = defineCollection({
+  loader: glob({
+    pattern: [
+      'HOOKS.md',
+      'plugins/elixir-phoenix/hooks/README.md',
+      'plugins/elixir-phoenix/hooks/docs/*.md',
+    ],
+    base: './plugin-source',
+    generateId: ({ entry }) => hookDocIdForPath(entry),
+  }),
+  schema: z.object({}).passthrough(),
+});
+
+export const collections = { skills, agents, references, upstreamDocs, hookDocs };

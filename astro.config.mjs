@@ -76,8 +76,28 @@ function rehypeWrapTables() {
   };
 }
 
-/** Map links between canonical runtime guides to their public site routes. */
+/**
+ * Map links inside upstream-owned Markdown to their public site routes.
+ *
+ * The runtime guides and the hook docs are written to be read in the plugin
+ * repository, so they link to each other by relative path. Left alone those
+ * resolve to 404s here. Hook group docs are reachable from three different
+ * depths (the repo-root HOOKS.md, the hooks README, and each other), so every
+ * spelling of the same target is listed rather than resolved positionally —
+ * a rewrite that guessed would silently mis-link on the next upstream move.
+ */
 function rehypeUpstreamDocLinks() {
+  const GH = 'https://github.com/oliver-kriska/claude-elixir-phoenix';
+  const HOOK_GROUPS = [
+    'safety-gates',
+    'code-quality',
+    'failure-recovery',
+    'context-injection',
+    'session-lifecycle',
+    'workflow-state',
+  ];
+
+  /** @type {Record<string, string>} */
   const routes = {
     'runtime-support.md': '/compatibility/',
     'amp.md': '/install/amp/',
@@ -85,15 +105,31 @@ function rehypeUpstreamDocLinks() {
     'pi.md': '/install/pi/',
     'opencode.md': '/install/opencode/',
     '../README.md#claude-code': '/install/#claude-code',
+    // Hook overview, as spelled from the hooks directory.
+    '../../../HOOKS.md': '/hooks/',
+    // Contributor guide, as spelled from HOOKS.md and from a group doc.
+    'plugins/elixir-phoenix/hooks/README.md': '/hooks/contributing/',
+    '../README.md#output-rules-per-event': '/hooks/contributing/#output-rules-per-event',
+    // Not a document — send readers to the scripts themselves.
+    'plugins/elixir-phoenix/hooks/scripts/': `${GH}/tree/main/plugins/elixir-phoenix/hooks/scripts`,
   };
+
+  for (const group of HOOK_GROUPS) {
+    // From HOOKS.md at the repo root, from the hooks README, and sibling-relative
+    // between group docs — plus the one deep link that carries an anchor.
+    routes[`plugins/elixir-phoenix/hooks/docs/${group}.md`] = `/hooks/${group}/`;
+    routes[`docs/${group}.md`] = `/hooks/${group}/`;
+    routes[`${group}.md`] = `/hooks/${group}/`;
+    routes[`docs/${group}.md#fail-open-contract`] = `/hooks/${group}/#fail-open-contract`;
+  }
+
   const rewrite = (/** @type {any} */ node) => {
     if (node.type === 'element' && node.tagName === 'a') {
       const href = node.properties?.href;
       if (typeof href === 'string' && routes[href]) {
         node.properties.href = routes[href];
       } else if (href === '../README.md') {
-        node.properties.href =
-          'https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/README.md';
+        node.properties.href = `${GH}/blob/main/README.md`;
       }
     }
     if (node.children) for (const child of node.children) rewrite(child);

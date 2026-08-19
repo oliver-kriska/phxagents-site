@@ -1,6 +1,7 @@
 ---
 import Default from './Default.astro';
 import { getDocsNav } from '../lib/docsNav';
+import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
 
 interface Props {
   title: string;
@@ -38,6 +39,17 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
           <li><a href="/install/pi/" aria-current={currentPath === '/install/pi/' ? 'page' : undefined}>Pi</a></li>
           <li><a href="/install/opencode/" aria-current={currentPath === '/install/opencode/' ? 'page' : undefined}>OpenCode</a></li>
           <li><a href="/iron-laws/" aria-current={currentPath === '/iron-laws/' ? 'page' : undefined}>Iron Laws</a></li>
+          <li><a href="/hooks/" aria-current={currentPath === '/hooks/' ? 'page' : undefined}>Hooks</a></li>
+          {hookDocPages
+            .filter((page) => page.slug !== 'overview')
+            .map((page) => (
+              <li class="docs-nav-child">
+                <a
+                  href={hookDocUrl(page.slug)}
+                  aria-current={currentPath === hookDocUrl(page.slug) ? 'page' : undefined}
+                >{page.navLabel}</a>
+              </li>
+            ))}
           <li><a href="/tidewave-mcp/" aria-current={currentPath === '/tidewave-mcp/' ? 'page' : undefined}>Tidewave MCP</a></li>
           <li><a href="/changelog/" aria-current={currentPath === '/changelog/' ? 'page' : undefined}>Changelog</a></li>
           <li><a href="/catalog/" aria-current={currentPath === '/catalog/' ? 'page' : undefined}>Catalog</a></li>
@@ -177,6 +189,13 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
     background: var(--accent-soft);
     font-weight: 500;
   }
+  .docs-nav-group ul li.docs-nav-child a {
+    padding-left: 22px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .docs-nav-group ul li.docs-nav-child a:hover { color: var(--fg); }
+  .docs-nav-group ul li.docs-nav-child a[aria-current="page"] { color: var(--accent-fg); }
   .docs-nav-group ul a code {
     background: transparent;
     border: 0;

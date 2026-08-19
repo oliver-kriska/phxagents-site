@@ -1,6 +1,7 @@
 ---
 import Default from '../layouts/Default.astro';
 import { stats } from '../data/stats';
+import { hookGroupPages, hookDocUrl } from '../lib/hookDocs';
 import { getLatestRelease } from '../data/release';
 import { getPortableWorkflowNames } from '../lib/skillNames';
 
@@ -98,6 +99,8 @@ const jsonLd = {
         <a class="stat" href="/catalog/?type=agent"><div class="n">{stats.agents}</div><div class="lbl">Claude Code agents</div></a>
         <a class="stat" href="#workflow"><div class="n">{adaptedWorkflows}</div><div class="lbl">Workflows adapted</div></a>
         <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron Laws</div></a>
+        <a class="stat" href="/hooks/"><div class="n">{stats.hooks}</div><div class="lbl">Enforcement hooks</div></a>
+        <a class="stat" href="/hooks/"><div class="n">{stats.hookEvents}</div><div class="lbl">Lifecycle events</div></a>
       </div>
     </div>
   </section>
@@ -145,7 +148,7 @@ const jsonLd = {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
           </span>
           <h3>Claude orchestration stays native</h3>
-          <p>Claude Code remains the full plugin: {stats.agents} named agents, lifecycle hooks, permission settings, root instructions and its specialist fan-out.</p>
+          <p>Claude Code remains the full plugin: {stats.agents} named agents, <a href="/hooks/">{stats.hooks} lifecycle hooks</a>, permission settings, root instructions and its specialist fan-out.</p>
           <div class="meta">full canonical implementation</div>
         </article>
 
@@ -218,6 +221,50 @@ const jsonLd = {
           </li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <section class="band band-hooks" id="hooks">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The layer that doesn’t rely on being read.</h2>
+        <p>Skills and agents are instructions a model may or may not follow. Hooks are shell scripts that always run. Session analysis across 400 sessions measured <code>CLAUDE.md</code> prose rules firing <strong>~0% of the time</strong> — so anything that genuinely must happen moved out of prose and into {stats.hooks} auditable bash scripts across {stats.hookEvents} lifecycle events.</p>
+      </div>
+
+      <div class="hooks-grid">
+        <div class="term" aria-hidden="true">
+          <div class="term-head">
+            <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="title">PreToolUse · block-dangerous-ops</div>
+          </div>
+          <div class="term-body">
+            <div class="term-line"><span class="prompt">$</span><span class="cmd">mix ecto.reset</span></div>
+            <div class="term-out"><span class="warn">BLOCKED: Destructive database operation detected.</span>
+mix ecto.reset/drop will destroy all data. If intentional, run manually
+outside Claude Code. Safer alternatives:
+<span class="dim">- mix ecto.rollback --step 1 (undo last migration)
+- mix ecto.migrate (apply pending migrations)</span></div>
+          </div>
+        </div>
+
+        <ul class="hooks-list">
+          {hookGroupPages.map((group) => (
+            <li>
+              <a href={hookDocUrl(group.slug)}>
+                <strong>{group.navLabel}</strong>
+                <span class="ev">{group.events.join(' · ')}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p class="hooks-note">
+        Every Elixir-specific hook gates on <code>mix.exs</code>, so the plugin is inert in a
+        non-Elixir repository, and all of them fail open — a broken hook means the guard is off,
+        never that the session is unusable.
+        <a href="/hooks/">Read how the hooks work →</a>
+      </p>
     </div>
   </section>
 
@@ -395,6 +442,56 @@ const jsonLd = {
   }
   @keyframes blink { 50% { opacity: 0; } }
 
+  /* Hooks */
+  .hooks-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .hooks-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .hooks-list li + li { border-top: 1px solid var(--border); }
+  .hooks-list a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 18px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 120ms;
+  }
+  .hooks-list a:hover { background: var(--surface-2); }
+  .hooks-list a:hover strong { color: var(--accent-fg); }
+  .hooks-list strong { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+  .hooks-list .ev {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--muted);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .hooks-note {
+    margin: 24px 0 0;
+    max-width: 760px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .hooks-note a { color: var(--accent-fg); text-decoration: none; white-space: nowrap; }
+  .hooks-note a:hover { text-decoration: underline; }
+  @media (max-width: 900px) {
+    .hooks-grid { grid-template-columns: 1fr; }
+  }
+
   /* Section bands — deliberately uneven rhythm (not a repeated 64px stamp):
      denser sections get more air, the closing CTA gets the most emphasis. */
   section.band {
@@ -404,6 +501,7 @@ const jsonLd = {
   section.band-stats { padding: 0 0 48px; border-top: 0; }
   section.band-features { padding: 72px 0; }
   section.band-workflow { padding: 64px 0; }
+  section.band-hooks { padding: 68px 0; }
   section.band-clients { padding: 56px 0; }
   section.band-cta { padding: 80px 0; }
   .section-head {
@@ -431,7 +529,7 @@ const jsonLd = {
   /* Stats */
   .stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     background: var(--surface);
@@ -440,12 +538,15 @@ const jsonLd = {
   .stat {
     padding: 22px 24px;
     border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
     text-decoration: none;
     color: inherit;
     transition: background 120ms, color 120ms;
     display: block;
   }
-  .stat:last-child { border-right: 0; }
+  /* Two rows of three: clear the rightmost column and the final row. */
+  .stat:nth-child(3n) { border-right: 0; }
+  .stat:nth-last-child(-n + 3) { border-bottom: 0; }
   @media (hover: hover) and (pointer: fine) {
     .stat:hover { background: var(--surface-2); }
     .stat:hover .n { color: var(--accent-fg); }
@@ -468,8 +569,11 @@ const jsonLd = {
   }
   @media (max-width: 760px) {
     .stats { grid-template-columns: repeat(2, 1fr); }
-    .stat:nth-child(2) { border-right: 0; }
-    .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--border); }
+    /* Three rows of two: the column and final-row rules shift accordingly. */
+    .stat:nth-child(3n) { border-right: 1px solid var(--border); }
+    .stat:nth-child(2n) { border-right: 0; }
+    .stat:nth-last-child(-n + 3) { border-bottom: 1px solid var(--border); }
+    .stat:nth-last-child(-n + 2) { border-bottom: 0; }
   }
 
   /* Features */
@@ -661,6 +765,7 @@ const jsonLd = {
   @media (max-width: 600px) {
     section.band-features,
     section.band-workflow,
+    section.band-hooks,
     section.band-clients { padding: 48px 0; }
     section.band-cta { padding: 56px 0; }
     .section-head { margin-bottom: 24px; }

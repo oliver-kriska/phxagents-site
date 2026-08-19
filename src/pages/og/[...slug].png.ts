@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { renderOgImage, type OgInput } from '../../lib/og';
 import { stats } from '../../data/stats';
 import { researchReports } from '../../data/research';
+import { hookDocPages } from '../../lib/hookDocs';
 import { getSkillIdentity } from '../../lib/skillNames';
 
 /**
@@ -72,6 +73,19 @@ export async function getStaticPaths() {
         kind: 'docs',
       },
     },
+    // The overview card leads with the counts; each deep dive carries its own
+    // description so a shared link says which group of hooks it opens on.
+    ...hookDocPages.map((page) => ({
+      slug: page.slug === 'overview' ? 'hooks' : `hooks/${page.slug}`,
+      data: {
+        title: page.slug === 'overview' ? `${stats.hooks} hooks, ${stats.hookEvents} events` : page.navLabel,
+        subtitle:
+          page.slug === 'overview'
+            ? 'Skills and agents are instructions a model may follow. Hooks are shell scripts that always run.'
+            : page.description,
+        kind: 'docs' as const,
+      },
+    })),
     {
       slug: 'changelog',
       data: { title: 'Changelog', subtitle: 'Release notes for the phxagents plugin.', kind: 'docs' },

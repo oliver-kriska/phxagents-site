@@ -10,7 +10,7 @@ const adaptedWorkflows = getPortableWorkflowNames().length;
   <div class="page-head">
         <h1>Install phxagents v{stats.version}</h1>
         <p class="lede">
-          One canonical set of <strong>{stats.skills} Elixir &amp; Phoenix skills</strong>, packaged for five AI coding runtimes. Claude Code installs the full plugin with <strong>{stats.agents} named agents and hooks</strong>; Amp, Codex, Pi and OpenCode install generated, runtime-native skill editions.
+          One canonical set of <strong>{stats.skills} Elixir &amp; Phoenix skills</strong>, packaged for five AI coding runtimes. Claude Code installs the full plugin with <strong>{stats.agents} named agents</strong> and <a href="/hooks/"><strong>{stats.hooks} enforcement hooks</strong></a>; Amp, Codex, Pi and OpenCode install generated, runtime-native skill editions.
         </p>
       </div>
 
@@ -91,7 +91,7 @@ claude plugin update elixir-phoenix@oliver-kriska</pre>
         <h2>What gets installed</h2>
         <ul>
           <li><strong>Every runtime:</strong> all {stats.skills} canonical skills, complete bundled resources, and {adaptedWorkflows} fully adapted workflows.</li>
-          <li><strong>Claude Code:</strong> {stats.agents} specialist agents, lifecycle and enforcement hooks, root instructions, permissions, and full workflow orchestration.</li>
+          <li><strong>Claude Code:</strong> {stats.agents} specialist agents, <a href="/hooks/">{stats.hooks} lifecycle and enforcement hooks</a>, root instructions, permissions, and full workflow orchestration.</li>
           <li><strong>Amp, Codex, Pi, OpenCode:</strong> generated skill distributions with native names and invocation. Named Claude agents and its broad hook set are not silently emulated.</li>
           <li><strong>Tidewave MCP:</strong> supported when your project and client already expose it; registration remains external to every edition.</li>
         </ul>
@@ -118,7 +118,7 @@ claude plugin update elixir-phoenix@oliver-kriska</pre>
           <li><strong>The baseline-aware repository scan passes</strong> after reviewed false-positive baselines. The current raw totals and every baseline decision live in <a href="https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.</li>
           <li>Lower-scoring <strong>CAUTION</strong> components remain documented rather than being hidden behind baselines.</li>
           <li>The few higher-scoring components are <strong>documented false positives</strong> — a static scanner flags the safety-enforcing and security-auditing skills precisely because they name dangerous patterns in order to <em>forbid or detect</em> them (one flagged line literally reads <code>NEVER bypass security checks for speed</code>).</li>
-          <li><strong>No data exfiltration</strong>, <strong>read-only review agents</strong> (source edits disallowed), and <strong>auditable bash hooks</strong>.</li>
+          <li><strong>No data exfiltration</strong>, <strong>read-only review agents</strong> (source edits disallowed), and <a href="/hooks/"><strong>auditable bash hooks</strong></a>.</li>
         </ul>
         <p>
           Read the full report, line-by-line triage, and a reproduce-it-yourself command in

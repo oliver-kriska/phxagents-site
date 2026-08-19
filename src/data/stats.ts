@@ -44,6 +44,25 @@ function countReferences(): number {
   return total;
 }
 
+/** Hook scripts on disk — the honest count, not the registration count. */
+function countHooks(): number {
+  const scriptsDir = path.join(PLUGIN_BASE, 'hooks', 'scripts');
+  return safeReadDir(scriptsDir).filter((f) => f.endsWith('.sh')).length;
+}
+
+/**
+ * Distinct Claude Code lifecycle events the plugin registers for. Several
+ * scripts are registered more than once under different `if` matchers, so this
+ * counts event keys rather than hook entries.
+ */
+function countHookEvents(): number {
+  const hooksJson = safeReadJson<{ hooks?: Record<string, unknown> }>(
+    path.join(PLUGIN_BASE, 'hooks', 'hooks.json'),
+    {}
+  );
+  return Object.keys(hooksJson.hooks ?? {}).length;
+}
+
 function countIronLaws(): number {
   const claudeMd = path.join(PLUGIN_BASE, '..', '..', 'CLAUDE.md');
   try {
@@ -79,6 +98,8 @@ export const stats = {
   agents: countAgents(),
   references: countReferences(),
   ironLaws: countIronLaws(),
+  hooks: countHooks(),
+  hookEvents: countHookEvents(),
   version: manifest.version ?? '0.0.0',
   description:
     manifest.description ??

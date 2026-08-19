@@ -5,25 +5,46 @@ import PageToc from './PageToc.astro';
 import { getPluginSourceDate } from '../lib/sourceDates';
 
 interface Props {
-  entryId: 'amp' | 'codex' | 'pi' | 'opencode' | 'runtime-support';
+  entryId: string;
+  /** Which upstream collection backs this page. */
+  collection?: 'upstreamDocs' | 'hookDocs';
+  /**
+   * Path of the backing file inside the plugin repository, used for the
+   * "View source" link and the git-derived dateModified. Runtime guides all
+   * live in docs/; hook docs are scattered, so they pass their own path.
+   */
+  sourcePath?: string;
   title: string;
   description: string;
   pageUrl: string;
   breadcrumb: string;
+  /** Sidebar highlight group. */
+  active?: string;
   wide?: boolean;
 }
 
-const { entryId, title, description, pageUrl, breadcrumb, wide = false } = Astro.props;
-const entry = await getEntry('upstreamDocs', entryId);
+const {
+  entryId,
+  collection = 'upstreamDocs',
+  sourcePath: sourcePathProp,
+  title,
+  description,
+  pageUrl,
+  breadcrumb,
+  active = 'runtimes',
+  wide = false,
+} = Astro.props;
+
+const sourcePath = sourcePathProp ?? `docs/${entryId}.md`;
+const entry = await getEntry(collection, entryId);
 
 if (!entry) {
   throw new Error(
-    `Missing canonical runtime documentation at plugin-source/docs/${entryId}.md. Clone or link the plugin source before building.`
+    `Missing canonical upstream documentation at plugin-source/${sourcePath}. Clone or link the plugin source before building.`
   );
 }
 
 const { Content, headings } = await render(entry);
-const sourcePath = `docs/${entryId}.md`;
 const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/${sourcePath}`;
 const dateModified = getPluginSourceDate(
   sourcePath,
@@ -56,7 +77,7 @@ const jsonLd = {
 };
 ---
 
-<DocPage title={breadcrumb} seoTitle={`${title} — phxagents`} description={description} active="runtimes">
+<DocPage title={breadcrumb} seoTitle={`${title} — phxagents`} description={description} active={active}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <div class="page-head">

@@ -1,0 +1,33 @@
+---
+import UpstreamDocPage from '../../components/UpstreamDocPage.astro';
+import { stats } from '../../data/stats';
+import { hookDocBySlug } from '../../lib/hookDocs';
+
+const page = hookDocBySlug.get('overview')!;
+---
+
+<UpstreamDocPage
+  entryId="overview"
+  collection="hookDocs"
+  sourcePath={page.sourcePath}
+  title={page.title}
+  description={page.description}
+  pageUrl="https://phxagents.dev/hooks/"
+  breadcrumb="Hooks"
+  active="hooks"
+  wide
+>
+  <section slot="intro" aria-labelledby="why-hooks">
+    <h2 id="why-hooks">Why hooks instead of instructions?</h2>
+    <p><strong>Skills and agents are instructions a model may or may not follow. Hooks are shell scripts that always run.</strong> The plugin ships {stats.hooks} of them across {stats.hookEvents} Claude Code lifecycle events, and that split is deliberate: guidance that benefits from judgement stays in skills, and anything that must happen regardless of judgement moves here.</p>
+
+    <h3>What made this necessary?</h3>
+    <p>Session analysis across 400 sessions measured <code>CLAUDE.md</code> prose rules firing <strong>~0% of the time</strong>. The rules were correct — they were simply never consulted mid-task. Intent routing and Iron Law injection moved into hooks because a rule that does not fire is not a rule.</p>
+
+    <h3>Is it safe to install the plugin globally?</h3>
+    <p>Yes. Every Elixir-specific hook checks for <code>mix.exs</code> before doing anything, so the plugin is inert in a Rust or Python repository — no directories created, no Phoenix rules injected, no banners. The one deliberate exception is the force-push block, which is dangerous in any repository.</p>
+
+    <h3>What happens when a hook breaks?</h3>
+    <p>Hooks fail open, never closed. No script uses <code>set -e</code>, and denials travel as JSON data rather than exit codes. A broken hook means the guard is off — never that the session is unusable. That rule was written after a corrupted safety script exited non-zero and blocked every Bash call in a session.</p>
+  </section>
+</UpstreamDocPage>

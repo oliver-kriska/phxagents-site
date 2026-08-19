@@ -1,0 +1,83 @@
+---
+import UpstreamDocPage from '../../components/UpstreamDocPage.astro';
+import { hookDocPages, type HookDocPage } from '../../lib/hookDocs';
+
+export function getStaticPaths() {
+  return hookDocPages
+    .filter((page) => page.slug !== 'overview')
+    .map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: HookDocPage };
+---
+
+<UpstreamDocPage
+  entryId={page.slug}
+  collection="hookDocs"
+  sourcePath={page.sourcePath}
+  title={page.title}
+  description={page.description}
+  pageUrl={`https://phxagents.dev/hooks/${page.slug}/`}
+  breadcrumb={page.navLabel}
+  active="hooks"
+>
+  <section slot="intro" aria-labelledby="group-context">
+    <h2 id="group-context" class="sr-only">About this hook group</h2>
+    <p class="group-meta">
+      <a href="/hooks/">Hooks</a>
+      {page.events.length > 0 && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span class="events">
+            {page.events.map((event) => <code>{event}</code>)}
+          </span>
+        </>
+      )}
+    </p>
+    <p>{page.description}</p>
+  </section>
+</UpstreamDocPage>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  /* Outweighs `.page-intro :global(p)` from UpstreamDocPage regardless of
+     stylesheet order, which is not guaranteed across the two components. */
+  p.group-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  p.group-meta a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  p.group-meta a:hover { color: var(--accent-fg); }
+  .events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .events code {
+    padding: 2px 7px;
+    font-size: 11px;
+    color: var(--fg-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+</style>

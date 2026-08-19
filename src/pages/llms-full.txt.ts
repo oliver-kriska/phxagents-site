@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { getMarkdownTitle, getRawBody } from '../lib/rawContent';
 import { getSkillIdentity } from '../lib/skillNames';
 import { researchReports } from '../data/research';
+import { hookDocBySlug } from '../lib/hookDocs';
 
 interface FullEntry {
   source: string;
@@ -16,10 +17,11 @@ function renderEntry(entry: FullEntry): string {
 }
 
 export const GET: APIRoute = async () => {
-  const [skills, agents, upstreamDocs] = await Promise.all([
+  const [skills, agents, upstreamDocs, hookDocs] = await Promise.all([
     getCollection('skills'),
     getCollection('agents'),
     getCollection('upstreamDocs'),
+    getCollection('hookDocs'),
   ]);
 
   const skillEntries: FullEntry[] = skills.map((entry) => {
@@ -44,6 +46,17 @@ export const GET: APIRoute = async () => {
     };
   });
 
+  // Hook docs live at three different depths in the plugin repository, so the
+  // source path comes from the registry rather than from a path template.
+  const hookEntries: FullEntry[] = hookDocs.map((entry) => {
+    const body = getRawBody(entry);
+    return {
+      source: hookDocBySlug.get(entry.id)?.sourcePath ?? `${entry.id}.md`,
+      title: getMarkdownTitle(body, entry.id),
+      body,
+    };
+  });
+
   // Site-owned long-form research. Not plugin-derived, so it has no collection —
   // but an agent fetching the full corpus should get the whole body, not just
   // the /llms.txt link entry.
@@ -56,14 +69,21 @@ export const GET: APIRoute = async () => {
   skillEntries.sort((a, b) => a.title.localeCompare(b.title));
   agentEntries.sort((a, b) => a.title.localeCompare(b.title));
   upstreamEntries.sort((a, b) => a.title.localeCompare(b.title));
+  hookEntries.sort((a, b) => a.title.localeCompare(b.title));
   researchEntries.sort((a, b) => a.title.localeCompare(b.title));
 
   const body = [
     '# phxagents — full documentation',
     '',
-    '> Canonical phxagents skills, agents, runtime guides, and research. Per-skill reference appendices are intentionally excluded.',
+    '> Canonical phxagents skills, agents, runtime guides, hook documentation, and research. Per-skill reference appendices are intentionally excluded.',
     '',
-    ...[...skillEntries, ...agentEntries, ...upstreamEntries, ...researchEntries].map(renderEntry),
+    ...[
+      ...skillEntries,
+      ...agentEntries,
+      ...upstreamEntries,
+      ...hookEntries,
+      ...researchEntries,
+    ].map(renderEntry),
   ].join('\n');
 
   return new Response(body, {

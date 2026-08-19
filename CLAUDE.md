@@ -24,7 +24,7 @@ npm run preview                                  # serve dist/ locally
 
 Node 22 LTS is required (pinned in `.nvmrc`, `.tool-versions`, and `package.json` engines). On Node 23+ install with `npm ci --ignore-scripts` because `sharp` doesn't yet ship prebuilds.
 
-There is no test suite, linter, or formatter wired up. Verification is `npm run build:local` succeeding (which also runs the research parity check) plus `npm run check` (`astro check`) for TypeScript/Astro diagnostics. `astro check` is **not** wired into the build: it reports six long-standing type errors in `astro.config.mjs`, `DocPage.astro`, `catalog.astro`, and `install/[runtime].astro`, so gating on it would block every deploy. Treat its output as "no *new* errors" rather than "zero errors". `tsconfig.json` excludes `plugin-source` — the plugin repo's own TypeScript is checked in its own repo, and scanning it here buries this site's diagnostics under ~40 errors that cannot be fixed from this side. That script runs `astro build` and then `scripts/verify-research-parity.mjs`, which fails the build if a research report's HTML page and its `.md` twin disagree on any figure.
+There is no test suite, linter, or formatter wired up. Verification is `npm run build:local` succeeding (which also runs the research and hook parity checks) plus `npm run check` (`astro check`) for TypeScript/Astro diagnostics. `astro check` is **not** wired into the build: it reports three long-standing type errors in `DocPage.astro` and `catalog.astro`, so gating on it would block every deploy. Treat its output as "no *new* errors" rather than "zero errors". `tsconfig.json` excludes `plugin-source` — the plugin repo's own TypeScript is checked in its own repo, and scanning it here buries this site's diagnostics under ~40 errors that cannot be fixed from this side. That script runs `astro build`, then `scripts/verify-research-parity.mjs` (fails the build if a research report's HTML page and its `.md` twin disagree on any figure), then `scripts/verify-hooks-parity.mjs` (fails the build if `HOOKS.md`'s stated hook/event counts disagree with the scripts on disk and `hooks.json`, if a script is unregistered, or if an upstream hook deep dive has no site route).
 
 ## Architecture: zero-manual-update derivation
 
@@ -41,10 +41,15 @@ plugin-source/plugins/elixir-phoenix/
 
 plugin-source/docs/{amp,codex,pi,opencode}.md → upstreamDocs collection → /install/<runtime>/
 plugin-source/docs/runtime-support.md          → upstreamDocs collection → /compatibility/
+plugin-source/HOOKS.md                         → hookDocs collection    → /hooks/
+plugin-source/plugins/elixir-phoenix/hooks/docs/*.md  → hookDocs        → /hooks/<group>/
+plugin-source/plugins/elixir-phoenix/hooks/README.md  → hookDocs        → /hooks/contributing/
+plugin-source/plugins/elixir-phoenix/hooks/scripts/   → src/data/stats.ts → hook count
+plugin-source/plugins/elixir-phoenix/hooks/hooks.json → src/data/stats.ts → lifecycle-event count
 plugin-source/scripts/port_lib/skill_transforms.py → src/lib/skillNames.ts → Claude and generated command names
 plugin-source/CLAUDE.md               → src/data/stats.ts → Iron Laws count (regex on "## Iron Laws Enforcement")
 
-skills + agents + upstreamDocs + research → /llms-full.txt
+skills + agents + upstreamDocs + hookDocs + research → /llms-full.txt
 skills + agents + src/data/pages.ts       → /llms.txt
 
 src/data/research/<slug>.md           → src/data/research.ts → /research/<slug>.md + /llms-full.txt + /llms.txt + /search.json
@@ -52,12 +57,13 @@ src/data/research/<slug>.md           → src/data/research.ts → /research/<sl
 
 Key files:
 
-- `src/content.config.ts` — defines **four** Astro Content Collections (`skills`, `agents`, `references`, `upstreamDocs`). The first three are rooted at `./plugin-source/plugins/elixir-phoenix/`; `upstreamDocs` loads the canonical runtime Markdown from `./plugin-source/docs/`. Schemas use `.passthrough()` because plugin frontmatter evolves independently. `references` is loaded for counts only; it has no public route.
+- `src/content.config.ts` — defines **five** Astro Content Collections (`skills`, `agents`, `references`, `upstreamDocs`, `hookDocs`). The first three are rooted at `./plugin-source/plugins/elixir-phoenix/`; `upstreamDocs` loads the canonical runtime Markdown from `./plugin-source/docs/`; `hookDocs` loads the hook documentation, which is scattered across the plugin repo (root `HOOKS.md`, the hooks `README.md`, and `hooks/docs/*.md`) and so uses a custom `generateId` driven by `src/lib/hookDocs.ts`. Schemas use `.passthrough()` because plugin frontmatter evolves independently. `references` is loaded for counts only; it has no public route.
 - `src/lib/skillNames.ts` — reads upstream `CANONICAL_PORTABLE_NAMES` at build time. v3 frontmatter names contain only final command segments, so the site must derive `/phx:*`, `/ecto:*`, `/lv:*`, and generated hyphenated names from this map rather than from `name:` prefixes.
 - `src/lib/docsNav.ts` — runs at build time (filesystem reads via `process.cwd()`, not Astro APIs) to build the Skills/Agents sidebar nav. Skills group by the command identities from `skillNames.ts`; agents group by model tier (opus = Orchestrators, sonnet = Specialists, haiku = Mechanical).
+- `src/lib/hookDocs.ts` — the registry mapping each upstream hook document to its public route, nav label, SEO title/description and lifecycle events. One source for the `hookDocs` collection IDs, the `/hooks/` routes, the sidebar, `/search.json`, `/llms.txt`, `/llms-full.txt` and the OG cards. Adding an upstream deep dive means adding an entry here **and** to `HOOK_GROUPS` in `astro.config.mjs`; the hook parity check fails the build until both exist.
 - `src/lib/sourceDates.ts` — derives `dateModified` from each plugin source file's last Git commit. `scripts/clone-source.sh` must retain full plugin history; a shallow clone without a frontmatter fallback fails rather than publishing fake freshness.
 - `src/lib/og.ts` — build-time Open Graph card generator. `satori` lays out a flexbox tree with embedded JetBrains Mono and emits SVG; `sharp` rasterizes it to PNG (no system-font dependency). satori only understands a CSS subset (hex/rgb, no oklch), so the palette is hardcoded hex.
-- `src/data/stats.ts` — same `process.cwd()` filesystem-read pattern; exposes `{ skills, agents, references, ironLaws, version, description, keywords }` to pages via import.
+- `src/data/stats.ts` — same `process.cwd()` filesystem-read pattern; exposes `{ skills, agents, references, ironLaws, hooks, hookEvents, version, description, keywords }` to pages via import.
 - `src/data/research.ts` — site-owned long-form reports. Unlike everything above these are **not** plugin-derived: the prose lives in `src/data/research/<slug>.md` and that Markdown is the artifact, served verbatim at `/research/<slug>.md` and embedded in `/llms-full.txt`. The matching `.astro` page is the presentation layer over the same figures; `scripts/verify-research-parity.mjs` fails the build if the two disagree.
 - `src/data/release.ts` — fetches the latest GitHub release **and** stargazer count at build time; uses `GITHUB_TOKEN` env var if set (CI does this) to avoid rate limits. Results are memoized per build.
 
@@ -68,6 +74,7 @@ Key files:
 - `src/pages/skills/[...slug].astro` and `src/pages/agents/[...slug].astro` — dynamic routes that render plugin markdown via `getCollection()` + `render()`, with prev/next nav. The skill route strips a trailing `/SKILL` segment from the collection ID (`pattern: '*/SKILL.md'` produces IDs like `oban/SKILL`).
 - `src/pages/skills/[slug].md.ts` and `src/pages/agents/[slug].md.ts` — additive raw-Markdown twins built from each collection entry's retained `body`.
 - `src/pages/llms.txt.ts` and `src/pages/llms-full.txt.ts` — generated LLM discovery index and concatenated full export. The full export deliberately excludes per-skill reference appendices; it carries skills, agents, upstream runtime docs and research report bodies (~530 KB).
+- `src/pages/hooks/index.astro` and `src/pages/hooks/[slug].astro` — the hook documentation section. Both render upstream Markdown through `UpstreamDocPage.astro` (which now takes `collection`, `sourcePath` and `active` props so it can serve either upstream collection). The overview owns `/hooks/`; the six group deep dives and the contributor guide come from `hookDocPages`.
 - `src/pages/research/index.astro` — the section index at `/research/`, derived from `researchReports` (a new report appears with no edit here). Each card's heading is the report's own Markdown H1, read at build time by `readHeadline()` rather than stored as a fourth title variant.
 - `src/pages/research/[slug].md.ts` — the raw-Markdown twin for each research report, the site-owned counterpart to the skill/agent `.md` routes.
 - `src/pages/og/[...slug].png.ts` — build-time endpoint emitting one OG PNG per page at `/og/<slug>.png` (home → `og/home.png`, `/skills/plan/` → `og/skills/plan.png`). `Default.astro` derives each page's `og:image` URL from its pathname; `default` is the fallback.
@@ -87,6 +94,7 @@ Key files:
 - `astro.config.mjs` — `site`, the `sitemap()` integration, `markdown.processor` (`unified()` from `@astrojs/markdown-remark`) carrying the `rehypeShiftHeadings` plugin (one-`<h1>`-per-page), `compressHTML: true` (restores v6 inline-whitespace collapsing — Astro 7's Rust compiler defaults to `'jsx'`, which strips newline-only whitespace between inline elements and would glue words like `dedicated<a>…`), and Shiki `langAlias` for `heex`/`eex`/`sface` (aliased to `html`)
 - The narrative `.astro` pages' prose (`index`, `install`, `iron-laws`, `changelog`, `catalog`, `tidewave-mcp`, and the site-owned comparison framing in `compatibility`). The Iron Laws *count*, version, and skill/agent *lists* on them are still derived via the `stats`/`getCollection` imports — only the surrounding copy is editable. Runtime guide and compatibility matrix bodies remain upstream-owned Markdown.
 - Footer text and the Plausible tag live in `src/layouts/Default.astro`.
+- Page metadata in `src/lib/hookDocs.ts` (nav label, `<h1>`/SEO title, description, lifecycle-event badges) and the site-owned intro slots in `src/pages/hooks/index.astro` and `hooks/[slug].astro`. The hook *bodies* are upstream-owned — the plugin's own CLAUDE.md requires `HOOKS.md` and the group docs to move with every hook change, so fix wrong prose in the plugin repo, not here.
 - Report metadata in `src/data/research.ts` drives the index card, nav label, search entry, `llms.txt` line and OG card at once — `title`, `sample` and `heroStats` are read by both the report page and its Open Graph image, so a shared preview cannot quote a figure the page has dropped.
 - `src/data/research/<slug>.md` and the matching `src/pages/research/<slug>.astro` — **edit both together**; the build's parity check rejects a change made to only one. Report metadata (nav label, `<title>`, description, date) lives once in `src/data/research.ts`.
 - `public/skills/index.html` and `public/agents/index.html` — static meta-refresh **redirect stubs** to `/catalog/?type=skill|agent`, carrying `noindex`. These are the `/skills/` and `/agents/` landing URLs.
@@ -111,6 +119,8 @@ Full deployment details: `docs/cloudflare-setup.md`.
 ## Conventions specific to this site
 
 - **One `<h1>` per page** — `rehypeShiftHeadings` in `astro.config.mjs` (wired through `markdown.processor: unified({ rehypePlugins: [...] })` under Astro 7) demotes every in-content heading by one level (h1→h2 … h6 stays) so the layout's title is the only `<h1>`. It runs on the rehype HTML AST, so `#` inside fenced code blocks is untouched; the companion CSS in `DocsLayout.astro` is shifted by the same +1, leaving rendering unchanged.
+- **Upstream link rewriting** — upstream Markdown links to sibling documents by relative path, which 404s once published here. `rehypeUpstreamDocLinks` in `astro.config.mjs` maps every spelling of each target to its site route. Hook group docs are reachable from three depths (repo-root `HOOKS.md`, the hooks `README.md`, and each other), so each spelling is listed explicitly rather than resolved positionally.
+- **`compressHTML` and pre-formatted blocks** — `compressHTML: true` collapses a newline sitting *between two adjacent inline elements* into a single space. Inside a `white-space: pre-wrap` block (the `.term-out` terminal panes on the home page) that silently joins two lines. Keep each newline inside a text node or within a single element — never between `</span>` and the next `<span>`.
 - **Per-page OG images** — generated at build by `satori` → `sharp` (`src/lib/og.ts` + `/og/[...slug].png.ts`). No runtime image service.
 - **Heex/EEx/Surface code blocks** — Shiki doesn't bundle these. `astro.config.mjs` aliases `heex`/`eex`/`sface` to `html` (matches hexdocs.pm). Don't register a real grammar — the alias is fine.
 - **Plausible analytics** — inline `<head>` script in `src/layouts/Default.astro`. Privacy-first, no cookies.
