@@ -6,19 +6,19 @@ import { stats } from '../data/stats';
 <UpstreamDocPage
   entryId="runtime-support"
   title="Claude Code vs Amp vs Codex: runtime comparison"
-  description="Compare phxagents on Claude Code, Amp, Codex, Pi, and OpenCode: installation, invocation, adapted workflows, and deliberately deferred capabilities."
+  description="Compare phxagents on Claude Code, Amp, Codex, Pi, OpenCode, and DeepSeek Harness: installation, invocation, adapted workflows, and deliberately deferred capabilities."
   pageUrl="https://phxagents.dev/compatibility/"
   breadcrumb="Runtime compatibility"
   wide
 >
   <section slot="intro" aria-labelledby="runtime-choice">
     <h2 id="runtime-choice">Which runtime should I use?</h2>
-    <p><strong>Use Claude Code for the full phxagents plugin</strong>, including custom agents, <a href="/hooks/">enforcement hooks</a>, commands, and plugin-root instructions. Choose Amp, Codex, Pi, or OpenCode as an alternative runtime when you want the same canonical skill knowledge through that runtime’s native installation and invocation model.</p>
+    <p><strong>Use Claude Code for the full phxagents plugin</strong>, including custom agents, <a href="/hooks/">enforcement hooks</a>, commands, and plugin-root instructions. Choose Amp, Codex, Pi, OpenCode, or DeepSeek Harness as an alternative runtime when you want the same canonical skill knowledge through that runtime’s native installation and invocation model.</p>
 
     <h3>Can I use phxagents without Claude Code?</h3>
-    <p>Yes. Amp, Codex, Pi, and OpenCode each receive a generated, drift-checked projection of all {stats.skills} canonical skills and their resource trees. The runtime matrix below shows the installation path and explicit invocation syntax for each one.</p>
+    <p>Yes. Amp, Codex, Pi, OpenCode, and DeepSeek Harness each receive a generated, drift-checked projection of all {stats.skills} canonical skills and their resource trees. The runtime matrix below shows the installation path and explicit invocation syntax for each one.</p>
 
     <h3>Which runtimes support the full plugin versus generated skills?</h3>
-    <p>Claude Code is the canonical full plugin. Amp, Codex, Pi, and OpenCode provide generated skills with focused workflow adaptations; Claude-only agents, hooks, and root-level configuration remain deferred unless the matrix says otherwise.</p>
+    <p>Claude Code is the canonical full plugin. Amp, Codex, Pi, OpenCode, and DeepSeek Harness provide generated skills with focused workflow adaptations; Claude-only agents, hooks, and root-level configuration remain deferred unless the matrix says otherwise.</p>
   </section>
 </UpstreamDocPage>

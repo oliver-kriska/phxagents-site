@@ -23,6 +23,11 @@ export function getStaticPaths() {
       title: 'Install phxagents for OpenCode',
       description: 'Install the generated phxagents skill tree with a project-local or global sparse checkout.',
     },
+    dsh: {
+      entryId: 'dsh',
+      title: 'Install phxagents for DeepSeek Harness',
+      description: 'Install the generated phxagents skill tree into a directory DeepSeek Harness already scans.',
+    },
   };
 
   return Object.entries(runtimes).map(([runtime, data]) => ({
@@ -30,6 +35,14 @@ export function getStaticPaths() {
     props: data,
   }));
 }
+
+const BREADCRUMBS: Record<string, string> = {
+  amp: 'Amp',
+  codex: 'Codex',
+  pi: 'Pi',
+  opencode: 'OpenCode',
+  dsh: 'DeepSeek Harness',
+};
 
 const { entryId, title, description } = Astro.props;
 const runtime = Astro.params.runtime!;
@@ -40,5 +53,5 @@ const runtime = Astro.params.runtime!;
   title={title}
   description={description}
   pageUrl={`https://phxagents.dev/install/${runtime}/`}
-  breadcrumb={runtime === 'opencode' ? 'OpenCode' : runtime === 'codex' ? 'Codex' : runtime === 'amp' ? 'Amp' : 'Pi'}
+  breadcrumb={BREADCRUMBS[runtime] ?? runtime}
 />

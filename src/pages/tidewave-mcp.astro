@@ -4,7 +4,7 @@ import { stats } from '../data/stats';
 
 const title = 'Tidewave MCP';
 const description =
-  'Use Tidewave MCP with phxagents and Phoenix across Claude Code, Codex, OpenCode, Amp, and Pi — runtime tools, client setup, and local fallbacks.';
+  'Use Tidewave MCP with phxagents and Phoenix across Claude Code, Codex, OpenCode, Amp, Pi, and dsh — runtime tools, client setup, and local fallbacks.';
 const pageUrl = 'https://phxagents.dev/tidewave-mcp/';
 
 // Structured data: Breadcrumb + a TechArticle for the Tidewave MCP guide, plus
@@ -51,7 +51,7 @@ const jsonLd = {
           acceptedAnswer: {
             '@type': 'Answer',
             text:
-              'Install the phxagents edition for your runtime, add Tidewave to the Phoenix app, and register the project-specific HTTP endpoint with your client. Claude Code, Codex, and OpenCode have documented registration paths; Tidewave remains externally configured for Amp and Pi. Every adapted workflow retains a local fallback when the connection is absent.',
+              'Install the phxagents edition for your runtime, add Tidewave to the Phoenix app, and register the project-specific HTTP endpoint with your client. Claude Code, Codex, and OpenCode have documented registration paths; Tidewave remains externally configured for Amp, Pi, and dsh. Every adapted workflow retains a local fallback when the connection is absent.',
           },
         },
         {
@@ -94,7 +94,7 @@ const jsonLd = {
       <code>mix.lock</code> versions.
     </p>
     <p>
-      Claude Code receives the full Tidewave-aware plugin; Amp, Codex, Pi and OpenCode receive the
+      Claude Code receives the full Tidewave-aware plugin; Amp, Codex, Pi, OpenCode and DeepSeek Harness receive the
       same <a href="/skills/tidewave-integration/"><code>tidewave-integration</code> skill</a> in their
       generated editions. Installing any edition exposes no fixed-port server and registers no MCP
       endpoint. When a client makes Tidewave tools available in a dev session, the skill can use them;

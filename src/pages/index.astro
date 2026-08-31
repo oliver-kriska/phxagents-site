@@ -13,7 +13,7 @@ const releaseStateLabel = releaseMatchesManifest
   ? 'full Claude plugin · four generated editions'
   : 'five runtime editions';
 const adaptedWorkflows = getPortableWorkflowNames().length;
-const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to Claude Code, Amp, Codex, Pi, and OpenCode, with ${adaptedWorkflows} workflows adapted for every runtime.`;
+const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to Claude Code, Amp, Codex, Pi, OpenCode, and DeepSeek Harness, with ${adaptedWorkflows} workflows adapted for every runtime.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -56,7 +56,7 @@ const jsonLd = {
             One Phoenix playbook. Five AI coding runtimes.
           </h1>
           <p class="lede">
-            <strong>Plausible Elixir is not idiomatic Phoenix.</strong> phxagents v3 gives Claude Code, Amp, Codex, Pi and OpenCode the same {stats.skills}-skill field manual. Claude Code also gets the full {stats.agents}-agent, hooks and orchestration layer.
+            <strong>Plausible Elixir is not idiomatic Phoenix.</strong> phxagents v3 gives Claude Code, Amp, Codex, Pi, OpenCode and DeepSeek Harness the same {stats.skills}-skill field manual. Claude Code also gets the full {stats.agents}-agent, hooks and orchestration layer.
           </p>
 
           <div class="hero-cta">
@@ -83,7 +83,8 @@ const jsonLd = {
 <span class="dim">generated</span>  <span class="info">Amp</span>          skill: invoke → phx-review
 <span class="dim">generated</span>  <span class="info">Codex</span>        $elixir-phoenix:phx-review
 <span class="dim">generated</span>  <span class="info">Pi</span>           /skill:phx-review
-<span class="dim">generated</span>  <span class="info">OpenCode</span>     skill tool → name: "phx-review"</div>
+<span class="dim">generated</span>  <span class="info">OpenCode</span>     skill tool → name: "phx-review"
+<span class="dim">generated</span>  <span class="info">dsh</span>          /phx-review</div>
 
             <div class="term-line" style="margin-top:14px"><span class="prompt">✓</span><span class="cmd">{stats.skills} skills · {adaptedWorkflows} adapted workflows · drift checked</span><span class="term-cursor"></span></div>
           </div>
@@ -117,13 +118,14 @@ const jsonLd = {
           <span class="feature-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
           </span>
-          <h3>{stats.skills} skills, generated four ways</h3>
-          <p>Amp, Codex, Pi and OpenCode receive deterministic projections of the canonical Claude skills, including complete resource trees, non-Markdown files and executable modes.</p>
+          <h3>{stats.skills} skills, generated five ways</h3>
+          <p>Amp, Codex, Pi, OpenCode and DeepSeek Harness receive deterministic projections of the canonical Claude skills, including complete resource trees, non-Markdown files and executable modes.</p>
           <ul class="feature-tags">
             <li>Amp Agent Skills</li>
             <li>Codex plugin</li>
             <li>Pi package</li>
             <li>OpenCode tree</li>
+            <li>dsh tree</li>
           </ul>
           <div class="meta">one source · golden snapshots · mode-aware drift checks</div>
         </article>
@@ -320,6 +322,16 @@ outside Claude Code. Safer alternatives:
           <span class="client-mark">OC</span>
           <div>
             <div class="name">OpenCode</div>
+            <div class="stat-row">
+              <span class="ok">● skills edition</span>
+              <span>{stats.skills} skills</span>
+            </div>
+          </div>
+        </a>
+        <a class="client" href="/install/dsh/">
+          <span class="client-mark">DS</span>
+          <div>
+            <div class="name">DeepSeek Harness</div>
             <div class="stat-row">
               <span class="ok">● skills edition</span>
               <span>{stats.skills} skills</span>

@@ -16,7 +16,7 @@ export const pageItems: PageItem[] = [
   {
     type: 'page',
     name: 'Install',
-    desc: 'Install phxagents for Claude Code, Amp, Codex, Pi, or OpenCode.',
+    desc: 'Install phxagents for Claude Code, Amp, Codex, Pi, OpenCode, or DeepSeek Harness.',
     url: '/install/',
     group: 'docs',
     llmsSection: 'Getting started',
@@ -24,7 +24,7 @@ export const pageItems: PageItem[] = [
   {
     type: 'page',
     name: 'Runtime compatibility',
-    desc: 'Compare supported and deferred phxagents capabilities across five AI coding runtimes.',
+    desc: 'Compare supported and deferred phxagents capabilities across six AI coding runtimes.',
     url: '/compatibility/',
     group: 'docs',
     llmsSection: 'Getting started',
@@ -66,6 +66,14 @@ export const pageItems: PageItem[] = [
     name: 'Install for OpenCode',
     desc: 'Install the generated phxagents skill tree for OpenCode.',
     url: '/install/opencode/',
+    group: 'docs',
+    llmsSection: 'Runtime guides',
+  },
+  {
+    type: 'page',
+    name: 'Install for DeepSeek Harness',
+    desc: 'Install the generated phxagents skill tree for DeepSeek Harness (dsh).',
+    url: '/install/dsh/',
     group: 'docs',
     llmsSection: 'Runtime guides',
   },

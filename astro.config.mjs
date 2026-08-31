@@ -104,6 +104,7 @@ function rehypeUpstreamDocLinks() {
     'codex.md': '/install/codex/',
     'pi.md': '/install/pi/',
     'opencode.md': '/install/opencode/',
+    'dsh.md': '/install/dsh/',
     '../README.md#claude-code': '/install/#claude-code',
     // Hook overview, as spelled from the hooks directory.
     '../../../HOOKS.md': '/hooks/',

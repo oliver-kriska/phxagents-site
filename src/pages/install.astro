@@ -6,11 +6,11 @@ import { getPortableWorkflowNames } from '../lib/skillNames';
 const adaptedWorkflows = getPortableWorkflowNames().length;
 ---
 
-<DocPage title="Install" description="Install phxagents v3 for Claude Code, Amp, Codex, Pi, or OpenCode." active="docs">
+<DocPage title="Install" description="Install phxagents v3 for Claude Code, Amp, Codex, Pi, OpenCode, or DeepSeek Harness." active="docs">
   <div class="page-head">
         <h1>Install phxagents v{stats.version}</h1>
         <p class="lede">
-          One canonical set of <strong>{stats.skills} Elixir &amp; Phoenix skills</strong>, packaged for five AI coding runtimes. Claude Code installs the full plugin with <strong>{stats.agents} named agents</strong> and <a href="/hooks/"><strong>{stats.hooks} enforcement hooks</strong></a>; Amp, Codex, Pi and OpenCode install generated, runtime-native skill editions.
+          One canonical set of <strong>{stats.skills} Elixir &amp; Phoenix skills</strong>, packaged for six AI coding runtimes. Claude Code installs the full plugin with <strong>{stats.agents} named agents</strong> and <a href="/hooks/"><strong>{stats.hooks} enforcement hooks</strong></a>; Amp, Codex, Pi, OpenCode and DeepSeek Harness install generated, runtime-native skill editions.
         </p>
       </div>
 
@@ -45,10 +45,15 @@ const adaptedWorkflows = getPortableWorkflowNames().length;
             <span><strong>OpenCode</strong><small>Generated skills via sparse Git checkout</small></span>
             <code>skill tool</code>
           </a>
+          <a href="/install/dsh/">
+            <span class="runtime-mark">DS</span>
+            <span><strong>DeepSeek Harness</strong><small>Generated skills copied into a scanned skill root</small></span>
+            <code>/phx-*</code>
+          </a>
         </div>
         <div class="callout info">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
-          <div><strong>Using Amp, Codex, Pi or OpenCode?</strong> Choose it above to open its complete guide. Continue below only to install the full Claude Code plugin.</div>
+          <div><strong>Using Amp, Codex, Pi, OpenCode or DeepSeek Harness?</strong> Choose it above to open its complete guide. Continue below only to install the full Claude Code plugin.</div>
         </div>
 
         <h2 id="claude-code">Claude Code — install the full plugin</h2>
@@ -92,7 +97,7 @@ claude plugin update elixir-phoenix@oliver-kriska</pre>
         <ul>
           <li><strong>Every runtime:</strong> all {stats.skills} canonical skills, complete bundled resources, and {adaptedWorkflows} fully adapted workflows.</li>
           <li><strong>Claude Code:</strong> {stats.agents} specialist agents, <a href="/hooks/">{stats.hooks} lifecycle and enforcement hooks</a>, root instructions, permissions, and full workflow orchestration.</li>
-          <li><strong>Amp, Codex, Pi, OpenCode:</strong> generated skill distributions with native names and invocation. Named Claude agents and its broad hook set are not silently emulated.</li>
+          <li><strong>Amp, Codex, Pi, OpenCode, DeepSeek Harness:</strong> generated skill distributions with native names and invocation. Named Claude agents and its broad hook set are not silently emulated.</li>
           <li><strong>Tidewave MCP:</strong> supported when your project and client already expose it; registration remains external to every edition.</li>
         </ul>
 

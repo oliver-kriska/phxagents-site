@@ -18,6 +18,15 @@ interface OgPath {
   data: OgInput;
 }
 
+/** Display names for the generated-runtime install pages. */
+const OG_RUNTIME_NAMES: Record<string, string> = {
+  amp: 'Amp',
+  codex: 'Codex',
+  pi: 'Pi',
+  opencode: 'OpenCode',
+  dsh: 'DeepSeek Harness',
+};
+
 export async function getStaticPaths() {
   const skills = await getCollection('skills');
   const agents = await getCollection('agents');
@@ -27,7 +36,7 @@ export async function getStaticPaths() {
       slug: 'home',
       data: {
         title: 'phxagents v3',
-        subtitle: `${stats.skills} Phoenix skills: full Claude Code plugin plus generated editions for Amp, Codex, Pi, and OpenCode.`,
+        subtitle: `${stats.skills} Phoenix skills: full Claude Code plugin plus generated editions for Amp, Codex, Pi, OpenCode, and dsh.`,
         kind: 'docs',
       },
     },
@@ -36,7 +45,7 @@ export async function getStaticPaths() {
       slug: 'install',
       data: {
         title: 'Install phxagents',
-        subtitle: `Elixir and Phoenix skills for Claude Code, Amp, Codex, Pi, and OpenCode.`,
+        subtitle: `Elixir and Phoenix skills for Claude Code, Amp, Codex, Pi, OpenCode, and dsh.`,
         kind: 'docs',
       },
     },
@@ -44,7 +53,7 @@ export async function getStaticPaths() {
       slug: 'compatibility',
       data: {
         title: 'Runtime compatibility',
-        subtitle: 'Compare installation, invocation, adapted workflows, and deferred capabilities across five AI coding runtimes.',
+        subtitle: 'Compare installation, invocation, adapted workflows, and deferred capabilities across six AI coding runtimes.',
         kind: 'docs',
       },
     },
@@ -53,10 +62,11 @@ export async function getStaticPaths() {
       ['codex', 'Codex skills plugin'],
       ['pi', 'Pi skills package'],
       ['opencode', 'OpenCode skills'],
+      ['dsh', 'DeepSeek Harness skill tree'],
     ].map(([runtime, label]) => ({
       slug: `install/${runtime}`,
       data: {
-        title: `Install for ${runtime === 'opencode' ? 'OpenCode' : runtime === 'codex' ? 'Codex' : runtime === 'amp' ? 'Amp' : 'Pi'}`,
+        title: `Install for ${OG_RUNTIME_NAMES[runtime] ?? runtime}`,
         subtitle: `Install all ${stats.skills} canonical phxagents skills as a generated ${label}.`,
         kind: 'docs' as const,
       },

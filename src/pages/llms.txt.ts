@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ site }) => {
   const lines = [
     '# phxagents',
     '',
-    '> Elixir & Phoenix skills, agents, and commands for AI coding agents — one canonical skill set across Claude Code, Amp, Codex, Pi, and OpenCode.',
+    '> Elixir & Phoenix skills, agents, and commands for AI coding agents — one canonical skill set across Claude Code, Amp, Codex, Pi, OpenCode, and DeepSeek Harness.',
     '',
   ];
 

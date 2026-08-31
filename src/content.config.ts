@@ -55,7 +55,7 @@ const references = defineCollection({
 // instead of falling back to a stale, hand-maintained copy in this repository.
 const upstreamDocs = defineCollection({
   loader: glob({
-    pattern: '{amp,codex,pi,opencode,runtime-support}.md',
+    pattern: '{amp,codex,pi,opencode,dsh,runtime-support}.md',
     base: './plugin-source/docs',
   }),
   schema: z.object({}).passthrough(),
