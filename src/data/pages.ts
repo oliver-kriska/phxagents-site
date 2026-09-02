@@ -1,4 +1,5 @@
 import { researchReports } from './research';
+import { origin } from './origin';
 import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
 
 export type PageSection = 'Getting started' | 'Runtime guides' | 'Documentation';
@@ -98,6 +99,14 @@ export const pageItems: PageItem[] = [
     name: 'Changelog',
     desc: 'Release notes for the phxagents plugin.',
     url: '/changelog/',
+    group: 'docs',
+    llmsSection: 'Documentation',
+  },
+  {
+    type: 'page',
+    name: origin.name,
+    desc: origin.description,
+    url: '/origin/',
     group: 'docs',
     llmsSection: 'Documentation',
   },

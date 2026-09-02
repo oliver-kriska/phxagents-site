@@ -705,6 +705,24 @@ body.menu-open { overflow: hidden; }
 .site-footer a:hover { color: var(--fg); }
 
 /* ===== Responsive ===== */
+/* Seven primary links, the 240px search field and the Install button need about
+   1240px of nav-inner to sit on one line, so everything between the 900px nav
+   collapse and ~1280px runs out of room. Tighten the chrome across that band
+   instead of dropping an item: without this, "Iron Laws" wraps to two lines and
+   the Install button is clipped off the right edge. */
+@media (min-width: 901px) and (max-width: 1280px) {
+  .nav-inner { gap: 14px; padding: 0 16px; }
+  .nav-links { gap: 0; margin-left: 0; }
+  .nav-links a { padding: 6px 7px; }
+  .search-btn { min-width: 190px; }
+  .search-btn .kbd { display: none; }
+}
+/* Below 1080 the GitHub "Star" label already collapses to its icon; the search
+   label goes with it, leaving the magnifier as the affordance. */
+@media (min-width: 901px) and (max-width: 1080px) {
+  .search-btn { min-width: auto; }
+  .search-btn .search-label { display: none; }
+}
 @media (max-width: 900px) {
   .nav-links { display: none; }
   .search-btn { min-width: auto; padding: 0 10px; }

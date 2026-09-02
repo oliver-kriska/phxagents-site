@@ -1,0 +1,454 @@
+---
+import Default from '../layouts/Default.astro';
+import { origin } from '../data/origin';
+import { Marked } from 'marked';
+
+/**
+ * The origin essay. Unlike the research report next door — 80 KB of hand-written
+ * HTML because it is chart-heavy — this piece is 4,900 words of narrative, so the
+ * page renders `src/data/origin.md` rather than restating it. There is no figure
+ * here that the Markdown does not carry, which is why no parity check guards it.
+ *
+ * `renderBody` has already dropped the leading H1 so the hero below owns the only
+ * <h1>; the source's `##` sections therefore land at the right level with no
+ * heading shift. `/origin.md` still serves the file whole.
+ */
+
+const pageUrl = 'https://phxagents.dev/origin/';
+const markdownUrl = '/origin.md';
+
+const slugify = (text: string): string =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+interface Section {
+  id: string;
+  text: string;
+}
+const sections: Section[] = [];
+
+// Local Marked instance so the shared parser used by iron-laws.astro is untouched.
+// Slugs come from the raw `token.text`, not the rendered HTML: parsing first turns
+// an apostrophe into `&#39;` and would leave `-39-` in every id that has one.
+const marked = new Marked({
+  renderer: {
+    heading(token) {
+      const html = this.parser.parseInline(token.tokens);
+      const id = slugify(token.text);
+      if (token.depth === 2) sections.push({ id, text: token.text });
+      return `<h${token.depth} id="${id}">${html}</h${token.depth}>\n`;
+    },
+    // Intrinsic dimensions so the one image in the piece reserves its own space
+    // and keeps its 16:9 ratio instead of stretching to the column.
+    image(token) {
+      const alt = token.text ?? '';
+      return `<img src="${token.href}" alt="${alt}" width="1672" height="941" decoding="async" />`;
+    },
+  },
+});
+const html = await marked.parse(origin.renderBody);
+
+const wordCount = origin.body.trim().split(/\s+/).length;
+const readMinutes = Math.round(wordCount / 220);
+const publishedLabel = new Date(`${origin.datePublished}T00:00:00Z`).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: origin.name, item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'Article',
+      '@id': `${pageUrl}#article`,
+      headline: origin.headline,
+      name: origin.headline,
+      description: origin.description,
+      url: pageUrl,
+      inLanguage: 'en',
+      datePublished: origin.datePublished,
+      dateModified: origin.datePublished,
+      wordCount,
+      author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
+      publisher: { '@id': 'https://phxagents.dev/#org' },
+      isPartOf: { '@id': 'https://phxagents.dev/#website' },
+      about: ['Elixir', 'Phoenix', 'Claude Code', 'AI coding agents', 'phxagents'],
+    },
+  ],
+};
+---
+
+<Default
+  title={origin.title}
+  description={origin.description}
+  seoTitle={origin.seoTitle}
+  active="origin"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <article class="essay">
+    <header class="es-hero">
+      <div class="wrap">
+        <div class="es-hero-in">
+          <p class="es-eyebrow">Origin story</p>
+          <h1>{origin.headline}</h1>
+          <p class="es-standfirst">{origin.description}</p>
+          <div class="es-meta">
+            <span><time datetime={origin.datePublished}>{publishedLabel}</time></span>
+            <span class="numeric">{origin.sample}</span>
+            <span>~{readMinutes} min read</span>
+          </div>
+          <div class="es-actions">
+            <a class="btn-ghost" href={markdownUrl}>View as Markdown</a>
+          </div>
+        </div>
+
+        <div class="es-stats numeric">
+          {origin.heroStats.map((stat) => (
+            <div class="es-stat">
+              <div class={`n c-${stat.tone}`}>{stat.value}</div>
+              <div class="lbl">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <div class="es-shell">
+        <nav class="es-toc" aria-label="Contents">
+          <details class="es-toc-box" open>
+            <summary>Contents</summary>
+            <ol>
+              {sections.map((section) => (
+                <li><a href={`#${section.id}`}>{section.text}</a></li>
+              ))}
+            </ol>
+          </details>
+        </nav>
+
+        <div class="es-main">
+          <div class="docs-body origin-body" set:html={html}></div>
+        </div>
+      </div>
+    </div>
+  </article>
+</Default>
+
+<style>
+  /* ===========================================================
+     Origin essay — long-form narrative on the site's tokens.
+     Scoped under .essay; the rendered Markdown needs :global().
+     =========================================================== */
+  .essay {
+    /* Same text-safe semantics as the research report: --danger/--warn from
+       global.css are tuned for fills, and at essay body sizes they need a
+       darker light value and a lighter dark value to clear WCAG AA. */
+    --es-good: var(--accent-fg);
+    --es-warn: var(--warn-fg);
+    --es-crit: oklch(45% 0.19 25);
+  }
+  :global([data-theme='dark']) .essay {
+    --es-crit: oklch(78% 0.15 25);
+  }
+  .essay .c-good { color: var(--es-good); }
+  .essay .c-warn { color: var(--es-warn); }
+  .essay .c-crit { color: var(--es-crit); }
+
+  /* ---------- hero ---------- */
+  .es-hero {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 56px 0 40px;
+  }
+  .es-hero-in {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 72ch;
+  }
+  .es-eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .es-hero h1 {
+    margin: 0;
+    font-size: clamp(30px, 4.4vw, 50px);
+    line-height: 1.06;
+    letter-spacing: -0.028em;
+    font-weight: 600;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .es-standfirst {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--fg-soft);
+  }
+  .es-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    padding-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .es-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .es-actions .btn-ghost { color: var(--fg); text-decoration: none; }
+  .es-actions .btn-ghost:hover { border-color: var(--border-strong); }
+
+  .es-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .es-stat {
+    padding: 20px 22px 22px;
+    border-right: 1px solid var(--border);
+  }
+  .es-stat:last-child { border-right: 0; }
+  .es-stat .n {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .es-stat .lbl {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--fg-soft);
+  }
+
+  /* ---------- shell + contents ---------- */
+  .es-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 0 0 40px;
+  }
+  .es-main { min-width: 0; }
+  .es-toc { padding: 24px 0 0; }
+  .es-toc-box {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .es-toc-box > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    cursor: pointer;
+    color: var(--fg);
+    font: 600 11px/1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    list-style: none;
+  }
+  .es-toc-box > summary::-webkit-details-marker { display: none; }
+  .es-toc-box > summary::after {
+    content: '+';
+    margin-left: auto;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .es-toc-box[open] > summary::after { content: '−'; }
+  .es-toc ol {
+    list-style: none;
+    counter-reset: es-toc;
+    margin: 0;
+    padding: 4px 8px 10px;
+    border-top: 1px solid var(--border);
+  }
+  .es-toc a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-height: 40px;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+  .es-toc a::before {
+    counter-increment: es-toc;
+    content: counter(es-toc, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--border-strong);
+    flex: none;
+  }
+  .es-toc a:hover { background: var(--surface-2); color: var(--fg); }
+  .es-toc a[aria-current='true'] {
+    color: var(--accent-fg);
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  .es-toc a[aria-current='true']::before { color: var(--accent); }
+
+  @media (min-width: 1000px) {
+    .es-shell {
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 56px;
+      align-items: start;
+    }
+    .es-toc {
+      position: sticky;
+      top: calc(var(--nav-h) + 24px);
+      max-height: calc(100vh - var(--nav-h) - 48px);
+      overflow-y: auto;
+      padding: 52px 0 0;
+    }
+    .es-toc-box { border: 0; background: transparent; }
+    .es-toc-box > summary { pointer-events: none; padding: 0 0 6px; min-height: 0; }
+    .es-toc-box > summary::after,
+    .es-toc-box[open] > summary::after { content: ''; }
+    .es-toc ol { padding: 0; border-top: 0; }
+    .es-toc a { min-height: 0; padding: 6px 9px; }
+  }
+
+  /* ---------- rendered essay ---------- */
+  .origin-body {
+    max-width: 68ch;
+    padding: 44px 0 0;
+    font-size: 16px;
+    line-height: 1.72;
+    color: var(--fg-soft);
+  }
+  .origin-body :global(h2) {
+    margin: 52px 0 16px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    font-size: clamp(21px, 2.4vw, 27px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: var(--fg);
+    text-wrap: balance;
+    scroll-margin-top: calc(var(--nav-h) + 16px);
+  }
+  .origin-body :global(h3) {
+    margin: 32px 0 10px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--fg);
+    scroll-margin-top: calc(var(--nav-h) + 16px);
+  }
+  .origin-body :global(p) { margin: 0 0 18px; }
+  .origin-body :global(strong) { color: var(--fg); font-weight: 600; }
+  .origin-body :global(ul), .origin-body :global(ol) {
+    margin: 0 0 18px;
+    padding-left: 22px;
+  }
+  .origin-body :global(li) { margin: 6px 0; }
+  .origin-body :global(a) {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .origin-body :global(a:hover) { color: var(--accent); }
+  .origin-body :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+  /* The quoted messages are the evidence in this piece, so they read as
+     testimony rather than as an aside: larger than the body, not smaller. */
+  .origin-body :global(blockquote) {
+    margin: 24px 0;
+    padding: 2px 0 2px 20px;
+    border-left: 2px solid var(--accent);
+    color: var(--fg);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .origin-body :global(blockquote p) { margin: 0 0 10px; }
+  .origin-body :global(blockquote p:last-child) { margin-bottom: 0; }
+  /* width/height on the tag give the ratio; these keep it inside the column. */
+  .origin-body :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+  .origin-body :global(p:has(> img)) { margin: 0 0 36px; }
+
+  @media (max-width: 900px) {
+    .es-stats { grid-template-columns: repeat(2, 1fr); }
+    .es-stat:nth-child(2n) { border-right: 0; }
+    .es-stat:nth-child(-n + 2) { border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 620px) {
+    .es-hero { padding-top: 36px; }
+    .es-stats { grid-template-columns: 1fr; }
+    .es-stat { border-right: 0; border-bottom: 1px solid var(--border); }
+    .es-stat:last-child { border-bottom: 0; }
+    .origin-body { font-size: 15.5px; padding-top: 32px; }
+    .origin-body :global(blockquote) { font-size: 16px; }
+  }
+</style>
+
+<script>
+  // Clickable index: mark the section currently in view.
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.es-toc a[href^="#"]'));
+  const sections = links
+    .map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
+    .filter((el): el is HTMLElement => el !== null);
+
+  if (links.length > 0 && sections.length > 0 && 'IntersectionObserver' in window) {
+    const visible = new Set<string>();
+
+    const setActive = (id: string | null) => {
+      for (const link of links) {
+        const isCurrent = id !== null && decodeURIComponent(link.hash.slice(1)) === id;
+        if (isCurrent) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        }
+        const first = sections.find((section) => visible.has(section.id));
+        if (first) setActive(first.id);
+      },
+      { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
+    );
+
+    for (const section of sections) observer.observe(section);
+  }
+</script>

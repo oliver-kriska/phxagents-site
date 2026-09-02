@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { renderOgImage, type OgInput } from '../../lib/og';
 import { stats } from '../../data/stats';
 import { researchReports } from '../../data/research';
+import { origin } from '../../data/origin';
 import { hookDocPages } from '../../lib/hookDocs';
 import { getSkillIdentity } from '../../lib/skillNames';
 
@@ -123,6 +124,26 @@ export async function getStaticPaths() {
         subtitle:
           'Independent measurement of the Elixir ecosystem — method, limits and raw Markdown published with every report.',
         kind: 'docs',
+      },
+    },
+    // The origin essay is measurement about the plugin itself, so its card uses
+    // the same stats-strip variant as a research report.
+    {
+      slug: 'origin',
+      data: {
+        title: origin.title,
+        subtitle: `Origin story · ${new Date(`${origin.datePublished}T00:00:00Z`).toLocaleDateString(
+          'en-GB',
+          { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }
+        )}`,
+        kind: 'research',
+        badge: 'origin',
+        stats: origin.heroStats.map((stat) => ({
+          value: stat.value,
+          label: stat.cardLabel,
+          tone: stat.tone,
+        })),
+        footnote: origin.sample,
       },
     },
     // Research cards trade the description for the report's own headline

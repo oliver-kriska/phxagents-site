@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { getMarkdownTitle, getRawBody } from '../lib/rawContent';
 import { getSkillIdentity } from '../lib/skillNames';
 import { researchReports } from '../data/research';
+import { origin } from '../data/origin';
 import { hookDocBySlug } from '../lib/hookDocs';
 
 interface FullEntry {
@@ -66,6 +67,14 @@ export const GET: APIRoute = async () => {
     body: report.body,
   }));
 
+  // The origin essay is site-owned long-form too, and carries the method behind
+  // every count above it. Same treatment as a research report.
+  const originEntry: FullEntry = {
+    source: 'origin.md',
+    title: getMarkdownTitle(origin.body, origin.name),
+    body: origin.body,
+  };
+
   skillEntries.sort((a, b) => a.title.localeCompare(b.title));
   agentEntries.sort((a, b) => a.title.localeCompare(b.title));
   upstreamEntries.sort((a, b) => a.title.localeCompare(b.title));
@@ -75,7 +84,7 @@ export const GET: APIRoute = async () => {
   const body = [
     '# phxagents — full documentation',
     '',
-    '> Canonical phxagents skills, agents, runtime guides, hook documentation, and research. Per-skill reference appendices are intentionally excluded.',
+    '> Canonical phxagents skills, agents, runtime guides, hook documentation, the origin essay, and research. Per-skill reference appendices are intentionally excluded.',
     '',
     ...[
       ...skillEntries,
@@ -83,6 +92,7 @@ export const GET: APIRoute = async () => {
       ...upstreamEntries,
       ...hookEntries,
       ...researchEntries,
+      originEntry,
     ].map(renderEntry),
   ].join('\n');
 

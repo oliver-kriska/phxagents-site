@@ -70,8 +70,14 @@ export interface OgInput {
   title: string;
   /** Short supporting line, usually the description. */
   subtitle?: string;
-  /** Drives the accent color + the corner label. */
+  /** Drives the accent color and the card layout variant. */
   kind?: OgKind;
+  /**
+   * Corner label, when the layout variant and the label disagree — the origin
+   * essay borrows the `research` stats strip but is not a research report.
+   * Defaults to the kind.
+   */
+  badge?: string;
   /**
    * Research cards replace the subtitle block with the report's own headline
    * figures — a preview that carries findings rather than a description.
@@ -155,7 +161,7 @@ function statStrip(stats: OgStat[]): any {
   );
 }
 
-function card({ title, subtitle, kind = 'docs', stats, footnote }: OgInput) {
+function card({ title, subtitle, kind = 'docs', badge, stats, footnote }: OgInput) {
   const accent = accentFor(kind);
   const hasStats = Array.isArray(stats) && stats.length > 0;
   return el(
@@ -212,7 +218,7 @@ function card({ title, subtitle, kind = 'docs', stats, footnote }: OgInput) {
                   letterSpacing: 2,
                   color: accent,
                 },
-                kind.toUpperCase()
+                (badge ?? kind).toUpperCase()
               ),
             ]
           ),

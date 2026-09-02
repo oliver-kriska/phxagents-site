@@ -103,6 +103,11 @@ const jsonLd = {
         <a class="stat" href="/hooks/"><div class="n">{stats.hooks}</div><div class="lbl">Enforcement hooks</div></a>
         <a class="stat" href="/hooks/"><div class="n">{stats.hookEvents}</div><div class="lbl">Lifecycle events</div></a>
       </div>
+      <p class="stats-note">
+        Every number above is read from the plugin at build time. What measurement said about
+        them afterwards, including which skills have never run in real work, is in
+        <a href="/origin/">the origin story</a>.
+      </p>
     </div>
   </section>
 
@@ -579,6 +584,20 @@ outside Claude Code. Safer alternatives:
     letter-spacing: 0.06em;
     font-family: var(--font-mono);
   }
+  .stats-note {
+    margin: 14px 0 0;
+    max-width: 640px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .stats-note a {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+    text-underline-offset: 2px;
+  }
+  .stats-note a:hover { color: var(--accent); }
   @media (max-width: 760px) {
     .stats { grid-template-columns: repeat(2, 1fr); }
     /* Three rows of two: the column and final-row rules shift accordingly. */
