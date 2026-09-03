@@ -40,7 +40,7 @@ const marked = new Marked({
       if (token.depth === 2) sections.push({ id, text: token.text });
       return `<h${token.depth} id="${id}">${html}</h${token.depth}>\n`;
     },
-    // Intrinsic dimensions so the one image in the piece reserves its own space
+    // Intrinsic dimensions so the lead image reserves its own space
     // and keeps its 16:9 ratio instead of stretching to the column.
     image(token) {
       const alt = token.text ?? '';
@@ -403,6 +403,318 @@ const jsonLd = {
     background: var(--surface-2);
   }
   .origin-body :global(p:has(> img)) { margin: 0 0 36px; }
+  .origin-body :global(.origin-diagram) {
+    width: min(100%, 560px);
+    margin: 28px auto 40px;
+  }
+  .origin-body :global(.origin-flow) {
+    color: var(--fg);
+  }
+  .origin-body :global(.origin-flow-sources) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .origin-body :global(.origin-flow-sources > div) {
+    min-width: 0;
+    padding: 11px 13px 12px;
+  }
+  .origin-body :global(.origin-flow-sources > div + div) {
+    border-left: 1px solid var(--border);
+  }
+  .origin-body :global(.origin-flow-sources span),
+  .origin-body :global(.origin-flow-node > span) {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--muted);
+    font: 500 10.5px/1.35 var(--font-mono);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .origin-body :global(.origin-flow-sources strong),
+  .origin-body :global(.origin-flow-node strong) {
+    display: block;
+    font-size: 14.5px;
+    line-height: 1.4;
+  }
+  .origin-body :global(.origin-flow-arrow) {
+    height: 27px;
+    display: grid;
+    place-items: center;
+    color: var(--border-strong);
+    font: 500 16px/1 var(--font-mono);
+  }
+  .origin-body :global(.origin-flow > .origin-flow-node) {
+    width: 82%;
+    margin: 0 auto;
+  }
+  .origin-body :global(.origin-flow-node) {
+    padding: 11px 13px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .origin-body :global(.origin-flow-node--violet) {
+    border-color: color-mix(in oklab, var(--violet) 28%, var(--border));
+    background: var(--violet-soft);
+  }
+  .origin-body :global(.origin-flow-node--violet > span) { color: var(--violet); }
+  .origin-body :global(.origin-flow-node--good) {
+    border-color: color-mix(in oklab, var(--accent) 28%, var(--border));
+    background: var(--accent-soft);
+  }
+  .origin-body :global(.origin-flow-node--good > span) { color: var(--accent-fg); }
+  .origin-body :global(.origin-flow-node--warn) {
+    border-color: color-mix(in oklab, var(--warn) 32%, var(--border));
+    background: var(--warn-soft);
+  }
+  .origin-body :global(.origin-flow-node--warn > span) { color: var(--warn-fg); }
+  .origin-body :global(.origin-flow-divider) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 13px 0;
+    color: var(--muted);
+    font: 500 10.5px/1.35 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .origin-body :global(.origin-flow-divider::before),
+  .origin-body :global(.origin-flow-divider::after) {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: var(--border);
+  }
+  .origin-body :global(.origin-flow-outcomes) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .origin-body :global(.origin-activation) {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .origin-body :global(.origin-activation-path) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .origin-body :global(.origin-activation-path > div) {
+    min-width: 0;
+    padding: 13px 10px;
+  }
+  .origin-body :global(.origin-activation-path strong) {
+    display: block;
+    color: var(--fg);
+    font: 600 20px/1.1 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .origin-body :global(.origin-activation-path span) {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+  .origin-body :global(.origin-activation-path i) {
+    display: grid;
+    place-items: center;
+    color: var(--border-strong);
+    font: 400 14px/1 var(--font-mono);
+    font-style: normal;
+  }
+  .origin-body :global(.origin-activation-path i::before) { content: '→'; }
+  .origin-body :global(.origin-activation-result) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .origin-body :global(.origin-activation-result span) {
+    color: var(--muted);
+    font: 500 10.5px/1.35 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .origin-body :global(.origin-activation-result strong) {
+    color: var(--fg);
+    font: 600 15px/1 var(--font-mono);
+  }
+  .origin-body :global(.origin-stepper) {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .origin-body :global(.origin-stepper-header) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .origin-body :global(.origin-stepper-header > span) {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+  .origin-body :global(.origin-stepper-header small),
+  .origin-body :global(.origin-stepper-step > span) {
+    color: var(--muted);
+    font: 600 9px/1.3 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .origin-body :global(.origin-stepper-header strong) {
+    color: var(--fg);
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .origin-body :global(.origin-stepper-header output) {
+    flex: 0 0 auto;
+    color: var(--muted);
+    font: 600 10px/1.3 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .origin-body :global(.origin-stepper-stage) {
+    display: grid;
+    min-height: 205px;
+    align-items: center;
+    padding: 20px;
+  }
+  .origin-body :global(.origin-stepper-step) {
+    --step-accent: var(--accent-fg);
+    margin: 0;
+    padding: 0;
+  }
+  .origin-body :global(.origin-stepper-step--violet) { --step-accent: var(--violet); }
+  .origin-body :global(.origin-stepper-step--good) { --step-accent: var(--accent-fg); }
+  .origin-body :global(.origin-stepper-step > span) { color: var(--step-accent); }
+  .origin-body :global(.origin-stepper-step > strong) {
+    display: block;
+    max-width: 31rem;
+    margin-top: 7px;
+    color: var(--fg);
+    font-size: 18px;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+  .origin-body :global(.origin-stepper-step > p) {
+    max-width: 32rem;
+    margin: 8px 0 0;
+    color: var(--fg-soft);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .origin-body :global(.origin-stepper-step > ul) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .origin-body :global(.origin-stepper-step > ul > li) {
+    margin: 0;
+    padding: 4px 7px;
+    border: 1px solid color-mix(in oklab, var(--step-accent) 25%, var(--border));
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--step-accent) 5%, var(--surface));
+    color: var(--fg-soft);
+    font: 500 9.5px/1.25 var(--font-mono);
+  }
+  .origin-body :global(.origin-stepper-footer) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 9px 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .origin-body :global(.origin-stepper-progress) {
+    display: flex;
+    flex: 1 1 120px;
+    gap: 4px;
+    max-width: 145px;
+  }
+  .origin-body :global(.origin-stepper-progress i) {
+    display: block;
+    flex: 1;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--border);
+    transition: background-color 140ms ease;
+  }
+  .origin-body :global(.origin-stepper-progress i.is-active) { background: var(--accent); }
+  .origin-body :global(.origin-stepper-controls) {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+  .origin-body :global(.origin-stepper-controls button) {
+    min-height: 34px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--fg-soft);
+    font: 600 9.5px/1 var(--font-mono);
+    cursor: pointer;
+  }
+  .origin-body :global(.origin-stepper-controls button:hover:not(:disabled)) {
+    border-color: var(--accent);
+    color: var(--accent-fg);
+  }
+  .origin-body :global(.origin-stepper-controls button:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .origin-body :global(.origin-stepper-controls button:disabled) {
+    opacity: 0.38;
+    cursor: default;
+  }
+  .origin-body :global(.origin-stepper-limit) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin: 8px 0 0;
+    color: var(--muted);
+    font: 400 10px/1.45 var(--font-mono);
+  }
+  .origin-body :global(.origin-stepper-limit code) {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+  }
+  .origin-body :global(.origin-diagram figcaption) {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .origin-body :global(.origin-inspiration) {
+    margin: 44px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
 
   @media (max-width: 900px) {
     .es-stats { grid-template-columns: repeat(2, 1fr); }
@@ -416,6 +728,19 @@ const jsonLd = {
     .es-stat:last-child { border-bottom: 0; }
     .origin-body { font-size: 15.5px; padding-top: 32px; }
     .origin-body :global(blockquote) { font-size: 16px; }
+    .origin-body :global(.origin-activation-path) { grid-template-columns: 1fr; }
+    .origin-body :global(.origin-activation-path > div) { padding: 11px 12px; }
+    .origin-body :global(.origin-activation-path i) { height: 18px; }
+    .origin-body :global(.origin-activation-path i::before) { content: '↓'; }
+    .origin-body :global(.origin-stepper-header) { padding: 11px 12px; }
+    .origin-body :global(.origin-stepper-stage) { min-height: 242px; padding: 16px; }
+    .origin-body :global(.origin-stepper-step > strong) { font-size: 16.5px; }
+    .origin-body :global(.origin-stepper-footer) { gap: 10px; }
+    .origin-body :global(.origin-stepper-progress) { max-width: 72px; }
+    .origin-body :global(.origin-stepper-controls button) {
+      min-height: 44px;
+      padding: 0 9px;
+    }
   }
 </style>
 
@@ -450,5 +775,37 @@ const jsonLd = {
     );
 
     for (const section of sections) observer.observe(section);
+  }
+
+  for (const stepper of document.querySelectorAll<HTMLElement>('[data-origin-stepper]')) {
+    const steps = Array.from(stepper.querySelectorAll<HTMLElement>('[data-origin-step]'));
+    const progress = Array.from(stepper.querySelectorAll<HTMLElement>('.origin-stepper-progress i'));
+    const count = stepper.querySelector<HTMLOutputElement>('[data-origin-stepper-count]');
+    const previous = stepper.querySelector<HTMLButtonElement>('[data-origin-stepper-prev]');
+    const next = stepper.querySelector<HTMLButtonElement>('[data-origin-stepper-next]');
+
+    if (steps.length === 0 || !count || !previous || !next) continue;
+
+    let current = 0;
+    const renderStep = () => {
+      for (const [index, step] of steps.entries()) step.hidden = index !== current;
+      for (const [index, segment] of progress.entries()) {
+        segment.classList.toggle('is-active', index <= current);
+      }
+      count.textContent = `${current + 1} / ${steps.length}`;
+      previous.disabled = current === 0;
+      next.disabled = current === steps.length - 1;
+    };
+
+    previous.addEventListener('click', () => {
+      current = Math.max(0, current - 1);
+      renderStep();
+    });
+    next.addEventListener('click', () => {
+      current = Math.min(steps.length - 1, current + 1);
+      renderStep();
+    });
+
+    renderStep();
   }
 </script>

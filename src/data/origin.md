@@ -164,6 +164,38 @@ not the source of truth. Take away any of the three evidence inputs and you get
 something that reads well and does nothing, which is precisely what I had on 4
 February.
 
+<figure class="origin-diagram" aria-labelledby="evidence-loop-caption">
+  <div class="origin-flow" role="img" aria-label="Research, codebases, and session transcripts feed generated candidate workflows. Real work decides whether each candidate is kept and enforced or rewritten and tested again.">
+    <div class="origin-flow-sources">
+      <div><span>Input</span><strong>Research</strong></div>
+      <div><span>Input</span><strong>Codebases</strong></div>
+      <div><span>Input</span><strong>Sessions</strong></div>
+    </div>
+    <div class="origin-flow-arrow" aria-hidden="true">↓</div>
+    <div class="origin-flow-node origin-flow-node--violet">
+      <span>Model generates</span>
+      <strong>Candidate workflows</strong>
+    </div>
+    <div class="origin-flow-arrow" aria-hidden="true">↓</div>
+    <div class="origin-flow-node">
+      <span>Real work tests</span>
+      <strong>Did it fire? Help? Need correction?</strong>
+    </div>
+    <div class="origin-flow-divider"><span>Evidence decides</span></div>
+    <div class="origin-flow-outcomes">
+      <div class="origin-flow-node origin-flow-node--good">
+        <span>Survives</span>
+        <strong>Keep + enforce</strong>
+      </div>
+      <div class="origin-flow-node origin-flow-node--warn">
+        <span>Fails</span>
+        <strong>Rewrite / delete ↺</strong>
+      </div>
+    </div>
+  </div>
+  <figcaption id="evidence-loop-caption"><strong>Evidence loop.</strong> Current research corrects model memory, real code reveals fit, and session transcripts decide what gets kept, enforced, rewritten, or deleted.</figcaption>
+</figure>
+
 ## Then I had it audited against real code
 
 Before any of it was public I had it audited. I asked for the prompt rather than
@@ -248,6 +280,22 @@ June, measured at the end of August:
 - those 43 follow-throughs landed in 32 of the 527 sessions, about **6%**,
   because a session sometimes took more than one hint.
 
+<figure class="origin-diagram" aria-labelledby="activation-path-caption">
+  <div class="origin-activation" role="img" aria-label="Of 527 sessions measured since the routing hook shipped, it fired in 123 sessions and injected 157 hints. Forty-three hints were followed in 32 sessions. Every command was typed by the author; zero routes were autonomous.">
+    <div class="origin-activation-path">
+      <div><strong>527</strong><span>sessions measured</span></div>
+      <i aria-hidden="true"></i>
+      <div><strong>123</strong><span>sessions saw the hook</span></div>
+      <i aria-hidden="true"></i>
+      <div><strong>157</strong><span>hints injected</span></div>
+      <i aria-hidden="true"></i>
+      <div><strong>43</strong><span>followed in 32 sessions</span></div>
+    </div>
+    <div class="origin-activation-result"><span>Autonomous routes</span><strong>0</strong></div>
+  </div>
+  <figcaption id="activation-path-caption"><strong>Measured activation path.</strong> Hooks made the suggestion visible. I still typed every command myself.</figcaption>
+</figure>
+
 I want to be careful about what that six percent is, because it is tempting to
 put it next to the zero and call it progress. It is not the same measurement. The
 zero was about the model activating rules on its own. The six percent is a
@@ -325,6 +373,49 @@ in the testing skill, a compression step so investigations stop flooding the mai
 context, and complexity detection to route trivial requests to the quick command
 instead of the full workflow.
 
+<figure class="origin-diagram" aria-labelledby="session-pipeline-caption">
+  <div class="origin-stepper" data-origin-stepper>
+    <div class="origin-stepper-header">
+      <span><small>Session analysis</small><strong>From transcript to change set</strong></span>
+      <output data-origin-stepper-count>1 / 4</output>
+    </div>
+    <div class="origin-stepper-stage" id="session-pipeline-stage" aria-live="polite">
+      <section class="origin-stepper-step" data-origin-step>
+        <span>01 / Source</span>
+        <strong>The input was work I had already done.</strong>
+        <p>Seven transcripts from real Phoenix sessions, not examples written for the plugin.</p>
+        <ul><li>7 transcripts</li><li>12 February</li><li>real work</li></ul>
+      </section>
+      <section class="origin-stepper-step origin-stepper-step--violet" data-origin-step hidden>
+        <span>02 / Analyze</span>
+        <strong>Ask the same six questions every time.</strong>
+        <p>A fixed template makes friction comparable across sessions.</p>
+        <ul><li>outcome</li><li>method</li><li>friction</li><li>missing skill</li><li>change</li><li>efficiency</li></ul>
+      </section>
+      <section class="origin-stepper-step" data-origin-step hidden>
+        <span>03 / Control</span>
+        <strong>Compare against the version that was actually present.</strong>
+        <p>A running session keeps its older local copy. Without the version, the analysis can blame a feature the session never had.</p>
+        <ul><li>plugin version</li><li>older copy</li><li>fair comparison</li></ul>
+      </section>
+      <section class="origin-stepper-step origin-stepper-step--good" data-origin-step hidden>
+        <span>04 / Change set</span>
+        <strong>Ship artifacts, not observations.</strong>
+        <p>Two useful findings became a concrete plugin change in the next commit.</p>
+        <ul><li>1 skill</li><li>2 Iron Laws</li><li>autoload</li><li>compression</li><li>complexity routing</li></ul>
+      </section>
+    </div>
+    <div class="origin-stepper-footer">
+      <div class="origin-stepper-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="origin-stepper-controls">
+        <button type="button" data-origin-stepper-prev aria-controls="session-pipeline-stage" disabled>← Previous</button>
+        <button type="button" data-origin-stepper-next aria-controls="session-pipeline-stage">Next →</button>
+      </div>
+    </div>
+  </div>
+  <figcaption id="session-pipeline-caption"><strong>Session-to-artifact pipeline.</strong> One pass produced two useful findings and a concrete plugin change set.</figcaption>
+</figure>
+
 That is the loop. Real work, read back, turned into something that stops the same
 half hour from happening again. Not a feature I thought would be nice.
 
@@ -359,6 +450,50 @@ descriptions, with no model in that part. It separates a description that missed
 a word the prompt used, from one that collides with a neighbour's top keywords,
 from one that says what the skill is and never says when to use it. Three
 different repairs, and I kept losing track of which one I was doing.
+
+<figure class="origin-diagram" aria-labelledby="routing-loop-caption">
+  <div class="origin-stepper" data-origin-stepper>
+    <div class="origin-stepper-header">
+      <span><small>Behavioral routing eval</small><strong>From prompt to repair</strong></span>
+      <output data-origin-stepper-count>1 / 4</output>
+    </div>
+    <div class="origin-stepper-stage" id="routing-loop-stage" aria-live="polite">
+      <section class="origin-stepper-step" data-origin-step>
+        <span>01 / Fixtures</span>
+        <strong>Build both positive and negative examples.</strong>
+        <p>Every skill owns prompts that should reach it and prompts that should not.</p>
+        <ul><li>51 descriptions</li><li>269 should trigger</li><li>233 should not</li></ul>
+      </section>
+      <section class="origin-stepper-step origin-stepper-step--violet" data-origin-step hidden>
+        <span>02 / Route</span>
+        <strong>Give one prompt to the routing model.</strong>
+        <p>Haiku sees the complete lineup of descriptions and chooses up to three skills, or none.</p>
+        <ul><li>1 prompt</li><li>all 51 descriptions</li><li>≤ 3 names or none</li></ul>
+      </section>
+      <section class="origin-stepper-step" data-origin-step hidden>
+        <span>03 / Score</span>
+        <strong>Score the answer relative to the target.</strong>
+        <p>A positive fixture passes when its skill appears. A negative passes when that skill stays absent.</p>
+        <ul><li>target present</li><li>target absent</li><li>75% minimum</li></ul>
+      </section>
+      <section class="origin-stepper-step origin-stepper-step--good" data-origin-step hidden>
+        <span>04 / Repair loop</span>
+        <strong>Turn the miss into a specific edit.</strong>
+        <p>Code classifies the failure, changes the description, and runs the fixture again.</p>
+        <ul><li>missing term</li><li>scope too broad</li><li>description overlap</li></ul>
+      </section>
+    </div>
+    <div class="origin-stepper-footer">
+      <div class="origin-stepper-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="origin-stepper-controls">
+        <button type="button" data-origin-stepper-prev aria-controls="routing-loop-stage" disabled>← Previous</button>
+        <button type="button" data-origin-stepper-next aria-controls="routing-loop-stage">Next →</button>
+      </div>
+    </div>
+  </div>
+  <p class="origin-stepper-limit"><code>lab routing</code> ≠ <code>real-session activation</code></p>
+  <figcaption id="routing-loop-caption"><strong>Routing evaluation loop.</strong> The model judges the route. Code classifies the failure. Each wrong route maps to a description repair, then runs through the fixtures again.</figcaption>
+</figure>
 
 On the last full run, in July, 34 of the 51 skills scored a perfect 100% and the
 average was 95.3%. Nothing fell below the gate. Three skills sit exactly on it, and two
@@ -527,3 +662,5 @@ now know which twelve to ask about.
 Start with `/phx:review` on a branch you already understand. If it tells you
 something you didn't know, keep it. If it doesn't, you lost ten minutes and I
 would genuinely like to hear which part missed.
+
+<p class="origin-inspiration">Small thanks to José Valim. The step-by-step diagrams were inspired by his article <a href="https://dashbit.co/blog/websockets-vs-sse"><cite>WebSockets versus Server-Sent Events</cite></a>.</p>
