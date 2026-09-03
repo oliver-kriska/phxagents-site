@@ -281,7 +281,7 @@ June, measured at the end of August:
   because a session sometimes took more than one hint.
 
 <figure class="origin-diagram" aria-labelledby="activation-path-caption">
-  <div class="origin-activation" role="img" aria-label="Of 527 sessions measured since the routing hook shipped, it fired in 123 sessions and injected 157 hints. Forty-three hints were followed in 32 sessions. Every command was typed by the author; zero routes were autonomous.">
+  <div class="origin-activation" role="img" aria-label="Of 527 sessions measured since the routing hook shipped, it fired in 123 sessions and injected 157 hints. Forty-three hints were followed in 32 sessions. Every command was typed by the author. Zero routes were autonomous.">
     <div class="origin-activation-path">
       <div><strong>527</strong><span>sessions measured</span></div>
       <i aria-hidden="true"></i>
