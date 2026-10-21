@@ -331,9 +331,8 @@ const jsonLd = {
       padding: 52px 0 0;
     }
     .es-toc-box { border: 0; background: transparent; }
-    .es-toc-box > summary { pointer-events: none; padding: 0 0 6px; min-height: 0; }
-    .es-toc-box > summary::after,
-    .es-toc-box[open] > summary::after { content: ''; }
+    .es-toc-box > summary { padding-inline: 9px; }
+    .es-toc-box > summary:focus-visible { outline-offset: -2px; }
     .es-toc ol { padding: 0; border-top: 0; }
     .es-toc a { min-height: 0; padding: 6px 9px; }
   }

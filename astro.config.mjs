@@ -80,6 +80,60 @@ function rehypeWrapTables() {
 }
 
 /**
+ * GFM task lists render as `<li><input type="checkbox" disabled> text</li>`:
+ * a form control with no accessible name (axe `label`), which screen readers
+ * announce as a bare "checkbox, not checked". Wrap the checkbox and the inline
+ * content after it in a `<label>`, which names it by its own item text without
+ * changing what is read or shown. Block children (a nested list, a paragraph)
+ * stay outside the label, since a label may contain only phrasing content.
+ */
+function rehypeLabelTaskItems() {
+  const BLOCK = new Set(['ul', 'ol', 'p', 'div', 'pre', 'table', 'blockquote', 'figure']);
+  const isCheckbox = (/** @type {any} */ node) =>
+    node?.type === 'element' && node.tagName === 'input' && node.properties?.type === 'checkbox';
+
+  /** @param {any} parent */
+  const wrap = (parent) => {
+    const start = parent.children.findIndex(isCheckbox);
+    if (start === -1) return false;
+    let end = start + 1;
+    while (end < parent.children.length) {
+      const child = parent.children[end];
+      if (child.type === 'element' && BLOCK.has(child.tagName)) break;
+      end++;
+    }
+    const label = {
+      type: 'element',
+      tagName: 'label',
+      properties: { className: ['task-list-label'] },
+      children: parent.children.slice(start, end),
+    };
+    parent.children.splice(start, end - start, label);
+    return true;
+  };
+
+  /** @param {any} node */
+  const visit = (node) => {
+    if (node.type === 'element' && node.tagName === 'li') {
+      const classes = node.properties?.className;
+      if (Array.isArray(classes) && classes.includes('task-list-item')) {
+        // Tight lists hold the checkbox directly; loose lists inside a <p>.
+        if (!wrap(node)) {
+          const para = node.children.find(
+            (/** @type {any} */ c) => c.type === 'element' && c.tagName === 'p'
+          );
+          if (para) wrap(para);
+        }
+      }
+    }
+    if (node.children) for (const child of node.children) visit(child);
+  };
+  return (/** @type {any} */ tree) => {
+    visit(tree);
+  };
+}
+
+/**
  * Map links inside upstream-owned Markdown to their public site routes. The map
  * itself lives in src/lib/upstreamLinks.mjs, shared with the /llms-full.txt
  * export so the HTML and text copies of a document link to the same places.
@@ -151,7 +205,12 @@ export default defineConfig({
     // deprecated). shikiConfig stays at the markdown level — it's applied by
     // Astro's syntax highlighter, not the unified processor.
     processor: unified({
-      rehypePlugins: [rehypeShiftHeadings, rehypeWrapTables, rehypeUpstreamDocLinks],
+      rehypePlugins: [
+        rehypeShiftHeadings,
+        rehypeWrapTables,
+        rehypeLabelTaskItems,
+        rehypeUpstreamDocLinks,
+      ],
     }),
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark-dimmed' },

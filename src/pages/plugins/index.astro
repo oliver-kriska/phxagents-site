@@ -5,9 +5,49 @@ import { getPlugin, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/
 const plugins = getPlugins();
 const products = plugins.filter((plugin) => plugin.role !== 'namespace');
 const namespaces = plugins.filter((plugin) => plugin.role === 'namespace');
+
+// One SoftwareApplication per plugin, matching the homepage's schema, so a
+// search result can show each plugin as a distinct product of this site.
+const site = 'https://phxagents.dev';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: `${site}/` },
+        { '@type': 'ListItem', position: 2, name: 'Plugins', item: `${site}/plugins/` },
+      ],
+    },
+    {
+      '@type': 'ItemList',
+      '@id': `${site}/plugins/#list`,
+      name: 'phxagents marketplace plugins',
+      numberOfItems: plugins.length,
+      itemListElement: plugins.map((plugin, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'SoftwareApplication',
+          name: plugin.displayName,
+          description: plugin.description,
+          softwareVersion: plugin.version,
+          applicationCategory: 'DeveloperApplication',
+          operatingSystem: 'macOS, Linux, Windows',
+          url: new URL(plugin.docsUrl.startsWith('/catalog/') ? `/plugins/#${plugin.id}` : plugin.docsUrl, site).href,
+          codeRepository: plugin.sourceUrl,
+          license: 'https://opensource.org/licenses/MIT',
+          isAccessibleForFree: true,
+          author: { '@type': 'Person', name: 'Oliver Kriška', url: 'https://github.com/oliver-kriska' },
+        },
+      })),
+    },
+  ],
+};
 ---
 
 <DocPage title="Plugins" description="Explore the phxagents plugin collection: capabilities, runtime support, release status and installation requirements." active="plugins">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <header class="plugins-heading">
     <h1>Plugins</h1>
     <p>Start with the Phoenix field manual. Add a focused workflow when you need it.</p>

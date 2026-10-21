@@ -97,7 +97,7 @@ function displayName(item: Item): string {
     <div class="catalog-head">
       <div>
         <h1>Catalog</h1>
-        <p>Every skill and Claude Code agent in the phxagents marketplace, across <a href="/plugins/">{pluginFilters.length} plugins</a>. The phx skills also generate for Amp, Codex, Pi, OpenCode and DeepSeek Harness. <a href="/compatibility/">Compare runtimes →</a></p>
+        <p>Skills and Claude Code agents across <a href="/plugins/">{pluginFilters.length} plugins</a>. <a href="/compatibility/">Compare runtime support →</a></p>
       </div>
       <div class="summary">
         <b><span data-catalog-count aria-live="polite">{items.length}</span></b>
@@ -191,6 +191,11 @@ function displayName(item: Item): string {
         const selected = el.dataset.catalogFilter === value;
         el.setAttribute('aria-checked', selected ? 'true' : 'false');
         el.tabIndex = selected ? 0 : -1;
+        // Reveal deep-linked selections in the phone's scrollable filter rows
+        // without moving focus or scrolling the page down to the filters.
+        if (selected && el.parentElement?.classList.contains('cat-bar')) {
+          el.parentElement.scrollLeft = el.offsetLeft - 4;
+        }
       });
     }
 
@@ -524,9 +529,33 @@ function displayName(item: Item): string {
   .catalog-clear-link:hover { text-decoration: none; }
 
   @media (max-width: 560px) {
-    .catalog-controls .filter-group { width: 100%; overflow-x: auto; }
+    .catalog-shell { padding-top: 24px; }
+    .catalog-head {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+    }
+    .catalog-head .summary { text-align: left; }
+    .catalog-head .summary b { display: inline; font-size: inherit; }
+    .catalog-controls { gap: 8px; margin-bottom: 12px; }
+    .catalog-controls .filter-group { flex: 1; min-width: 0; }
+    .filter-chip { flex: 1; justify-content: center; padding-inline: 8px; }
     .filter-chip .count { display: none; }
-    .catalog-search { width: 100%; }
+    .catalog-search { flex-basis: 100%; min-width: 0; }
+    .catalog-search input { height: 44px; font-size: 16px; }
+    .catalog-clear { height: 44px; }
+    .cat-bar {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      position: relative;
+      gap: 8px;
+      padding: 4px 4px 12px;
+      margin: 0 -4px 12px;
+      scroll-padding-inline: 4px;
+    }
+    .cat-chip { flex: none; white-space: nowrap; }
   }
 
   @media (max-width: 900px) {

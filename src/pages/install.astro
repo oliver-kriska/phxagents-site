@@ -2,8 +2,10 @@
 import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
 import { getPortableWorkflowNames } from '../lib/skillNames';
+import { getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../lib/plugins';
 
 const adaptedWorkflows = getPortableWorkflowNames().length;
+const addons = getPlugins().filter((plugin) => plugin.role === 'addon');
 ---
 
 <DocPage title="Install" description="Install phxagents v3 for Claude Code, Amp, Codex, Pi, OpenCode, or DeepSeek Harness." active="docs">
@@ -76,6 +78,23 @@ const adaptedWorkflows = getPortableWorkflowNames().length;
         </div>
 
         <p>A fresh v3 install automatically pulls the small <code>ecto</code> and <code>lv</code> compatibility namespaces that preserve <code>/ecto:*</code> and <code>/lv:*</code> commands. Run <code>/reload-plugins</code> in an open session before using the new skills, agents and hooks.</p>
+
+        {addons.length > 0 && (
+          <>
+            <h3 id="add-ons">Optional add-ons</h3>
+            <p>The same marketplace ships {addons.length} more plugins. Install any of them alongside the core plugin:</p>
+            <ul class="addon-list">
+              {addons.map((plugin) => (
+                <li>
+                  <a href={plugin.docsUrl}><strong>{plugin.displayName}</strong></a>
+                  {' '}· {STATUS_LABELS[plugin.status]} · {plugin.runtimes.map((r) => RUNTIME_LABELS[r]).join(', ')}
+                  <br /><code>/plugin install {plugin.id}@{plugin.marketplace}</code>
+                </li>
+              ))}
+            </ul>
+            <p><a href="/plugins/">Compare every plugin →</a></p>
+          </>
+        )}
 
         <h2>Updating from v2.x</h2>
         <p>Install the new command-compatibility dependencies before updating the main plugin:</p>
@@ -175,6 +194,20 @@ claude plugin update elixir-phoenix@oliver-kriska</pre>
     line-height: 1.65;
   }
   .docs-body li { margin: 4px 0; }
+  /* Prose links: underlined at rest, so they never rely on colour alone. */
+  .docs-body p a,
+  .docs-body li a {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .docs-body h3 {
+    margin: 28px 0 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .addon-list code { font-size: 12.5px; }
   .runtime-heading {
     display: flex;
     align-items: center;

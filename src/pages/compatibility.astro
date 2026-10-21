@@ -1,6 +1,13 @@
 ---
 import UpstreamDocPage from '../components/UpstreamDocPage.astro';
 import { stats } from '../data/stats';
+import { getPlugins, RUNTIME_LABELS } from '../lib/plugins';
+
+const list = (items: string[]) => new Intl.ListFormat('en', { type: 'conjunction' }).format(items);
+// Add-ons that ship for Claude Code alone; the matrix below covers phx only.
+const claudeOnlyAddons = getPlugins().filter(
+  (p) => p.role === 'addon' && p.runtimes.length === 1 && p.runtimes[0] === 'claude-code'
+);
 ---
 
 <UpstreamDocPage
@@ -20,5 +27,12 @@ import { stats } from '../data/stats';
 
     <h3>Which runtimes support the full plugin versus generated skills?</h3>
     <p>Claude Code is the canonical full plugin. Amp, Codex, Pi, OpenCode, and DeepSeek Harness provide generated skills with focused workflow adaptations; Claude-only agents, hooks, and root-level configuration remain deferred unless the matrix says otherwise.</p>
+
+    {claudeOnlyAddons.length > 0 && (
+      <>
+        <h3>Do the add-on plugins run on other runtimes?</h3>
+        <p>No. {list(claudeOnlyAddons.map((p) => p.displayName))} {claudeOnlyAddons.length === 1 ? 'is a' : 'are'} {RUNTIME_LABELS['claude-code']} {claudeOnlyAddons.length === 1 ? 'plugin' : 'plugins'} with no generated edition, so this matrix covers the core phxagents plugin only. <a href="/plugins/">See every plugin →</a></p>
+      </>
+    )}
   </section>
 </UpstreamDocPage>

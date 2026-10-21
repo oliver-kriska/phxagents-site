@@ -15,9 +15,6 @@ const release = await getLatestRelease();
 const releaseTag = `v${stats.version}`;
 const releaseMatchesManifest = release?.tag_name === releaseTag;
 const releaseUrl = releaseMatchesManifest ? release!.html_url : '/changelog/';
-const releaseStateLabel = releaseMatchesManifest
-  ? `full Claude plugin · ${generatedEditions} generated editions`
-  : `${runtimes.length} runtime editions`;
 const adaptedWorkflows = getPortableWorkflowNames().length;
 const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to ${runtimeNames}, with ${adaptedWorkflows} workflows adapted for every runtime.`;
 
@@ -56,13 +53,13 @@ const jsonLd = {
         <div>
           <div class="eyebrow">
             <span class="dot"></span>
-            <a href={releaseUrl} rel={releaseUrl.startsWith('http') ? 'noopener' : undefined}>{releaseTag}</a> · {releaseStateLabel}
+            <a href={releaseUrl} rel={releaseUrl.startsWith('http') ? 'noopener' : undefined}>{releaseTag}</a> · {runtimes.length} runtime editions
           </div>
           <h1 class="headline">
             One Phoenix playbook. {runtimes.length} AI coding runtimes.
           </h1>
           <p class="lede">
-            <strong>Plausible Elixir is not idiomatic Phoenix.</strong> phxagents v3 gives {runtimeNames} the same {stats.skills}-skill field manual. Claude Code also gets the full {stats.agents}-agent, hooks and orchestration layer.
+            <strong>Plausible Elixir is not idiomatic Phoenix.</strong> {stats.skills} skills for every runtime. Claude Code adds {stats.agents} specialist agents and {stats.hooks} enforcement hooks.
           </p>
 
           <div class="hero-cta">
@@ -77,24 +74,14 @@ const jsonLd = {
           </div>
         </div>
 
-        <div class="term" aria-hidden="true">
-          <div class="term-head">
-            <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
-            <div class="title">phxagents v3 · runtime map</div>
+        <figure class="hero-proof">
+          <figcaption>Claude Code · safety gate example</figcaption>
+          <div class="proof-body">
+            <div class="proof-command"><span>Bash</span><code>mix ecto.reset</code></div>
+            <p class="proof-response"><samp>BLOCKED: Destructive database operation detected.</samp></p>
           </div>
-          <div class="term-body">
-            <div class="term-line"><span class="prompt">v3</span><span class="cmd">one canonical skill set → {runtimes.length} runtime editions</span></div>
-            <div class="term-out">
-<span class="dim">full</span>       <span class="info">Claude Code</span>  /phx:review
-<span class="dim">generated</span>  <span class="info">Amp</span>          skill: invoke → phx-review
-<span class="dim">generated</span>  <span class="info">Codex</span>        $elixir-phoenix:phx-review
-<span class="dim">generated</span>  <span class="info">Pi</span>           /skill:phx-review
-<span class="dim">generated</span>  <span class="info">OpenCode</span>     skill tool → name: "phx-review"
-<span class="dim">generated</span>  <span class="info">dsh</span>          /phx-review</div>
-
-            <div class="term-line" style="margin-top:14px"><span class="prompt">✓</span><span class="cmd">{stats.skills} skills · {adaptedWorkflows} adapted workflows · drift checked</span><span class="term-cursor"></span></div>
-          </div>
-        </div>
+          <p class="proof-note">In a project with <code>mix.exs</code>, the hook stops this command before it runs. <a href="/hooks/safety-gates/">Read the safety gate →</a></p>
+        </figure>
       </div>
     </div>
   </section>
@@ -102,17 +89,15 @@ const jsonLd = {
   <section class="band band-stats">
     <div class="wrap">
       <div class="stats numeric">
-        <a class="stat" href="/catalog/?type=skill"><div class="n">{stats.skills}</div><div class="lbl">Canonical skills</div></a>
-        <a class="stat" href="/catalog/?type=agent"><div class="n">{stats.agents}</div><div class="lbl">Claude Code agents</div></a>
+        <a class="stat" href="/catalog/?type=skill&amp;plugin=elixir-phoenix"><div class="n">{stats.skills}</div><div class="lbl">Canonical skills</div></a>
+        <a class="stat" href="/catalog/?type=agent&amp;plugin=elixir-phoenix"><div class="n">{stats.agents}</div><div class="lbl">Claude Code agents</div></a>
         <a class="stat" href="#workflow"><div class="n">{adaptedWorkflows}</div><div class="lbl">Workflows adapted</div></a>
         <a class="stat" href="/iron-laws/"><div class="n">{stats.ironLaws}</div><div class="lbl">Iron Laws</div></a>
         <a class="stat" href="/hooks/"><div class="n">{stats.hooks}</div><div class="lbl">Enforcement hooks</div></a>
         <a class="stat" href="/hooks/"><div class="n">{stats.hookEvents}</div><div class="lbl">Lifecycle events</div></a>
       </div>
       <p class="stats-note">
-        Every number above is read from the plugin at build time. What measurement said about
-        them afterwards, including which skills have never run in real work, is in
-        <a href="/origin/">the origin story</a>.
+        Counts read from source at build time. See what gets used in <a href="/origin/">the origin story</a>.
       </p>
     </div>
   </section>
@@ -251,12 +236,10 @@ const jsonLd = {
             <div class="title">PreToolUse · block-dangerous-ops</div>
           </div>
           <div class="term-body">
-            <div class="term-line"><span class="prompt">$</span><span class="cmd">mix ecto.reset</span></div>
-            <div class="term-out"><span class="warn">BLOCKED: Destructive database operation detected.</span>
-mix ecto.reset/drop will destroy all data. If intentional, run manually
-outside Claude Code. Safer alternatives:
-<span class="dim">- mix ecto.rollback --step 1 (undo last migration)
-- mix ecto.migrate (apply pending migrations)</span></div>
+            <div class="term-line"><span class="prompt">$</span><span class="cmd">git push --force</span></div>
+            <div class="term-out"><span class="warn">BLOCKED: Force push detected — this rewrites remote history.</span>
+If intentional, run manually outside Claude Code.
+<span class="dim">Safer alternative: git push --force-with-lease</span></div>
           </div>
         </div>
 
@@ -273,8 +256,8 @@ outside Claude Code. Safer alternatives:
       </div>
 
       <p class="hooks-note">
-        Every Elixir-specific hook gates on <code>mix.exs</code>, so the plugin is inert in a
-        non-Elixir repository, and all of them fail open — a broken hook means the guard is off,
+        Every Elixir-specific hook gates on <code>mix.exs</code>, so in a non-Elixir repository
+        only the force-push block stays on, and all of them fail open — a broken hook means the guard is off,
         never that the session is unusable.
         <a href="/hooks/">Read how the hooks work →</a>
       </p>
@@ -425,6 +408,37 @@ outside Claude Code. Safer alternatives:
   }
   .hero-cta .btn-primary, .hero-cta .btn-ghost { height: 38px; padding: 0 16px; font-size: 13.5px; }
 
+  .hero-proof {
+    min-width: 0;
+    margin: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .hero-proof figcaption {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .proof-body { padding: 24px 20px; }
+  .proof-command { display: flex; align-items: baseline; gap: 16px; }
+  .proof-command span { color: var(--muted); font: 12px var(--font-mono); }
+  .proof-command code { color: var(--fg); font: 14px var(--font-mono); }
+  .proof-response { margin: 18px 0 0; color: var(--warn-fg); }
+  .proof-response samp { font: 13px/1.65 var(--font-mono); }
+  .proof-note {
+    margin: 0;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--fg-soft);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .proof-note a { color: var(--accent-fg); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+
   /* Terminal */
   .term {
     background: var(--surface);
@@ -460,13 +474,6 @@ outside Claude Code. Safer alternatives:
   .term-out .warn { color: var(--warn-fg); }
   .term-out .info { color: var(--info-fg); }
   .term-out .dim { color: var(--muted); }
-  .term-cursor::after {
-    content: "▍";
-    color: var(--accent);
-    animation: blink 1.1s steps(2) infinite;
-    margin-left: 2px;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
 
   /* Hooks */
   .hooks-grid {
@@ -559,42 +566,28 @@ outside Claude Code. Safer alternatives:
   .stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--surface);
-    overflow: hidden;
+    border-block: 1px solid var(--border);
+    padding: 8px 0;
+    gap: 0 24px;
   }
   .stat {
-    padding: 22px 24px;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    min-height: 44px;
     text-decoration: none;
     color: inherit;
-    transition: background 120ms, color 120ms;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  /* Two rows of three: clear the rightmost column and the final row. */
-  .stat:nth-child(3n) { border-right: 0; }
-  .stat:nth-last-child(-n + 3) { border-bottom: 0; }
-  @media (hover: hover) and (pointer: fine) {
-    .stat:hover { background: var(--surface-2); }
-    .stat:hover .n { color: var(--accent-fg); }
-  }
+  .stat:hover .lbl { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
   .stat .n {
     font-family: var(--font-mono);
-    font-size: 28px;
+    font-size: 14px;
     color: var(--fg);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-    line-height: 1;
   }
   .stat .lbl {
-    margin-top: 8px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-family: var(--font-mono);
   }
   .stats-note {
     margin: 14px 0 0;
@@ -610,13 +603,11 @@ outside Claude Code. Safer alternatives:
     text-underline-offset: 2px;
   }
   .stats-note a:hover { color: var(--accent); }
+  @media (min-width: 1100px) {
+    .stats { grid-template-columns: repeat(6, 1fr); }
+  }
   @media (max-width: 760px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    /* Three rows of two: the column and final-row rules shift accordingly. */
-    .stat:nth-child(3n) { border-right: 1px solid var(--border); }
-    .stat:nth-child(2n) { border-right: 0; }
-    .stat:nth-last-child(-n + 3) { border-bottom: 1px solid var(--border); }
-    .stat:nth-last-child(-n + 2) { border-bottom: 0; }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 0 16px; }
   }
 
   /* Features */
@@ -806,6 +797,12 @@ outside Claude Code. Safer alternatives:
     .hero { padding: 56px 0 40px; }
   }
   @media (max-width: 600px) {
+    .hero { padding: 32px 0; }
+    .hero-grid { gap: 24px; }
+    .lede { margin-bottom: 20px; }
+    .hero-proof figcaption { padding: 10px 16px; }
+    .proof-body { padding: 16px; }
+    .proof-note { padding: 12px 16px; }
     section.band-features,
     section.band-workflow,
     section.band-hooks,
