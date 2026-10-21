@@ -1,0 +1,61 @@
+---
+import { render } from 'astro:content';
+import DocsLayout from '../../../../components/DocsLayout.astro';
+import { getAddonSkills, type AddonSkill } from '../../../../lib/addonEntries';
+import { getPluginSourceDate } from '../../../../lib/sourceDates';
+
+export async function getStaticPaths() {
+  const skills = await getAddonSkills();
+  return skills.map((skill) => {
+    // The pager stays inside one plugin, in the order the catalog lists it.
+    const siblings = skills.filter((s) => s.plugin.id === skill.plugin.id);
+    const idx = siblings.indexOf(skill);
+    return {
+      params: { plugin: skill.plugin.id, slug: skill.slug },
+      props: { skill, prev: siblings[idx - 1] ?? null, next: siblings[idx + 1] ?? null },
+    };
+  });
+}
+
+interface Props {
+  skill: AddonSkill;
+  prev: AddonSkill | null;
+  next: AddonSkill | null;
+}
+
+const { skill, prev, next } = Astro.props;
+const { entry } = skill;
+const { Content, headings } = await render(entry);
+const rawHint = entry.data['argument-hint'];
+const argumentHint = Array.isArray(rawHint)
+  ? `[${rawHint.join('|')}]`
+  : typeof rawHint === 'string'
+  ? rawHint
+  : rawHint != null
+  ? String(rawHint)
+  : undefined;
+const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/${skill.sourcePath}`;
+const dateModified = getPluginSourceDate(
+  skill.sourcePath,
+  entry.data.dateModified ?? entry.data.updated ?? entry.data.date
+);
+const pager = (s: AddonSkill | null) => (s ? { name: s.displayName, href: s.url } : null);
+---
+
+<DocsLayout
+  title={skill.displayName}
+  description={skill.description}
+  kind="skill"
+  name={skill.name}
+  slug={skill.slug}
+  effort={entry.data.effort}
+  argumentHint={argumentHint}
+  sourceUrl={sourceUrl}
+  dateModified={dateModified}
+  headings={headings}
+  prev={pager(prev)}
+  next={pager(next)}
+  addon={skill}
+>
+  <Content />
+</DocsLayout>

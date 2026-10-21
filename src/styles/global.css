@@ -210,8 +210,11 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
 .brand-name { font-size: 14px; }
 .brand-name span { color: var(--muted); font-weight: 400; }
 
-.nav-links { display: flex; align-items: center; gap: 4px; margin-left: 8px; }
+.nav-links { display: flex; align-items: center; gap: 4px; margin-left: 8px; flex: none; }
+/* Labels never wrap; when the bar runs short, the search button gives up
+   width instead (see .search-btn below). */
 .nav-links a {
+  white-space: nowrap;
   padding: 6px 10px;
   border-radius: var(--radius);
   font-size: 13px;
@@ -222,7 +225,11 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
 .nav-links a[aria-current="true"] { color: var(--fg); background: var(--surface-2); }
 
 .nav-spacer { flex: 1; }
-.nav-right { display: flex; align-items: center; gap: 8px; }
+/* min-width: 0 lets the group itself shrink, so the search button inside it
+   can give up width before the bar overflows. */
+.nav-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
+/* Only the search button gives up width; the icon controls keep their size. */
+.nav-right > :not(.search-btn) { flex-shrink: 0; }
 
 .search-btn {
   display: flex;
@@ -235,10 +242,14 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
   background: var(--surface-2);
   color: var(--muted);
   font-size: 13px;
-  min-width: 240px;
+  flex: 0 1 240px;
+  min-width: 0;
+  overflow: hidden;
   transition: border-color 120ms ease;
 }
 .search-btn:hover { border-color: var(--border-strong); }
+.search-btn svg, .search-btn .kbd { flex: none; }
+.search-btn .search-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .search-btn .kbd {
   margin-left: auto;
   font-family: var(--font-mono);
@@ -714,18 +725,24 @@ body.menu-open { overflow: hidden; }
   .nav-inner { gap: 14px; padding: 0 16px; }
   .nav-links { gap: 0; margin-left: 0; }
   .nav-links a { padding: 6px 7px; }
-  .search-btn { min-width: 190px; }
+  .search-btn { flex-basis: 190px; }
   .search-btn .kbd { display: none; }
 }
 /* Below 1080 the GitHub "Star" label already collapses to its icon; the search
    label goes with it, leaving the magnifier as the affordance. */
 @media (min-width: 901px) and (max-width: 1080px) {
-  .search-btn { min-width: auto; }
+  /* Eight unwrapped nav labels plus the right-hand controls only just fit at
+     901px; tighter gaps buy back the margin. */
+  .nav-inner { gap: 10px; }
+  .nav-links a { padding: 6px 5px; }
+  /* Never narrower than its 14px icon plus padding, or overflow clips it. */
+  .search-btn { flex-basis: auto; min-width: 36px; }
   .search-btn .search-label { display: none; }
 }
 @media (max-width: 900px) {
   .nav-links { display: none; }
-  .search-btn { min-width: auto; padding: 0 10px; }
+  /* Icon-only here: drop the desktop flex basis so it sizes to its icon. */
+  .search-btn { flex: none; min-width: auto; padding: 0 10px; }
   .search-btn .search-label { display: none; }
   .search-btn .kbd { display: none; }
   .menu-btn { display: inline-flex; }

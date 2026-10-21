@@ -1,0 +1,153 @@
+---
+import DocPage from '../../layouts/DocPage.astro';
+import { getPlugin, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/plugins';
+
+const plugins = getPlugins();
+const products = plugins.filter((plugin) => plugin.role !== 'namespace');
+const namespaces = plugins.filter((plugin) => plugin.role === 'namespace');
+---
+
+<DocPage title="Plugins" description="Explore the phxagents plugin collection: capabilities, runtime support, release status and installation requirements." active="plugins">
+  <header class="plugins-heading">
+    <h1>Plugins</h1>
+    <p>Start with the Phoenix field manual. Add a focused workflow when you need it.</p>
+  </header>
+
+  <div class="plugin-grid">
+    {products.map((plugin) => (
+      <article class:list={['plugin', { 'plugin-core': plugin.role === 'core' }]} id={plugin.id} aria-labelledby={`title-${plugin.id}`}>
+        <div class="plugin-meta">
+          <span>{plugin.role === 'core' ? 'Core plugin' : 'Add-on'}</span>
+          <span class:list={['plugin-status', plugin.status]}>{STATUS_LABELS[plugin.status]}</span>
+          <span class="version">v{plugin.version}</span>
+        </div>
+        <h2 id={`title-${plugin.id}`}>{plugin.displayName}</h2>
+        <p class="plugin-description">{plugin.description}</p>
+        <dl>
+          <div>
+            <dt>Runs on</dt>
+            <dd>{plugin.runtimes.map((runtime) => RUNTIME_LABELS[runtime]).join(' · ')}</dd>
+          </div>
+          <div>
+            <dt>Includes</dt>
+            <dd>{plugin.skills} {plugin.skills === 1 ? 'skill' : 'skills'}{plugin.agents > 0 && ` · ${plugin.agents} Claude Code ${plugin.agents === 1 ? 'agent' : 'agents'}`}</dd>
+          </div>
+          {plugin.dependencies.length > 0 && (
+            <div>
+              <dt>{plugin.role === 'core' ? 'Bundled namespaces' : 'Requires'}</dt>
+              <dd>{plugin.dependencies.map((id, index) => (
+                <>{index > 0 && ' · '}<a href={`#${id}`}>{getPlugin(id).displayName}</a></>
+              ))}</dd>
+            </div>
+          )}
+        </dl>
+        {plugin.role === 'core' && (
+          <p class="runtime-note">Full plugin on Claude Code; generated skill editions on the other runtimes. <a href="/compatibility/">Compare support →</a></p>
+        )}
+        <div class="plugin-actions">
+          <a class={plugin.role === 'core' ? 'btn-primary' : 'btn-ghost'} href={plugin.docsUrl}>
+            {plugin.role === 'core' ? 'Choose your runtime' : 'Read the guide'} <span aria-hidden="true">→</span>
+          </a>
+          <a href={`/catalog/?plugin=${plugin.id}`}>Browse catalog</a>
+          <a href={plugin.sourceUrl}>Source <span aria-hidden="true">↗</span></a>
+        </div>
+        <details class="plugin-install">
+          <summary>Install in {RUNTIME_LABELS['claude-code']}</summary>
+          <div class="code-block">
+            <div class="code-head">
+              <span>{RUNTIME_LABELS['claude-code']}</span>
+              <button class="copy" type="button" data-copy={`#install-${plugin.id}`} aria-label={`Copy ${plugin.displayName} installation commands`}>Copy</button>
+            </div>
+            <pre id={`install-${plugin.id}`}><code>{plugin.install.join('\n')}</code></pre>
+          </div>
+        </details>
+      </article>
+    ))}
+  </div>
+
+  <section class="namespaces" aria-labelledby="namespace-heading">
+    <h2 id="namespace-heading">Compatibility namespaces</h2>
+    <p>Alternate command prefixes for the core plugin, not separate toolkits.</p>
+    {namespaces.map((plugin) => (
+      <article class="namespace" id={plugin.id} aria-labelledby={`title-${plugin.id}`}>
+        <div class="namespace-heading">
+          <h3 id={`title-${plugin.id}`}>{plugin.displayName}</h3>
+          <span class="version">v{plugin.version}</span>
+        </div>
+        <p>{plugin.description}</p>
+        <p class="namespace-meta">
+          {plugin.runtimes.map((runtime) => RUNTIME_LABELS[runtime]).join(' · ')}
+          {plugin.aliasOf && <> · Re-exposes <a href={`#${plugin.aliasOf}`}>{getPlugin(plugin.aliasOf).displayName}</a> commands</>}
+        </p>
+        <div class="namespace-links">
+          <a href={plugin.docsUrl}>Browse commands <span aria-hidden="true">→</span></a>
+          <a href={plugin.sourceUrl}>Source <span aria-hidden="true">↗</span></a>
+        </div>
+        <details class="plugin-install">
+          <summary>Install in {RUNTIME_LABELS['claude-code']}</summary>
+          <div class="code-block">
+            <div class="code-head">
+              <span>{RUNTIME_LABELS['claude-code']}</span>
+              <button class="copy" type="button" data-copy={`#install-${plugin.id}`} aria-label={`Copy ${plugin.displayName} installation commands`}>Copy</button>
+            </div>
+            <pre id={`install-${plugin.id}`}><code>{plugin.install.join('\n')}</code></pre>
+          </div>
+        </details>
+      </article>
+    ))}
+  </section>
+</DocPage>
+
+<style>
+  .plugins-heading { margin-bottom: 28px; }
+  .plugins-heading h1 { margin: 0 0 10px; font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; font-weight: 600; }
+  .plugins-heading p { margin: 0; max-width: 55ch; font-size: 16.5px; color: var(--fg-soft); }
+  .plugin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .plugin { display: flex; flex-direction: column; min-width: 0; padding: 24px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); scroll-margin-top: 80px; }
+  .plugin-core { grid-column: 1 / -1; border-color: var(--border-strong); }
+  .plugin-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; font-size: 12px; color: var(--muted); }
+  .version { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+  .plugin-meta .version { margin-left: auto; }
+  .plugin-status { padding: 2px 7px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--fg-soft); }
+  .plugin-status.stable { background: var(--accent-soft); color: var(--accent-fg); }
+  .plugin-status.experimental { background: var(--warn-soft); color: var(--warn-fg); }
+  .plugin h2 { margin: 16px 0 10px; font-size: 22px; line-height: 1.25; letter-spacing: -0.015em; font-weight: 600; text-wrap: balance; }
+  .plugin-core h2 { font-size: 28px; }
+  .plugin-description { margin: 0 0 20px; max-width: 70ch; color: var(--fg-soft); }
+  dl { margin: 0 0 20px; font-size: 13px; }
+  dl > div + div { margin-top: 10px; }
+  dt { color: var(--muted); margin-bottom: 3px; }
+  dd { margin: 0; }
+  .plugin-core dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
+  .plugin-core dl > div:first-child { grid-column: 1 / -1; }
+  .plugin-core dl > div + div { margin-top: 0; }
+  .runtime-note { margin: 0 0 20px; max-width: 70ch; font-size: 13px; color: var(--fg-soft); }
+  dd a, .runtime-note a, .namespace-meta a { color: var(--accent-fg); text-decoration: underline; text-underline-offset: 3px; }
+  .runtime-note a { white-space: nowrap; }
+  .plugin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-top: auto; }
+  .plugin-actions > a, .namespace-links > a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; }
+  .plugin-actions > a:not(.btn-primary):not(.btn-ghost), .namespace-links > a { text-decoration: underline; text-underline-offset: 3px; color: var(--fg-soft); }
+  .plugin-actions > a:hover, .namespace-links > a:hover { text-decoration-thickness: 2px; }
+  .plugin-install { margin-top: 16px; border-top: 1px solid var(--border); }
+  summary { padding: 14px 0; min-height: 44px; font-size: 13px; cursor: pointer; }
+  summary:hover { color: var(--accent-fg); }
+  .code-block { margin: 0; }
+  .code-block .code-head { height: 44px; }
+  .code-block .copy { min-height: 44px; min-width: 44px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .namespaces { margin-top: 40px; }
+  .namespaces > h2 { margin: 0 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; }
+  .namespaces > p { margin: 0 0 24px; color: var(--fg-soft); }
+  .namespace { border-top: 1px solid var(--border); padding: 24px 0; scroll-margin-top: 80px; }
+  .namespace-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+  .namespace h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  .namespace p { max-width: 70ch; margin: 8px 0; color: var(--fg-soft); }
+  .namespace .namespace-meta { font-size: 12px; color: var(--muted); }
+  .namespace-links { display: flex; flex-wrap: wrap; gap: 16px; }
+  .namespace .plugin-install { border-top: 0; margin-top: 0; }
+  @media (max-width: 1100px) and (min-width: 901px), (max-width: 620px) {
+    .plugin-grid { grid-template-columns: minmax(0, 1fr); }
+    .plugin { padding: 20px; }
+    .plugin-core dl { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

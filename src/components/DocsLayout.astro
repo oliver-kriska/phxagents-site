@@ -4,6 +4,8 @@ import DocPage from '../layouts/DocPage.astro';
 import PageToc from './PageToc.astro';
 import { serpDescription, serpTitle } from '../lib/seo';
 import { getSkillIdentity } from '../lib/skillNames';
+import type { AddonEntry } from '../lib/addonEntries';
+import { RUNTIME_LABELS } from '../lib/plugins';
 
 interface PagerEntry {
   name: string;
@@ -25,6 +27,8 @@ interface Props {
   headings: MarkdownHeading[];
   prev?: PagerEntry | null;
   next?: PagerEntry | null;
+  /** Set for an add-on plugin's skill or agent (rewrite, catchup); phx entries leave it unset. */
+  addon?: Pick<AddonEntry, 'plugin' | 'displayName' | 'isCommand' | 'url' | 'markdownUrl'>;
 }
 
 const {
@@ -42,11 +46,15 @@ const {
   headings,
   prev,
   next,
+  addon,
 } = Astro.props;
-const skillIdentity = kind === 'skill' ? getSkillIdentity(slug, name) : null;
-const displayName = skillIdentity?.isCommand ? '/' + skillIdentity.claudeName : name;
+const skillIdentity = kind === 'skill' && !addon ? getSkillIdentity(slug, name) : null;
+const displayName = addon
+  ? addon.displayName
+  : skillIdentity?.isCommand ? '/' + skillIdentity.claudeName : name;
 function pagerLabel(entryName: string): string {
-  if (kind === 'agent') return entryName;
+  // Add-on pager names arrive already in display form.
+  if (kind === 'agent' || addon) return entryName;
   return entryName.includes(':') ? '/' + entryName : entryName;
 }
 const synopsis = argumentHint ? `${displayName} ${argumentHint}` : displayName;
@@ -63,10 +71,20 @@ const pillKind =
 // for "opus" would let the same color mean two unrelated things sitewide.
 const modelPillClass =
   model === 'opus' ? 'pill-warn' : model === 'haiku' ? 'pill-info' : 'pill-accent';
-const catalogFilter = kind === 'agent' ? '/catalog/?type=agent' : '/catalog/?type=skill';
-const markdownUrl = `/${kind === 'agent' ? 'agents' : 'skills'}/${slug}.md`;
+const typeFilter = kind === 'agent' ? 'type=agent' : 'type=skill';
+const catalogFilter = addon ? `/catalog/?plugin=${addon.plugin.id}&${typeFilter}` : `/catalog/?${typeFilter}`;
+const markdownUrl = addon?.markdownUrl ?? `/${kind === 'agent' ? 'agents' : 'skills'}/${slug}.md`;
 const generatedName = skillIdentity?.portableName ?? name.replace(/:/g, '-');
-const runtimeInvocations = kind === 'skill' ? [
+// Add-ons ship only to the runtimes their registry entry lists (Claude Code
+// today); the generated-edition rows below are phx's.
+const addonInvocations = addon
+  ? addon.plugin.runtimes.map((runtime) => ({
+      name: RUNTIME_LABELS[runtime],
+      href: addon.plugin.docsUrl,
+      command: addon.isCommand ? addon.displayName : `use ${name}`,
+    }))
+  : null;
+const runtimeInvocations = addonInvocations ?? (kind === 'skill' ? [
   {
     name: 'Claude Code',
     href: '/install/#claude-code',
@@ -97,13 +115,21 @@ const runtimeInvocations = kind === 'skill' ? [
     href: '/install/dsh/',
     command: `/${generatedName}`,
   },
-] : [];
+] : []);
 
 // Structured data: breadcrumb trail + a per-entity TechArticle so each skill/agent
 // is a distinct entity. Mirrors the visible crumbs and the SoftwareApplication
 // schema on the homepage.
 const sectionName = kind === 'agent' ? 'Agents' : 'Skills';
-const pageUrl = `https://phxagents.dev/${kind === 'agent' ? 'agents' : 'skills'}/${slug}/`;
+const pageUrl = addon
+  ? `https://phxagents.dev${addon.url}`
+  : `https://phxagents.dev/${kind === 'agent' ? 'agents' : 'skills'}/${slug}/`;
+const crumbTrail = addon
+  ? [
+      { name: 'Plugins', href: '/plugins/' },
+      { name: addon.plugin.displayName, href: addon.plugin.docsUrl },
+    ]
+  : [{ name: sectionName, href: catalogFilter }];
 const detailJsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -111,8 +137,13 @@ const detailJsonLd = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
-        { '@type': 'ListItem', position: 2, name: sectionName, item: `https://phxagents.dev${catalogFilter}` },
-        { '@type': 'ListItem', position: 3, name: displayName, item: pageUrl },
+        ...crumbTrail.map((crumb, i) => ({
+          '@type': 'ListItem',
+          position: i + 2,
+          name: crumb.name,
+          item: `https://phxagents.dev${crumb.href}`,
+        })),
+        { '@type': 'ListItem', position: crumbTrail.length + 2, name: displayName, item: pageUrl },
       ],
     },
     {
@@ -138,14 +169,18 @@ const detailJsonLd = {
   title={title}
   description={description && serpDescription(description)}
   seoTitle={serpTitle(displayName, kind)}
-  active="catalog"
+  active={addon ? 'plugins' : 'catalog'}
 >
   <script type="application/ld+json" set:html={JSON.stringify(detailJsonLd)} />
   <div class="crumbs">
     <a href="/">phxagents</a>
     <span class="sep">/</span>
-    <a href={catalogFilter}>{kind === 'agent' ? 'Agents' : 'Skills'}</a>
-    <span class="sep">/</span>
+    {crumbTrail.map((crumb) => (
+      <>
+        <a href={crumb.href}>{crumb.name}</a>
+        <span class="sep">/</span>
+      </>
+    ))}
     <span class="mono">{displayName}</span>
   </div>
 
@@ -157,6 +192,9 @@ const detailJsonLd = {
     </div>
     <h1>{displayName}</h1>
     {description && <p class="lede">{description}</p>}
+    {addon && kind === 'agent' && (
+      <p class="runtime-note">A {addon.plugin.runtimes.map((r) => RUNTIME_LABELS[r]).join(', ')} agent in the <a href={addon.plugin.docsUrl}>{addon.plugin.displayName}</a> plugin.</p>
+    )}
 
     {argumentHint && (
       <div class="synopsis-block">
@@ -168,7 +206,7 @@ const detailJsonLd = {
     {kind === 'skill' && (
       <section class="runtime-invocations" aria-labelledby="invoke-heading">
         <div class="runtime-invocations-head">
-          <h2 id="invoke-heading">Invoke in v3</h2>
+          <h2 id="invoke-heading">{addon ? 'Invoke' : 'Invoke in v3'}</h2>
           <a href="/compatibility/">Compare runtime support →</a>
         </div>
         <div class="runtime-invocation-grid">
@@ -179,7 +217,13 @@ const detailJsonLd = {
             </a>
           ))}
         </div>
-        <p class="runtime-note">Claude Code includes the full custom-agent and hook layer. Generated runtimes load the same skill knowledge with runtime-native invocation.</p>
+        {addon ? (
+          addon.plugin.runtimes.length === 1 && (
+            <p class="runtime-note">{addon.plugin.displayName} ships for {RUNTIME_LABELS[addon.plugin.runtimes[0]]} only; it has no generated edition for other runtimes.</p>
+          )
+        ) : (
+          <p class="runtime-note">Claude Code includes the full custom-agent and hook layer. Generated runtimes load the same skill knowledge with runtime-native invocation.</p>
+        )}
       </section>
     )}
 
@@ -372,6 +416,8 @@ const detailJsonLd = {
     font-size: 11.5px;
     line-height: 1.5;
   }
+  .runtime-note a { color: var(--fg-soft); text-decoration: underline; text-underline-offset: 2px; }
+  .lede + .runtime-note { margin: 0 0 14px; }
 
   /* Markdown body — headings are shifted +1 at render time (rehypeShiftHeadings
      in astro.config.mjs) so the layout title above is the page's only visible

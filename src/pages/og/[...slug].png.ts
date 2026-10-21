@@ -6,6 +6,8 @@ import { researchReports } from '../../data/research';
 import { origin } from '../../data/origin';
 import { hookDocPages } from '../../lib/hookDocs';
 import { getSkillIdentity } from '../../lib/skillNames';
+import { getAddonAgents, getAddonSkills } from '../../lib/addonEntries';
+import { getPagePlugins, getPlugins } from '../../lib/plugins';
 
 /**
  * Build-time Open Graph images. One PNG per page at dist/og/<slug>.png.
@@ -31,6 +33,7 @@ const OG_RUNTIME_NAMES: Record<string, string> = {
 export async function getStaticPaths() {
   const skills = await getCollection('skills');
   const agents = await getCollection('agents');
+  const [addonSkills, addonAgents] = await Promise.all([getAddonSkills(), getAddonAgents()]);
 
   const paths: OgPath[] = [
     {
@@ -76,6 +79,36 @@ export async function getStaticPaths() {
       slug: 'catalog',
       data: { title: 'Catalog', subtitle: 'All skills and agents, searchable and filterable.', kind: 'docs' },
     },
+    {
+      slug: 'plugins',
+      data: {
+        title: 'Plugins',
+        subtitle: `${getPlugins().length} plugins in one marketplace: ${getPlugins()
+          .map((p) => p.id)
+          .join(', ')}.`,
+        kind: 'docs',
+      },
+    },
+    ...getPagePlugins().map((plugin) => ({
+      slug: plugin.docsUrl.replace(/^\/|\/$/g, ''),
+      data: {
+        title: plugin.displayName,
+        subtitle: plugin.description,
+        kind: 'docs' as const,
+        badge: `plugin v${plugin.version}`,
+      },
+    })),
+    // Add-on entries say which plugin they come from, since a slug such as
+    // `verify` also exists in phx.
+    ...[...addonSkills, ...addonAgents].map((item) => ({
+      slug: item.url.replace(/^\/|\/$/g, ''),
+      data: {
+        title: item.displayName,
+        subtitle: item.description,
+        kind: item.kind,
+        badge: `${item.plugin.prefix} ${item.kind}`,
+      },
+    })),
     {
       slug: 'iron-laws',
       data: {

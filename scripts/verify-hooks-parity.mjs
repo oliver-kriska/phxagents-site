@@ -112,7 +112,7 @@ const dangling = routedGroups.filter((g) => !upstreamGroups.includes(g));
 if (unpublished.length > 0) {
   fail(
     `upstream hook deep dives with no site route: ${unpublished.join(', ')}. ` +
-      'Add them to src/lib/hookDocs.ts and to HOOK_GROUPS in astro.config.mjs.'
+      'Add them to src/lib/hookDocs.ts and to HOOK_GROUPS in src/lib/upstreamLinks.mjs.'
   );
 }
 if (dangling.length > 0) {

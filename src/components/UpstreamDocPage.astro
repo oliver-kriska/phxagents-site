@@ -8,7 +8,7 @@ import { getPluginSourceDate } from '../lib/sourceDates';
 interface Props {
   entryId: string;
   /** Which upstream collection backs this page. */
-  collection?: 'upstreamDocs' | 'hookDocs';
+  collection?: 'upstreamDocs' | 'hookDocs' | 'pluginReadmes';
   /**
    * Path of the backing file inside the plugin repository, used for the
    * "View source" link and the git-derived dateModified. Runtime guides all

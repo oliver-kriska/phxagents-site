@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { pageItems, type PageSection } from '../data/pages';
 import { getSkillIdentity, type SkillGroup } from '../lib/skillNames';
+import { getAddonAgents, getAddonSkills, type AddonEntry } from '../lib/addonEntries';
+import { getCatalogPlugins } from '../lib/plugins';
 
 const pageSections: PageSection[] = ['Getting started', 'Runtime guides', 'Documentation'];
 const skillGroups: { key: SkillGroup; label: string }[] = [
@@ -16,6 +18,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   const skills = await getCollection('skills');
   const agents = await getCollection('agents');
+  const [addonSkills, addonAgents] = await Promise.all([getAddonSkills(), getAddonAgents()]);
   const absoluteUrl = (url: string) => new URL(url, site).href;
   const lines = [
     '# phxagents',
@@ -64,7 +67,22 @@ export const GET: APIRoute = async ({ site }) => {
     );
   }
 
-  return new Response(lines.join('\n') + '\n', {
+  lines.push('');
+
+  // Add-on plugins: one section each, so their commands are never mistaken
+  // for phx ones that share a slug.
+  const entryLine = (item: AddonEntry) =>
+    `- [${item.isCommand ? item.displayName.slice(1) : item.displayName}](${absoluteUrl(item.url)}): ${item.description}`;
+  for (const plugin of getCatalogPlugins()) {
+    lines.push(`## Plugin: ${plugin.displayName}`, '', `> ${plugin.description}`, '');
+    lines.push(`- [${plugin.displayName} documentation](${absoluteUrl(plugin.docsUrl)})`, '');
+    const skills = addonSkills.filter((s) => s.plugin.id === plugin.id);
+    const agents = addonAgents.filter((a) => a.plugin.id === plugin.id);
+    if (skills.length) lines.push('### Skills', '', ...skills.map(entryLine), '');
+    if (agents.length) lines.push('### Agents', '', ...agents.map(entryLine), '');
+  }
+
+  return new Response(lines.join('\n').replace(/\n+$/, '') + '\n', {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   });
 };

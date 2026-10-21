@@ -1,6 +1,7 @@
 import { researchReports } from './research';
 import { origin } from './origin';
 import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
+import { getPagePlugins, getPlugins } from '../lib/plugins';
 
 export type PageSection = 'Getting started' | 'Runtime guides' | 'Documentation';
 
@@ -38,6 +39,26 @@ export const pageItems: PageItem[] = [
     group: 'docs',
     llmsSection: 'Documentation',
   },
+  {
+    type: 'page',
+    name: 'Plugins',
+    desc: `The ${getPlugins().length} plugins in the phxagents marketplace: what each does, its status, runtimes, install command and source.`,
+    url: '/plugins/',
+    group: 'docs',
+    llmsSection: 'Getting started',
+  },
+  // One entry per add-on with its own README page; the manifest supplies both
+  // the name and the description.
+  ...getPagePlugins().map(
+    (plugin): PageItem => ({
+      type: 'page',
+      name: plugin.displayName,
+      desc: plugin.description,
+      url: plugin.docsUrl,
+      group: 'docs',
+      llmsSection: 'Documentation',
+    })
+  ),
   {
     type: 'page',
     name: 'Install for Amp',

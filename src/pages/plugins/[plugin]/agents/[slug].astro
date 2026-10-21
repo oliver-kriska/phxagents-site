@@ -1,0 +1,59 @@
+---
+import { render } from 'astro:content';
+import DocsLayout from '../../../../components/DocsLayout.astro';
+import { getAddonAgents, type AddonAgent } from '../../../../lib/addonEntries';
+import { getPluginSourceDate } from '../../../../lib/sourceDates';
+
+export async function getStaticPaths() {
+  const agents = await getAddonAgents();
+  return agents.map((agent) => {
+    const siblings = agents.filter((a) => a.plugin.id === agent.plugin.id);
+    const idx = siblings.indexOf(agent);
+    return {
+      params: { plugin: agent.plugin.id, slug: agent.slug },
+      props: { agent, prev: siblings[idx - 1] ?? null, next: siblings[idx + 1] ?? null },
+    };
+  });
+}
+
+interface Props {
+  agent: AddonAgent;
+  prev: AddonAgent | null;
+  next: AddonAgent | null;
+}
+
+const { agent, prev, next } = Astro.props;
+const { entry } = agent;
+const { Content, headings } = await render(entry);
+const rawTools = entry.data.tools;
+const tools = Array.isArray(rawTools)
+  ? rawTools.join(', ')
+  : typeof rawTools === 'string'
+  ? rawTools
+  : undefined;
+const sourceUrl = `https://github.com/oliver-kriska/claude-elixir-phoenix/blob/main/${agent.sourcePath}`;
+const dateModified = getPluginSourceDate(
+  agent.sourcePath,
+  entry.data.dateModified ?? entry.data.updated ?? entry.data.date
+);
+const pager = (a: AddonAgent | null) => (a ? { name: a.displayName, href: a.url } : null);
+---
+
+<DocsLayout
+  title={agent.name}
+  description={agent.description}
+  kind="agent"
+  name={agent.name}
+  slug={agent.slug}
+  effort={entry.data.effort}
+  model={entry.data.model}
+  tools={tools}
+  sourceUrl={sourceUrl}
+  dateModified={dateModified}
+  headings={headings}
+  prev={pager(prev)}
+  next={pager(next)}
+  addon={agent}
+>
+  <Content />
+</DocsLayout>

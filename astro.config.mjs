@@ -2,6 +2,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { unified } from '@astrojs/markdown-remark';
+import fs from 'node:fs';
+import path from 'node:path';
+import { githubHref, upstreamRoute } from './src/lib/upstreamLinks.mjs';
 
 /**
  * Demote every in-content heading by one level (h1→h2 … h5→h6; h6 stays h6).
@@ -77,66 +80,33 @@ function rehypeWrapTables() {
 }
 
 /**
- * Map links inside upstream-owned Markdown to their public site routes.
- *
- * The runtime guides and the hook docs are written to be read in the plugin
- * repository, so they link to each other by relative path. Left alone those
- * resolve to 404s here. Hook group docs are reachable from three different
- * depths (the repo-root HOOKS.md, the hooks README, and each other), so every
- * spelling of the same target is listed rather than resolved positionally —
- * a rewrite that guessed would silently mis-link on the next upstream move.
+ * Map links inside upstream-owned Markdown to their public site routes. The map
+ * itself lives in src/lib/upstreamLinks.mjs, shared with the /llms-full.txt
+ * export so the HTML and text copies of a document link to the same places.
+ * A relative link the map does not know (an add-on README pointing at eval
+ * results elsewhere in the repo) goes to that file on GitHub instead of
+ * resolving against the page URL into a 404.
  */
 function rehypeUpstreamDocLinks() {
-  const GH = 'https://github.com/oliver-kriska/claude-elixir-phoenix';
-  const HOOK_GROUPS = [
-    'safety-gates',
-    'code-quality',
-    'failure-recovery',
-    'context-injection',
-    'session-lifecycle',
-    'workflow-state',
-  ];
-
-  /** @type {Record<string, string>} */
-  const routes = {
-    'runtime-support.md': '/compatibility/',
-    'amp.md': '/install/amp/',
-    'codex.md': '/install/codex/',
-    'pi.md': '/install/pi/',
-    'opencode.md': '/install/opencode/',
-    'dsh.md': '/install/dsh/',
-    '../README.md#claude-code': '/install/#claude-code',
-    // Hook overview, as spelled from the hooks directory.
-    '../../../HOOKS.md': '/hooks/',
-    // Contributor guide, as spelled from HOOKS.md and from a group doc.
-    'plugins/elixir-phoenix/hooks/README.md': '/hooks/contributing/',
-    '../README.md#output-rules-per-event': '/hooks/contributing/#output-rules-per-event',
-    // Not a document — send readers to the scripts themselves.
-    'plugins/elixir-phoenix/hooks/scripts/': `${GH}/tree/main/plugins/elixir-phoenix/hooks/scripts`,
+  const sourceRoots = [path.resolve('plugin-source'), fs.realpathSync(path.resolve('plugin-source'))];
+  /** @param {string | undefined} file */
+  const repoPathOf = (file) => {
+    const root = file && sourceRoots.find((r) => file.startsWith(r + path.sep));
+    return root ? path.relative(root, file).split(path.sep).join('/') : null;
   };
-
-  for (const group of HOOK_GROUPS) {
-    // From HOOKS.md at the repo root, from the hooks README, and sibling-relative
-    // between group docs — plus the one deep link that carries an anchor.
-    routes[`plugins/elixir-phoenix/hooks/docs/${group}.md`] = `/hooks/${group}/`;
-    routes[`docs/${group}.md`] = `/hooks/${group}/`;
-    routes[`${group}.md`] = `/hooks/${group}/`;
-    routes[`docs/${group}.md#fail-open-contract`] = `/hooks/${group}/#fail-open-contract`;
-  }
-
-  const rewrite = (/** @type {any} */ node) => {
+  /** @param {any} node @param {string | null} repoPath */
+  const rewrite = (node, repoPath) => {
     if (node.type === 'element' && node.tagName === 'a') {
       const href = node.properties?.href;
-      if (typeof href === 'string' && routes[href]) {
-        node.properties.href = routes[href];
-      } else if (href === '../README.md') {
-        node.properties.href = `${GH}/blob/main/README.md`;
+      if (typeof href === 'string') {
+        const route = upstreamRoute(href) ?? (repoPath ? githubHref(href, repoPath) : null);
+        if (route) node.properties.href = route;
       }
     }
-    if (node.children) for (const child of node.children) rewrite(child);
+    if (node.children) for (const child of node.children) rewrite(child, repoPath);
   };
-  return (/** @type {any} */ tree) => {
-    rewrite(tree);
+  return (/** @type {any} */ tree, /** @type {any} */ file) => {
+    rewrite(tree, repoPathOf(file?.path));
   };
 }
 

@@ -1,0 +1,177 @@
+---
+import UpstreamDocPage from '../../../components/UpstreamDocPage.astro';
+import { getAddonAgents, getAddonSkills, type AddonEntry } from '../../../lib/addonEntries';
+import {
+  getPagePlugins,
+  getPlugin,
+  RUNTIME_LABELS,
+  STATUS_LABELS,
+  type PluginInfo,
+} from '../../../lib/plugins';
+
+export async function getStaticPaths() {
+  const [skills, agents] = await Promise.all([getAddonSkills(), getAddonAgents()]);
+  return getPagePlugins().map((plugin) => ({
+    params: { plugin: plugin.id },
+    props: {
+      plugin,
+      skills: skills.filter((s) => s.plugin.id === plugin.id),
+      agents: agents.filter((a) => a.plugin.id === plugin.id),
+    },
+  }));
+}
+
+interface Props {
+  plugin: PluginInfo;
+  skills: AddonEntry[];
+  agents: AddonEntry[];
+}
+
+const { plugin, skills, agents } = Astro.props;
+const commands = skills.filter((s) => s.isCommand);
+const references = skills.filter((s) => !s.isCommand);
+const statusPill = plugin.status === 'experimental' ? 'pill-warn' : plugin.status === 'mvp' ? 'pill-info' : 'pill-accent';
+---
+
+<UpstreamDocPage
+  entryId={plugin.id}
+  collection="pluginReadmes"
+  sourcePath={`plugins/${plugin.dir}/README.md`}
+  title={plugin.displayName}
+  description={plugin.description}
+  pageUrl={`https://phxagents.dev${plugin.docsUrl}`}
+  breadcrumb={plugin.displayName}
+  active="plugins"
+>
+  <section slot="intro" aria-labelledby="plugin-facts">
+    <h2 id="plugin-facts" class="sr-only">About this plugin</h2>
+    <p class="plugin-meta">
+      <a href="/plugins/">Plugins</a>
+      <span aria-hidden="true">·</span>
+      <span class={`pill ${statusPill}`}>{STATUS_LABELS[plugin.status]}</span>
+      <span class="pill numeric">v{plugin.version}</span>
+      <span class="pill">{plugin.runtimes.map((r) => RUNTIME_LABELS[r]).join(', ')}</span>
+      {plugin.dependencies.length > 0 && (
+        <span class="deps">
+          Requires {plugin.dependencies.map((dep, i) => (
+            <>
+              {i > 0 && ', '}
+              <a href={getPlugin(dep).docsUrl}><code>{dep}</code></a>
+            </>
+          ))}
+        </span>
+      )}
+    </p>
+
+    <div class="plugin-index">
+      {commands.length > 0 && (
+        <div>
+          <h3>Commands</h3>
+          <ul>
+            {commands.map((s) => (
+              <li><a href={s.url}><code>{s.displayName}</code></a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {references.length > 0 && (
+        <div>
+          <h3>Reference skills</h3>
+          <ul>
+            {references.map((s) => (
+              <li><a href={s.url}><code>{s.displayName}</code></a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {agents.length > 0 && (
+        <div>
+          <h3>Agents</h3>
+          <ul>
+            {agents.map((a) => (
+              <li><a href={a.url}><code>{a.displayName}</code></a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+    {plugin.commandStyle === 'bare' && commands.length > 0 && (
+      // Bare names work while no other installed command shares them; the
+      // namespaced form always does.
+      <p class="plugin-fullnames">
+        Full names: {commands.map((s, i) => (
+          <>{i > 0 && ', '}<code>/{plugin.prefix}:{s.slug}</code></>
+        ))}
+      </p>
+    )}
+    <p class="plugin-links">
+      <a href={`/catalog/?plugin=${plugin.id}`}>Browse in the catalog →</a>
+      <a href={plugin.sourceUrl} rel="noopener">Source on GitHub →</a>
+    </p>
+  </section>
+</UpstreamDocPage>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  /* Outweighs `.page-intro :global(p)` from UpstreamDocPage regardless of
+     stylesheet order. */
+  p.plugin-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .plugin-meta a:hover { color: var(--fg); }
+  .plugin-meta .deps { color: var(--fg-soft); }
+  .plugin-meta .deps a { text-decoration: underline; text-underline-offset: 2px; }
+  .plugin-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px 24px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .plugin-index h3 {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .plugin-index ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .plugin-index a {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--fg);
+  }
+  .plugin-index a:hover { color: var(--accent); }
+  p.plugin-fullnames {
+    margin: 12px 0 0;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  p.plugin-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 14px 0 0;
+    font-size: 13px;
+  }
+  .plugin-links a { color: var(--accent-fg); text-decoration: underline; text-underline-offset: 2px; }
+</style>
