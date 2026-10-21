@@ -108,6 +108,10 @@ function rehypeLabelTaskItems() {
       properties: { className: ['task-list-label'] },
       children: parent.children.slice(start, end),
     };
+    // The checkbox's CSS margin is the gap; a leading space would add to it
+    // and push the first line past the hanging indent.
+    const first = label.children[1];
+    if (first?.type === 'text') first.value = first.value.replace(/^\s+/, '');
     parent.children.splice(start, end - start, label);
     return true;
   };
