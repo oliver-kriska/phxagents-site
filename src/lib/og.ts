@@ -33,23 +33,26 @@ const FONTS = [
   { name: 'JetBrains Mono', data: readFont('jetbrains-mono-latin-700-normal.woff'), weight: 700 as const, style: 'normal' as const },
 ];
 
-// Brand palette (hex form of the dark theme tokens in global.css).
-const BG = '#0e1117';
-const FG = '#e6edf3';
-const FG_SOFT = '#9aa7b4';
-const MUTED = '#6e7b8a';
-const BORDER = '#283039';
-const ACCENT = '#2dd4a7'; // teal — skills + default
-const AMBER = '#e3b341'; // agents
-const VIOLET = '#a78bfa'; // docs + research
+// Brand palette: hex forms of the light-theme tokens in global.css (satori has
+// no oklch). Light matches the site's default theme.
+const BG = '#f8fafd'; // --bg
+const SURFACE = '#ffffff'; // --surface
+const FG = '#121c23'; // --fg
+const FG_SOFT = '#343f47'; // --fg-soft
+const MUTED = '#606b72'; // --muted
+const BORDER = '#d9dfe3'; // --border
+// Each kind has a fill (strip, mark, outline) and a darker ink for text, the
+// same split as the site's pills. Skills green, agents amber, docs violet.
+const ACCENT = { fill: '#1c882d', ink: '#045e17' }; // --accent
+const AMBER = { fill: '#d0901e', ink: '#915200' }; // --warn / --warn-fg
+const VIOLET = { fill: '#734ac3', ink: '#734ac3' }; // --violet
 
-// Semantic tones for research stat strips. Hex forms of the dark-theme
-// --accent-fg / --warn-fg / --rp-crit tokens, so a figure keeps the same
-// reading on the card as it has on the page it links to.
+// Semantic tones for research stat strips: --accent-fg-ish / --warn-fg /
+// --danger, so a figure keeps the same reading on the card as on the page.
 const TONE = {
-  good: '#9be39d',
-  warn: '#e9ab2b',
-  crit: '#ff8e86',
+  good: '#045e17',
+  warn: '#915200',
+  crit: '#b32228',
 } as const;
 
 export const OG_WIDTH = 1200;
@@ -87,7 +90,7 @@ export interface OgInput {
   footnote?: string;
 }
 
-function accentFor(kind: OgKind): string {
+function accentFor(kind: OgKind): { fill: string; ink: string } {
   if (kind === 'agent') return AMBER;
   if (kind === 'docs' || kind === 'research') return VIOLET;
   return ACCENT;
@@ -134,6 +137,7 @@ function statStrip(stats: OgStat[]): any {
       marginTop: 30,
       border: `1px solid ${BORDER}`,
       borderRadius: 12,
+      backgroundColor: SURFACE,
     },
     cells.map((stat, i) =>
       el(
@@ -179,13 +183,13 @@ function card({ title, subtitle, kind = 'docs', badge, stats, footnote }: OgInpu
       display: 'flex',
       flexDirection: 'column',
       backgroundColor: BG,
-      backgroundImage: `radial-gradient(900px 460px at 86% -12%, ${accent}22, transparent 60%)`,
+      backgroundImage: `radial-gradient(900px 460px at 86% -12%, ${accent.fill}1a, transparent 60%)`,
       color: FG,
       fontFamily: 'JetBrains Mono',
     },
     [
       // Top accent strip
-      el('div', { width: '100%', height: 10, backgroundColor: accent }),
+      el('div', { width: '100%', height: 10, backgroundColor: accent.fill }),
       // Body
       el(
         'div',
@@ -207,7 +211,7 @@ function card({ title, subtitle, kind = 'docs', badge, stats, footnote }: OgInpu
                   width: 30,
                   height: 30,
                   borderRadius: 8,
-                  backgroundColor: accent,
+                  backgroundColor: accent.fill,
                   marginRight: 16,
                 }),
                 el('div', { display: 'flex', fontSize: 28, fontWeight: 700, color: FG }, 'phxagents'),
@@ -217,13 +221,13 @@ function card({ title, subtitle, kind = 'docs', badge, stats, footnote }: OgInpu
                 'div',
                 {
                   display: 'flex',
-                  border: `1px solid ${accent}`,
+                  border: `1.5px solid ${accent.fill}`,
                   borderRadius: 999,
                   padding: '6px 18px',
                   fontSize: 18,
                   fontWeight: 500,
                   letterSpacing: 2,
-                  color: accent,
+                  color: accent.ink,
                 },
                 (badge ?? kind).toUpperCase()
               ),
@@ -232,7 +236,7 @@ function card({ title, subtitle, kind = 'docs', badge, stats, footnote }: OgInpu
           // Main: title, then either a description or the report's figures
           el('div', { display: 'flex', flexDirection: 'column' }, [
             el('div', { display: 'flex', alignItems: 'flex-start' }, [
-              el('div', { display: 'flex', fontSize: titleSize(title), fontWeight: 700, color: accent, marginRight: 18 }, '›'),
+              el('div', { display: 'flex', fontSize: titleSize(title), fontWeight: 700, color: accent.fill, marginRight: 18 }, '›'),
               el(
                 'div',
                 { display: 'flex', fontSize: titleSize(title), fontWeight: 700, color: FG, lineHeight: 1.08 },
