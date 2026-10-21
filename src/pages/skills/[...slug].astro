@@ -64,6 +64,7 @@ const nextNav = next ? { name: next.name, href: `/skills/${next.slug}/` } : null
 <DocsLayout
   title={name}
   description={description}
+  seoTitle={slug === 'deploy' ? 'Deploy a Phoenix app built with Claude Code — phxagents' : undefined}
   kind="skill"
   name={name}
   slug={slug}
@@ -75,5 +76,8 @@ const nextNav = next ? { name: next.name, href: `/skills/${next.slug}/` } : null
   prev={prevNav}
   next={nextNav}
 >
+  {slug === 'deploy' && (
+    <p>Deploy a Phoenix app built with Claude Code using the deployment reference below. It covers Fly.io and Docker, Mix releases, runtime configuration, health checks, and production migrations.</p>
+  )}
   <Content />
 </DocsLayout>

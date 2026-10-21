@@ -42,7 +42,11 @@ export const pageItems: PageItem[] = [
   {
     type: 'page',
     name: 'Plugins',
-    desc: `The ${getPlugins().length} plugins in the phxagents marketplace: what each does, its status, runtimes, install command and source.`,
+    // Namespaces only re-expose core commands, so they are not counted as plugins
+    // here, matching the /plugins/ page ("not separate toolkits").
+    desc: `The ${getPlugins().filter((p) => p.role !== 'namespace').length} phxagents plugins and ${
+      getPlugins().filter((p) => p.role === 'namespace').length
+    } compatibility namespaces: what each does, its status, runtimes, install command and source.`,
     url: '/plugins/',
     group: 'docs',
     llmsSection: 'Getting started',

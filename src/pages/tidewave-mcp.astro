@@ -5,6 +5,9 @@ import { stats } from '../data/stats';
 const title = 'Tidewave MCP';
 const description =
   'Use Tidewave MCP with phxagents and Phoenix across Claude Code, Codex, OpenCode, Amp, Pi, and dsh — runtime tools, client setup, and local fallbacks.';
+// The nav label stays short; the <title> names the task people search for
+// ("tidewave claude code", "tidewave mcp setup").
+const seoTitle = 'Tidewave MCP setup for Phoenix and Claude Code — phxagents';
 const pageUrl = 'https://phxagents.dev/tidewave-mcp/';
 
 // Structured data: Breadcrumb + a TechArticle for the Tidewave MCP guide, plus
@@ -23,8 +26,8 @@ const jsonLd = {
     {
       '@type': 'TechArticle',
       '@id': `${pageUrl}#article`,
-      headline: 'Tidewave MCP for Phoenix',
-      name: 'Tidewave MCP for Phoenix',
+      headline: 'Tidewave MCP setup for Phoenix',
+      name: 'Tidewave MCP setup for Phoenix',
       description,
       url: pageUrl,
       inLanguage: 'en',
@@ -69,11 +72,11 @@ const jsonLd = {
 };
 ---
 
-<DocPage title={title} description={description} active="docs">
+<DocPage title={title} seoTitle={seoTitle} description={description} active="docs">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <div class="page-head">
-    <h1>Tidewave MCP for Phoenix</h1>
+    <h1>Tidewave MCP setup for Phoenix</h1>
     <p class="lede">
       <strong>Tidewave MCP</strong> gives your AI editor runtime intelligence for a running Phoenix
       app — live SQL, code evaluation, Ecto schema introspection, and version-exact hex docs over the

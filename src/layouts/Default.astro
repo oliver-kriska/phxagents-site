@@ -4,6 +4,7 @@ import { stats } from '../data/stats';
 import { getStargazersCount, formatStars } from '../data/release';
 import { researchReports } from '../data/research';
 import { origin } from '../data/origin';
+import { clampDescription } from '../lib/seo';
 
 interface Props {
   title: string;
@@ -28,6 +29,11 @@ const canonical = `https://phxagents.dev${Astro.url.pathname.replace(/\/+$/, '/'
 // from the path so a second report inherits the type and dateline without any
 // per-page wiring.
 const trimmedPath = Astro.url.pathname.replace(/\/+$/, '');
+// Bound the audited plugin/runtime previews without changing upstream prose,
+// article schema, or the settled snippets on the homepage and other sections.
+const metaDescription = trimmedPath === '/compatibility' || trimmedPath.startsWith('/plugins/')
+  ? clampDescription(description)
+  : description;
 const article =
   researchReports.find((report) => trimmedPath === `/research/${report.slug}`) ??
   (trimmedPath === '/origin' ? origin : null);
@@ -73,6 +79,15 @@ const siteJsonLd = {
       inLanguage: 'en',
       publisher: { '@id': 'https://phxagents.dev/#org' },
     },
+    // These top-level pages have no page-owned trail. Detail pages emit their
+    // own breadcrumbs, so adding them here unconditionally would duplicate them.
+    ...(['/install', '/catalog', '/iron-laws', '/changelog'].includes(trimmedPath) ? [{
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'phxagents', item: 'https://phxagents.dev/' },
+        { '@type': 'ListItem', position: 2, name: title, item: canonical },
+      ],
+    }] : []),
   ],
 };
 
@@ -94,13 +109,13 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
     <meta charset="utf-8" />
     <title>{fullTitle}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <meta name="theme-color" content="#0e1117" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
     <meta name="color-scheme" content="light dark" />
 
     <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:type" content={article ? 'article' : 'website'} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="phxagents" />
@@ -116,7 +131,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
     )}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={fullTitle} />
 

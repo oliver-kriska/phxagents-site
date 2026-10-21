@@ -38,6 +38,27 @@ function clamp(text: string, max: number): string {
   return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;—-]+$/, '')}…`;
 }
 
+/** Bound page metadata without changing the source description or visible prose. */
+export function clampDescription(text: string): string {
+  if (text.length <= MAX_DESCRIPTION) return text;
+
+  // Sentence segmentation preserves dotted identifiers such as Ecto.Query and Fly.io.
+  let complete = '';
+  for (const { index, segment } of new Intl.Segmenter('en', { granularity: 'sentence' }).segment(text)) {
+    const candidate = text.slice(0, index + segment.length).trimEnd();
+    if (candidate.length > MAX_DESCRIPTION) break;
+    complete = candidate;
+  }
+  if (complete) return complete;
+
+  // A long single sentence may be a list; prefer a complete clause over "design a…".
+  const cut = text.slice(0, MAX_DESCRIPTION - 1);
+  const clause = Math.max(cut.lastIndexOf(', '), cut.lastIndexOf('; '));
+  return clause >= MAX_DESCRIPTION / 2
+    ? `${cut.slice(0, clause)}…`
+    : clamp(text, MAX_DESCRIPTION);
+}
+
 /**
  * Human-facing meta description derived from a plugin `description`.
  *

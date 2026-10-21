@@ -88,9 +88,15 @@ export async function getStaticPaths() {
       slug: 'plugins',
       data: {
         title: 'Plugins',
-        subtitle: `${getPlugins().length} plugins in one marketplace: ${getPlugins()
+        // Counted as on the page: namespaces re-expose core commands, so they
+        // are not plugins in their own right.
+        subtitle: `${getPlugins()
+          .filter((p) => p.role !== 'namespace')
+          .map((p) => p.displayName)
+          .join(', ')}, plus ${getPlugins()
+          .filter((p) => p.role === 'namespace')
           .map((p) => p.id)
-          .join(', ')}.`,
+          .join(' and ')} compatibility namespaces.`,
         kind: 'docs',
       },
     },
@@ -155,7 +161,7 @@ export async function getStaticPaths() {
     {
       slug: 'tidewave-mcp',
       data: {
-        title: 'Tidewave MCP for Phoenix',
+        title: 'Tidewave MCP setup for Phoenix',
         subtitle: 'Runtime debugging, live SQL, and Ecto introspection for phxagents across supported MCP clients.',
         kind: 'docs',
       },

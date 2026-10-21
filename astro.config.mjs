@@ -185,6 +185,25 @@ const shikiAaLightTokens = {
   },
 };
 
+/**
+ * Sitemap `<lastmod>` is the date the page itself states as its JSON-LD
+ * `dateModified` (the plugin source file's last commit, or a report's date),
+ * read back from the built HTML so the two can never disagree. Pages that
+ * state no such date get no `<lastmod>`: a build-time stamp on every URL would
+ * teach crawlers to ignore the field.
+ * @param {import('@astrojs/sitemap').SitemapItem} item
+ */
+function sitemapLastmod(item) {
+  const file = path.join('dist', new URL(item.url).pathname, 'index.html');
+  try {
+    const date = fs.readFileSync(file, 'utf8').match(/"dateModified":"([^"]+)"/)?.[1];
+    if (date) item.lastmod = new Date(date).toISOString();
+  } catch {
+    // Not an HTML page (or not emitted): leave lastmod unset.
+  }
+  return item;
+}
+
 export default defineConfig({
   site: 'https://phxagents.dev',
   redirects: {
@@ -202,7 +221,7 @@ export default defineConfig({
     // on every page — worth it here since the total CSS is small and gzips well.
     inlineStylesheets: 'always',
   },
-  integrations: [sitemap()],
+  integrations: [sitemap({ serialize: sitemapLastmod })],
   markdown: {
     // Astro 7: remark/rehype plugins run through the `unified` processor from
     // @astrojs/markdown-remark (the old `markdown.rehypePlugins` shorthand is

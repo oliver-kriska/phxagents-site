@@ -5,6 +5,9 @@ import { getPlugin, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/
 const plugins = getPlugins();
 const products = plugins.filter((plugin) => plugin.role !== 'namespace');
 const namespaces = plugins.filter((plugin) => plugin.role === 'namespace');
+const productNames = products.map((plugin) =>
+  plugin.role === 'core' ? 'core' : plugin.id.charAt(0).toUpperCase() + plugin.id.slice(1)
+).join(', ');
 
 // One SoftwareApplication per plugin, matching the homepage's schema, so a
 // search result can show each plugin as a distinct product of this site.
@@ -46,7 +49,7 @@ const jsonLd = {
 };
 ---
 
-<DocPage title="Plugins" description="Explore the phxagents plugin collection: capabilities, runtime support, release status and installation requirements." active="plugins">
+<DocPage title="Plugins" seoTitle={`Elixir & Phoenix plugins: ${productNames} — phxagents`} description="Explore the phxagents plugin collection: capabilities, runtime support, release status and installation requirements." active="plugins">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <header class="plugins-heading">
     <h1>Plugins</h1>
