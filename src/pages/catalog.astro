@@ -125,8 +125,10 @@ function displayName(item: Item): string {
 
 <script>
   (function () {
-    const catalog = document.querySelector('[data-catalog]');
-    if (!catalog) return;
+    const found = document.querySelector('[data-catalog]');
+    if (!found) return;
+    // Hoisted function declarations below don't inherit the null check.
+    const catalog: Element = found;
     const search = catalog.querySelector('[data-catalog-search]') as HTMLInputElement;
     const filters = catalog.querySelectorAll('[data-catalog-filter]');
     const items = Array.from(catalog.querySelectorAll('[data-catalog-item]')) as HTMLElement[];

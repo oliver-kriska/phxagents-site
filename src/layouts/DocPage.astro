@@ -1,4 +1,5 @@
 ---
+import type { ComponentProps } from 'astro/types';
 import Default from './Default.astro';
 import { getDocsNav } from '../lib/docsNav';
 import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
@@ -7,7 +8,7 @@ interface Props {
   title: string;
   description?: string;
   seoTitle?: string;
-  active?: string;
+  active?: ComponentProps<typeof Default>['active'];
 }
 
 const { title, description, seoTitle, active = 'docs' } = Astro.props;

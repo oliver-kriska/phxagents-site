@@ -1,4 +1,5 @@
 ---
+import type { ComponentProps } from 'astro/types';
 import { getEntry, render } from 'astro:content';
 import DocPage from '../layouts/DocPage.astro';
 import PageToc from './PageToc.astro';
@@ -19,7 +20,7 @@ interface Props {
   pageUrl: string;
   breadcrumb: string;
   /** Sidebar highlight group. */
-  active?: string;
+  active?: ComponentProps<typeof DocPage>['active'];
   wide?: boolean;
 }
 
