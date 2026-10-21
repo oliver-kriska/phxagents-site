@@ -44,7 +44,10 @@ const marked = new Marked({
     // and keeps its 16:9 ratio instead of stretching to the column.
     image(token) {
       const alt = token.text ?? '';
-      return `<img src="${token.href}" alt="${alt}" width="1672" height="941" decoding="async" />`;
+      return `<picture>
+        <source type="image/webp" srcset="/origin-calibration-workbench-780.webp 780w, /origin-calibration-workbench-1672.webp 1672w" sizes="(min-width: 1000px) min(700px, calc(100vw - 354px)), min(700px, calc(100vw - 48px))" />
+        <img src="${token.href}" alt="${alt}" width="1672" height="941" decoding="async" />
+      </picture>`;
     },
   },
 });
@@ -402,7 +405,7 @@ const jsonLd = {
     border-radius: var(--radius-lg);
     background: var(--surface-2);
   }
-  .origin-body :global(p:has(> img)) { margin: 0 0 36px; }
+  .origin-body :global(p:has(> picture)) { margin: 0 0 36px; }
   .origin-body :global(.origin-diagram) {
     width: min(100%, 560px);
     margin: 28px auto 40px;

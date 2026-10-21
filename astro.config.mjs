@@ -110,6 +110,23 @@ function rehypeUpstreamDocLinks() {
   };
 }
 
+/**
+ * github-light colours variables, markdown list markers and diffs `#E36209`,
+ * 3.49:1 on its white canvas. Every other token in the theme clears 4.5:1, so
+ * the one colour is swapped for a darker orange of the same hue (4.83:1)
+ * rather than changing themes. The dark palette (`--shiki-dark`) is untouched.
+ * @type {import('shiki').ShikiTransformer}
+ */
+const shikiAaLightTokens = {
+  name: 'phxagents:aa-light-tokens',
+  span(node) {
+    const style = node.properties?.style;
+    if (typeof style === 'string') {
+      node.properties.style = style.replace(/(^|;)color:#e36209/i, '$1color:#B35900');
+    }
+  },
+};
+
 export default defineConfig({
   site: 'https://phxagents.dev',
   redirects: {
@@ -139,6 +156,7 @@ export default defineConfig({
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark-dimmed' },
       langAlias: { heex: 'html', eex: 'html', sface: 'html' },
+      transformers: [shikiAaLightTokens],
     },
   },
 });

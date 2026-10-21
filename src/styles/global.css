@@ -363,9 +363,10 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
 }
 .pill-accent { color: var(--accent-fg); background: var(--accent-soft); border-color: color-mix(in oklab, var(--accent) 25%, transparent); }
 .pill-violet { color: var(--violet); background: var(--violet-soft); border-color: color-mix(in oklab, var(--violet) 25%, transparent); }
-.pill-warn   { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in oklab, var(--warn) 25%, transparent); }
+/* Text uses the -fg tokens: --warn and --info are fills, under AA as text in light. */
+.pill-warn   { color: var(--warn-fg); background: var(--warn-soft); border-color: color-mix(in oklab, var(--warn) 25%, transparent); }
 .pill-danger { color: var(--danger); background: var(--danger-soft); border-color: color-mix(in oklab, var(--danger) 25%, transparent); }
-.pill-info   { color: var(--info); background: var(--info-soft); border-color: color-mix(in oklab, var(--info) 25%, transparent); }
+.pill-info   { color: var(--info-fg); background: var(--info-soft); border-color: color-mix(in oklab, var(--info) 25%, transparent); }
 
 /* ===== Code ===== */
 code:not(pre code) {
@@ -391,14 +392,11 @@ pre {
 
 .table-scroll-hint { display: none; }
 
-/* Shiki-generated code blocks */
-.astro-code,
-pre.astro-code {
-  background: var(--surface-2) !important;
-}
-[data-theme="dark"] .astro-code,
-[data-theme="dark"] pre.astro-code {
-  background: var(--surface-2) !important;
+/* Keep Shiki's light background: surface-2 drops green/comments below AA.
+   The dark palette needs the darker canvas for its dimmest comment tokens. */
+[data-theme="dark"] .astro-code {
+  background: var(--bg) !important;
+  color: var(--shiki-dark) !important;
 }
 [data-theme="dark"] .astro-code span {
   color: var(--shiki-dark) !important;

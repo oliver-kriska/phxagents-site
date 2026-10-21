@@ -4,16 +4,22 @@ import { stats } from '../data/stats';
 import { hookGroupPages, hookDocUrl } from '../lib/hookDocs';
 import { getLatestRelease } from '../data/release';
 import { getPortableWorkflowNames } from '../lib/skillNames';
+import { getPlugin, RUNTIME_LABELS } from '../lib/plugins';
 
+const runtimes = getPlugin('elixir-phoenix').runtimes;
+const generatedEditions = runtimes.filter((runtime) => runtime !== 'claude-code').length;
+const runtimeNames = new Intl.ListFormat('en', { type: 'conjunction' }).format(
+  runtimes.map((runtime) => RUNTIME_LABELS[runtime])
+);
 const release = await getLatestRelease();
 const releaseTag = `v${stats.version}`;
 const releaseMatchesManifest = release?.tag_name === releaseTag;
 const releaseUrl = releaseMatchesManifest ? release!.html_url : '/changelog/';
 const releaseStateLabel = releaseMatchesManifest
-  ? 'full Claude plugin · four generated editions'
-  : 'five runtime editions';
+  ? `full Claude plugin · ${generatedEditions} generated editions`
+  : `${runtimes.length} runtime editions`;
 const adaptedWorkflows = getPortableWorkflowNames().length;
-const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to Claude Code, Amp, Codex, Pi, OpenCode, and DeepSeek Harness, with ${adaptedWorkflows} workflows adapted for every runtime.`;
+const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to ${runtimeNames}, with ${adaptedWorkflows} workflows adapted for every runtime.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -53,10 +59,10 @@ const jsonLd = {
             <a href={releaseUrl} rel={releaseUrl.startsWith('http') ? 'noopener' : undefined}>{releaseTag}</a> · {releaseStateLabel}
           </div>
           <h1 class="headline">
-            One Phoenix playbook. Five AI coding runtimes.
+            One Phoenix playbook. {runtimes.length} AI coding runtimes.
           </h1>
           <p class="lede">
-            <strong>Plausible Elixir is not idiomatic Phoenix.</strong> phxagents v3 gives Claude Code, Amp, Codex, Pi, OpenCode and DeepSeek Harness the same {stats.skills}-skill field manual. Claude Code also gets the full {stats.agents}-agent, hooks and orchestration layer.
+            <strong>Plausible Elixir is not idiomatic Phoenix.</strong> phxagents v3 gives {runtimeNames} the same {stats.skills}-skill field manual. Claude Code also gets the full {stats.agents}-agent, hooks and orchestration layer.
           </p>
 
           <div class="hero-cta">
@@ -77,7 +83,7 @@ const jsonLd = {
             <div class="title">phxagents v3 · runtime map</div>
           </div>
           <div class="term-body">
-            <div class="term-line"><span class="prompt">v3</span><span class="cmd">one canonical skill set → five runtime editions</span></div>
+            <div class="term-line"><span class="prompt">v3</span><span class="cmd">one canonical skill set → {runtimes.length} runtime editions</span></div>
             <div class="term-out">
 <span class="dim">full</span>       <span class="info">Claude Code</span>  /phx:review
 <span class="dim">generated</span>  <span class="info">Amp</span>          skill: invoke → phx-review
@@ -123,7 +129,7 @@ const jsonLd = {
           <span class="feature-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
           </span>
-          <h3>{stats.skills} skills, generated five ways</h3>
+          <h3>{stats.skills} skills, generated {generatedEditions} ways</h3>
           <p>Amp, Codex, Pi, OpenCode and DeepSeek Harness receive deterministic projections of the canonical Claude skills, including complete resource trees, non-Markdown files and executable modes.</p>
           <ul class="feature-tags">
             <li>Amp Agent Skills</li>
@@ -344,6 +350,10 @@ outside Claude Code. Safer alternatives:
           </div>
         </a>
       </div>
+      <p class="plugins-note">
+        Looking beyond the core plugin? <a href="/plugins/">Explore the plugin collection →</a>
+        Each plugin lists its own runtime support and installation requirements.
+      </p>
     </div>
   </section>
 
@@ -420,7 +430,6 @@ outside Claude Code. Safer alternatives:
     background: var(--surface);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
     overflow: hidden;
     font-family: var(--font-mono);
     font-size: 12.5px;
@@ -448,7 +457,7 @@ outside Claude Code. Safer alternatives:
   .term-line .cmd { color: var(--fg); min-width: 0; overflow-wrap: anywhere; }
   .term-out { color: var(--fg-soft); padding-left: 18px; white-space: pre-wrap; font-size: 11.5px; }
   .term-out .ok { color: var(--accent); }
-  .term-out .warn { color: var(--warn); }
+  .term-out .warn { color: var(--warn-fg); }
   .term-out .info { color: var(--info-fg); }
   .term-out .dim { color: var(--muted); }
   .term-cursor::after {
@@ -496,15 +505,18 @@ outside Claude Code. Safer alternatives:
     text-align: right;
     overflow-wrap: anywhere;
   }
-  .hooks-note {
+  .hooks-note, .plugins-note {
     margin: 24px 0 0;
     max-width: 760px;
     font-size: 13.5px;
     line-height: 1.6;
     color: var(--muted);
   }
-  .hooks-note a { color: var(--accent-fg); text-decoration: none; white-space: nowrap; }
-  .hooks-note a:hover { text-decoration: underline; }
+  .hooks-note a, .plugins-note a {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   @media (max-width: 900px) {
     .hooks-grid { grid-template-columns: 1fr; }
   }
