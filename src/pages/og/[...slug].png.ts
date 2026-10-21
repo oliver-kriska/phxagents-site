@@ -7,7 +7,7 @@ import { origin } from '../../data/origin';
 import { hookDocPages } from '../../lib/hookDocs';
 import { getSkillIdentity } from '../../lib/skillNames';
 import { getAddonAgents, getAddonSkills } from '../../lib/addonEntries';
-import { getPagePlugins, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/plugins';
+import { getPagePlugins, getPlugin, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/plugins';
 
 /**
  * Build-time Open Graph images. One PNG per page at dist/og/<slug>.png.
@@ -38,10 +38,15 @@ export async function getStaticPaths() {
   const paths: OgPath[] = [
     {
       slug: 'home',
+      // Leads with the site's own opinion, as the home hero does.
       data: {
-        title: 'phxagents v3',
-        subtitle: `${stats.skills} Phoenix skills: full Claude Code plugin plus generated editions for Amp, Codex, Pi, OpenCode, and dsh.`,
+        title: 'Plausible Elixir is not idiomatic Phoenix.',
+        subtitle: `One playbook for ${getPlugin('elixir-phoenix').runtimes.length} AI coding runtimes.`,
         kind: 'docs',
+        badge: `v${stats.version}`,
+        meta: `${stats.skills} skills · ${stats.agents} agents · ${stats.hooks} hooks · ${stats.ironLaws} Iron Laws`,
+        // The counts mix scopes, so say which ones are Claude Code only.
+        scope: 'Skills run in every runtime. Agents and hooks are Claude Code only.',
       },
     },
     { slug: 'default', data: { title: 'phxagents', subtitle: stats.description, kind: 'docs' } },
@@ -90,7 +95,7 @@ export async function getStaticPaths() {
       },
     },
     // Add-on cards lead with what a reader should know before installing:
-    // maturity in the badge, size in the strip, scope in the footer.
+    // maturity in the badge, size as a fact line, scope in plain words.
     ...getPagePlugins().map((plugin) => ({
       slug: plugin.docsUrl.replace(/^\/|\/$/g, ''),
       data: {
@@ -98,16 +103,13 @@ export async function getStaticPaths() {
         subtitle: plugin.description,
         kind: 'docs' as const,
         badge: `${STATUS_LABELS[plugin.status]} plugin`,
-        stats: [
-          { value: String(plugin.skills), label: plugin.skills === 1 ? 'Skill' : 'Skills' },
-          { value: String(plugin.agents), label: plugin.agents === 1 ? 'Agent' : 'Agents' },
-          {
-            value: `v${plugin.version}`,
-            label: 'Version',
-            tone: plugin.status === 'stable' ? undefined : ('warn' as const),
-          },
-        ],
-        footnote: [
+        badgeTone: plugin.status === 'experimental' ? ('warn' as const) : plugin.status === 'mvp' ? ('info' as const) : ('accent' as const),
+        meta: [
+          `${plugin.skills} ${plugin.skills === 1 ? 'skill' : 'skills'}`,
+          `${plugin.agents} ${plugin.agents === 1 ? 'agent' : 'agents'}`,
+          `v${plugin.version}`,
+        ].join(' · '),
+        scope: [
           plugin.runtimes.map((r) => RUNTIME_LABELS[r]).join(', ') + (plugin.runtimes.length === 1 ? ' only' : ''),
           ...(plugin.dependencies.length ? [`requires ${plugin.dependencies.join(', ')}`] : []),
         ].join(' · '),
@@ -119,6 +121,7 @@ export async function getStaticPaths() {
       slug: item.url.replace(/^\/|\/$/g, ''),
       data: {
         title: item.displayName,
+        titleStyle: item.isCommand ? ('command' as const) : ('identifier' as const),
         subtitle: item.description,
         kind: item.kind,
         badge: `${item.plugin.prefix} ${item.kind}`,
@@ -175,15 +178,12 @@ export async function getStaticPaths() {
       },
     },
     // The origin essay is measurement about the plugin itself, so its card uses
-    // the same stats-strip variant as a research report.
+    // the same evidence variant as a research report. Evidence cards carry no
+    // subtitle: the room goes to labels that stay readable in a feed.
     {
       slug: 'origin',
       data: {
         title: origin.title,
-        subtitle: `Origin story · ${new Date(`${origin.datePublished}T00:00:00Z`).toLocaleDateString(
-          'en-GB',
-          { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }
-        )}`,
         kind: 'research',
         badge: 'origin',
         stats: origin.heroStats.map((stat) => ({
@@ -200,7 +200,6 @@ export async function getStaticPaths() {
       slug: `research/${report.slug}`,
       data: {
         title: report.title,
-        subtitle: 'Independent ecosystem audit — 18 August 2026',
         kind: 'research' as const,
         stats: report.heroStats.map((stat) => ({
           value: stat.value,
@@ -218,6 +217,7 @@ export async function getStaticPaths() {
         slug: `skills/${slug}`,
         data: {
           title: identity.isCommand ? `/${identity.claudeName}` : name,
+          titleStyle: identity.isCommand ? ('command' as const) : ('identifier' as const),
           subtitle: entry.data.description as string,
           kind: 'skill' as const,
         },
@@ -227,13 +227,19 @@ export async function getStaticPaths() {
       slug: `agents/${entry.id}`,
       data: {
         title: entry.data.name as string,
+        titleStyle: 'identifier' as const,
         subtitle: entry.data.description as string,
         kind: 'agent' as const,
       },
     })),
   ];
 
-  return paths.map((p) => ({ params: { slug: p.slug }, props: { data: p.data } }));
+  // The footer shows the page's own route; the fallback card has no single page.
+  const pathFor = (slug: string) => (slug === 'home' ? '/' : slug === 'default' ? undefined : `/${slug}/`);
+  return paths.map((p) => ({
+    params: { slug: p.slug },
+    props: { data: { path: pathFor(p.slug), ...p.data } },
+  }));
 }
 
 export const GET: APIRoute = async ({ props }) => {
