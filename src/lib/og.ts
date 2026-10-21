@@ -102,9 +102,16 @@ function titleSize(title: string): number {
   return 34;
 }
 
+// Too long: end on the last sentence or clause that fits, else the last whole
+// word, so a card never ends "set the c…".
 function clamp(text: string, max = 116): string {
   const t = text.replace(/\s+/g, ' ').trim();
-  return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
+  if (t.length <= max) return t;
+  const stop = Math.max(t.lastIndexOf('. ', max), t.lastIndexOf(': ', max));
+  if (stop > max * 0.4) return t.slice(0, stop) + '.';
+  const cut = t.slice(0, max - 1);
+  const space = cut.lastIndexOf(' ');
+  return (space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[\s,;:.—-]+$/, '') + '…';
 }
 
 // Tiny hyperscript helper so the tree reads top-to-bottom without JSX.

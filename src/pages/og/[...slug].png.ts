@@ -7,7 +7,7 @@ import { origin } from '../../data/origin';
 import { hookDocPages } from '../../lib/hookDocs';
 import { getSkillIdentity } from '../../lib/skillNames';
 import { getAddonAgents, getAddonSkills } from '../../lib/addonEntries';
-import { getPagePlugins, getPlugins } from '../../lib/plugins';
+import { getPagePlugins, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/plugins';
 
 /**
  * Build-time Open Graph images. One PNG per page at dist/og/<slug>.png.
@@ -89,13 +89,28 @@ export async function getStaticPaths() {
         kind: 'docs',
       },
     },
+    // Add-on cards lead with what a reader should know before installing:
+    // maturity in the badge, size in the strip, scope in the footer.
     ...getPagePlugins().map((plugin) => ({
       slug: plugin.docsUrl.replace(/^\/|\/$/g, ''),
       data: {
         title: plugin.displayName,
         subtitle: plugin.description,
         kind: 'docs' as const,
-        badge: `plugin v${plugin.version}`,
+        badge: `${STATUS_LABELS[plugin.status]} plugin`,
+        stats: [
+          { value: String(plugin.skills), label: plugin.skills === 1 ? 'Skill' : 'Skills' },
+          { value: String(plugin.agents), label: plugin.agents === 1 ? 'Agent' : 'Agents' },
+          {
+            value: `v${plugin.version}`,
+            label: 'Version',
+            tone: plugin.status === 'stable' ? undefined : ('warn' as const),
+          },
+        ],
+        footnote: [
+          plugin.runtimes.map((r) => RUNTIME_LABELS[r]).join(', ') + (plugin.runtimes.length === 1 ? ' only' : ''),
+          ...(plugin.dependencies.length ? [`requires ${plugin.dependencies.join(', ')}`] : []),
+        ].join(' · '),
       },
     })),
     // Add-on entries say which plugin they come from, since a slug such as
