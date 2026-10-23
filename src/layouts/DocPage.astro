@@ -4,15 +4,17 @@ import Default from './Default.astro';
 import { getDocsNav } from '../lib/docsNav';
 import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
 import { getPagePlugins } from '../lib/plugins';
+import { getChangelogArchives } from '../lib/changelog';
 
 interface Props {
   title: string;
   description?: string;
   seoTitle?: string;
+  dateModified?: string;
   active?: ComponentProps<typeof Default>['active'];
 }
 
-const { title, description, seoTitle, active = 'docs' } = Astro.props;
+const { title, description, seoTitle, dateModified, active = 'docs' } = Astro.props;
 const currentPath = Astro.url.pathname;
 const nav = getDocsNav();
 
@@ -22,9 +24,9 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
 }
 ---
 
-<Default title={title} description={description} seoTitle={seoTitle} active={active}>
+<Default title={title} description={description} seoTitle={seoTitle} dateModified={dateModified} active={active}>
   <div class="docs-shell">
-    <button class="docs-nav-trigger btn-ghost" data-docs-nav-toggle type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="docs-sidebar">
+    <button class="docs-nav-trigger btn-ghost" data-docs-nav-toggle type="button" aria-label="Menu — documentation navigation" aria-expanded="false" aria-controls="docs-sidebar">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       <span>Menu</span>
     </button>
@@ -55,6 +57,11 @@ function sidebarLabel(entryName: string, entryKind: 'skill' | 'agent'): string {
             ))}
           <li><a href="/tidewave-mcp/" aria-current={currentPath === '/tidewave-mcp/' ? 'page' : undefined}>Tidewave MCP</a></li>
           <li><a href="/changelog/" aria-current={currentPath === '/changelog/' ? 'page' : undefined}>Changelog</a></li>
+          {getChangelogArchives().map((major) => (
+            <li class="docs-nav-child">
+              <a href={major.url} aria-current={currentPath === major.url ? 'page' : undefined}>{major.label} archive</a>
+            </li>
+          ))}
           <li><a href="/catalog/" aria-current={currentPath === '/catalog/' ? 'page' : undefined}>Catalog</a></li>
           <li><a href="/plugins/" aria-current={currentPath === '/plugins/' ? 'page' : undefined}>Plugins</a></li>
           {getPagePlugins().map((plugin) => (

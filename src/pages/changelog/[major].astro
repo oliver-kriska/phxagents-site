@@ -1,0 +1,25 @@
+---
+import ChangelogPage from '../../components/ChangelogPage.astro';
+import { changelogSpan, getChangelogArchives, type ChangelogMajor } from '../../lib/changelog';
+
+export function getStaticPaths() {
+  return getChangelogArchives().map((major) => ({ params: { major: major.label }, props: { major } }));
+}
+
+const { major } = Astro.props as { major: ChangelogMajor };
+const released = major.releases.filter((r) => r.date);
+const first = released.at(-1)!;
+const last = released[0];
+const range = first === last ? `v${first.version}` : `v${first.version} to v${last.version}`;
+---
+
+<ChangelogPage
+  major={major}
+  title={`Changelog: ${major.label}`}
+  seoTitle={`phxagents ${major.label} changelog: ${range} — phxagents`}
+  description={`Release notes for phxagents ${range}, ${changelogSpan(major)}. Archived major version of the elixir-phoenix plugin.`}
+>
+  <Fragment slot="lede">
+    Archived release notes for {range} of the <code>elixir-phoenix</code> plugin, {`${released.length} ${released.length === 1 ? 'release' : 'releases'}`}. The current major is on the <a href="/changelog/">changelog</a>.
+  </Fragment>
+</ChangelogPage>

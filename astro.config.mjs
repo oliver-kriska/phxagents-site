@@ -36,12 +36,33 @@ function rehypeShiftHeadings() {
  * skill/agent tables can scroll horizontally on narrow viewports instead of
  * forcing the whole page wider. The outer shell carries a mobile visual cue
  * without placing it inside the scrolling region.
+ *
+ * Each region is a landmark, so each needs its own name (axe `landmark-unique`):
+ * it is named after the nearest heading above it, numbered when one section
+ * holds several tables.
  */
 function rehypeWrapTables() {
+  /** @param {any} node @returns {string} */
+  const textOf = (node) =>
+    node.type === 'text' ? node.value : (node.children ?? []).map(textOf).join('');
+  /** @type {string | null} */
+  let heading = null;
+  /** @type {Map<string, number>} */
+  let seen = new Map();
+  const nameFor = () => {
+    const base = heading ? `Table: ${heading}` : 'Table';
+    const n = (seen.get(base) ?? 0) + 1;
+    seen.set(base, n);
+    return n === 1 ? base : `${base} (${n})`;
+  };
   const wrap = (/** @type {any} */ node) => {
     if (!node.children) return;
     node.children = node.children.map((/** @type {any} */ child) => {
+      if (child.type === 'element' && /^h[1-6]$/.test(child.tagName)) {
+        heading = textOf(child).trim().replace(/\s+/g, ' ') || heading;
+      }
       if (child.type === 'element' && child.tagName === 'table') {
+        const label = nameFor();
         return {
           type: 'element',
           tagName: 'div',
@@ -63,7 +84,7 @@ function rehypeWrapTables() {
                 className: ['table-wrap'],
                 tabIndex: 0,
                 role: 'region',
-                ariaLabel: 'Scrollable table',
+                ariaLabel: label,
               },
               children: [child],
             },
@@ -75,6 +96,8 @@ function rehypeWrapTables() {
     });
   };
   return (/** @type {any} */ tree) => {
+    heading = null;
+    seen = new Map();
     wrap(tree);
   };
 }

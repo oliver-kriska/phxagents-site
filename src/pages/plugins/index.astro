@@ -1,6 +1,7 @@
 ---
 import DocPage from '../../layouts/DocPage.astro';
 import { getPlugin, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/plugins';
+import { getLatestPluginSourceDate } from '../../lib/sourceDates';
 
 const plugins = getPlugins();
 const products = plugins.filter((plugin) => plugin.role !== 'namespace');
@@ -49,7 +50,7 @@ const jsonLd = {
 };
 ---
 
-<DocPage title="Plugins" seoTitle={`Elixir & Phoenix plugins: ${productNames} — phxagents`} description="Explore the phxagents plugin collection: capabilities, runtime support, release status and installation requirements." active="plugins">
+<DocPage title="Plugins" dateModified={getLatestPluginSourceDate(['.claude-plugin/marketplace.json', 'plugins/*/.claude-plugin/plugin.json'])} seoTitle={`Elixir & Phoenix plugins: ${productNames} — phxagents`} description="Explore the phxagents plugin collection: capabilities, runtime support, release status and installation requirements." active="plugins">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <header class="plugins-heading">
     <h1>Plugins</h1>

@@ -15,10 +15,16 @@ interface Props {
    * the bare name "oban". Pages that omit it keep the "<title> — phxagents" form.
    */
   seoTitle?: string;
+  /**
+   * The date the page's content last changed at its source (a plugin file's
+   * last commit, a report's date). Emitted as WebPage.dateModified and read
+   * back for the sitemap's <lastmod>; omit it rather than pass a build time.
+   */
+  dateModified?: string;
   active?: 'docs' | 'runtimes' | 'catalog' | 'plugins' | 'changelog' | 'iron-laws' | 'hooks' | 'origin' | 'home' | null;
 }
 
-const { title, description = stats.description, seoTitle, active = null } = Astro.props;
+const { title, description = stats.description, seoTitle, dateModified, active = null } = Astro.props;
 
 const stargazersCount = await getStargazersCount();
 const starsLabel = formatStars(stargazersCount);
@@ -51,6 +57,7 @@ const ogSlug = ogPath === '' ? 'home' : ogPath;
 const ogHasCard =
   ['home', 'install', 'compatibility', 'catalog', 'plugins', 'iron-laws', 'changelog', 'tidewave-mcp', 'amp', 'research', 'hooks', 'origin'].includes(ogSlug) ||
   ogSlug.startsWith('install/') ||
+  ogSlug.startsWith('changelog/') ||
   ogSlug.startsWith('hooks/') ||
   ogSlug.startsWith('research/') ||
   ogSlug.startsWith('plugins/') ||
@@ -79,6 +86,9 @@ const siteJsonLd = {
       inLanguage: 'en',
       publisher: { '@id': 'https://phxagents.dev/#org' },
     },
+    ...(dateModified
+      ? [{ '@type': 'WebPage', '@id': `${canonical}#page`, url: canonical, name: title, dateModified, isPartOf: { '@id': 'https://phxagents.dev/#website' } }]
+      : []),
     // These top-level pages have no page-owned trail. Detail pages emit their
     // own breadcrumbs, so adding them here unconditionally would duplicate them.
     ...(['/install', '/catalog', '/iron-laws', '/changelog'].includes(trimmedPath) ? [{
@@ -172,7 +182,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
 
     <header class="nav">
       <div class="nav-inner">
-        <a href="/" class="brand" aria-label="phxagents home">
+        <a href="/" class="brand" aria-label="phxagents.dev home">
           <span class="brand-mark" aria-hidden="true"></span>
           <span class="brand-name">phxagents<span>.dev</span></span>
         </a>
@@ -188,7 +198,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
         </nav>
         <div class="nav-spacer"></div>
         <div class="nav-right">
-          <button class="search-btn" data-search-open aria-label="Open search (press / or ⌘K)" type="button">
+          <button class="search-btn" data-search-open aria-label="Search docs, skills… ⌘K (or press /)" type="button">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             <span class="search-label">Search docs, skills…</span>
             <span class="kbd" aria-hidden="true">⌘K</span>
@@ -198,7 +208,7 @@ function currentAttr(href: string, sectionMatch: boolean): 'page' | 'true' | und
             href="https://github.com/oliver-kriska/claude-elixir-phoenix"
             rel="noopener"
             data-loaded={starsLoaded ? 'true' : undefined}
-            aria-label={starsLoaded ? `View phxagents on GitHub; ${stargazersCount} stars` : 'View phxagents on GitHub'}
+            aria-label={starsLoaded ? `Star ${starsLabel} — phxagents on GitHub` : 'Star phxagents on GitHub'}
           >
             <span class="gh-label">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-1.94c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.34.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>

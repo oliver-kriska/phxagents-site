@@ -46,3 +46,14 @@ export function getPluginSourceDate(sourcePath: string, fallback?: unknown): str
   dates.set(sourcePath, date);
   return date;
 }
+
+/**
+ * The newest source date among several plugin paths, for a page derived from
+ * more than one file (the plugin manifests, every skill). Paths are Git
+ * pathspecs, so a `*` segment matches every plugin's skills directory.
+ */
+export function getLatestPluginSourceDate(sourcePaths: string[]): string {
+  return sourcePaths
+    .map((sourcePath) => getPluginSourceDate(sourcePath))
+    .reduce((latest, date) => (new Date(date) > new Date(latest) ? date : latest));
+}

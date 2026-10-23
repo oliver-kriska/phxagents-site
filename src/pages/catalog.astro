@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import { getSkillIdentity } from '../lib/skillNames';
 import { getAddonAgents, getAddonSkills } from '../lib/addonEntries';
 import { getCatalogPlugins, getPlugin } from '../lib/plugins';
+import { getLatestPluginSourceDate } from '../lib/sourceDates';
 
 const skills = await getCollection('skills');
 const agents = await getCollection('agents');
@@ -92,7 +93,7 @@ function displayName(item: Item): string {
 }
 ---
 
-<Default title="Catalog" description={`All ${items.length} skills and Claude Code agents across the ${pluginFilters.length} phxagents marketplace plugins.`} active="catalog">
+<Default title="Catalog" dateModified={getLatestPluginSourceDate(['plugins/*/skills/*', 'plugins/*/agents/*'])} description={`All ${items.length} skills and Claude Code agents across the ${pluginFilters.length} phxagents marketplace plugins.`} active="catalog">
   <div class="catalog-shell" data-catalog>
     <div class="catalog-head">
       <div>

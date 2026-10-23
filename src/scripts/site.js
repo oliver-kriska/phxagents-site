@@ -132,9 +132,14 @@ document.addEventListener('click', function (e) {
   const nav = document.querySelector('[data-docs-nav]');
   if (nav) {
     applyInert(nav);
+    // Scroll the sidebar itself, not with scrollIntoView: that also scrolls the
+    // window, which opened low-listed pages with their <h1> under the header.
     const current = nav.querySelector('a[aria-current="page"]');
-    if (current && typeof current.scrollIntoView === 'function') {
-      requestAnimationFrame(() => current.scrollIntoView({ block: 'center' }));
+    if (current) {
+      requestAnimationFrame(() => {
+        const offset = current.getBoundingClientRect().top - nav.getBoundingClientRect().top;
+        nav.scrollTop += offset - (nav.clientHeight - current.offsetHeight) / 2;
+      });
     }
   }
 })();

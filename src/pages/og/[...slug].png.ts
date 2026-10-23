@@ -8,6 +8,7 @@ import { hookDocPages } from '../../lib/hookDocs';
 import { getSkillIdentity } from '../../lib/skillNames';
 import { getAddonAgents, getAddonSkills } from '../../lib/addonEntries';
 import { getPagePlugins, getPlugin, getPlugins, RUNTIME_LABELS, STATUS_LABELS } from '../../lib/plugins';
+import { changelogSpan, getChangelogArchives } from '../../lib/changelog';
 
 /**
  * Build-time Open Graph images. One PNG per page at dist/og/<slug>.png.
@@ -156,8 +157,17 @@ export async function getStaticPaths() {
     })),
     {
       slug: 'changelog',
-      data: { title: 'Changelog', subtitle: 'Release notes for the phxagents plugin.', kind: 'docs' },
+      data: { title: 'Changelog', subtitle: 'Release notes for the phxagents plugin.', kind: 'docs', badge: `v${stats.version}` },
     },
+    ...getChangelogArchives().map((major) => ({
+      slug: `changelog/${major.label}`,
+      data: {
+        title: `Changelog: ${major.label}`,
+        subtitle: `Archived release notes for phxagents ${major.label}.x, ${changelogSpan(major)}.`,
+        kind: 'docs' as const,
+        badge: 'archive',
+      },
+    })),
     {
       slug: 'tidewave-mcp',
       data: {

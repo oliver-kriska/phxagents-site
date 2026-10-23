@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import DocPage from '../layouts/DocPage.astro';
 import { stats } from '../data/stats';
+import { getPluginSourceDate } from '../lib/sourceDates';
 import { marked } from 'marked';
 
 const ROOT = process.cwd();
@@ -76,7 +77,7 @@ const fallbackHtml = parsed ? '' : await marked.parse(section || '## Iron Laws\n
 const violationHtml = violationSrc.trim() ? await marked.parse(violationSrc.trim()) : '';
 ---
 
-<DocPage title="Iron Laws" description={`${stats.ironLaws} non-negotiable rules enforced by the phxagents plugin.`} active="iron-laws">
+<DocPage title="Iron Laws" dateModified={getPluginSourceDate('CLAUDE.md')} description={`${stats.ironLaws} non-negotiable rules enforced by the phxagents plugin.`} active="iron-laws">
   <div class="page-head">
     <h1>Iron Laws</h1>
     <p class="lede">

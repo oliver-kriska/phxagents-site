@@ -982,7 +982,8 @@ test -f doc/llms.txt</code></pre>
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 72ch;
+    /* Fit the full-size heading on two lines before and after Inter loads. */
+    max-width: 50em;
   }
   .rp-hero h1 {
     margin: 0;
@@ -1168,9 +1169,8 @@ test -f doc/llms.txt</code></pre>
       padding: 52px 0 0;
     }
     .rp-toc-box { border: 0; background: transparent; }
-    .rp-toc-box > summary { pointer-events: none; padding: 0 0 6px; min-height: 0; }
-    .rp-toc-box > summary::after,
-    .rp-toc-box[open] > summary::after { content: ''; }
+    .rp-toc-box > summary { padding-inline: 9px; }
+    .rp-toc-box > summary:focus-visible { outline-offset: -2px; }
     .rp-toc ol { padding: 0; border-top: 0; }
     .rp-toc a { min-height: 0; padding: 6px 9px; }
   }

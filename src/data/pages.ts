@@ -2,6 +2,7 @@ import { researchReports } from './research';
 import { origin } from './origin';
 import { hookDocPages, hookDocUrl } from '../lib/hookDocs';
 import { getPagePlugins, getPlugins } from '../lib/plugins';
+import { changelogSpan, getChangelogArchives } from '../lib/changelog';
 
 export type PageSection = 'Getting started' | 'Runtime guides' | 'Documentation';
 
@@ -122,11 +123,22 @@ export const pageItems: PageItem[] = [
   {
     type: 'page',
     name: 'Changelog',
-    desc: 'Release notes for the phxagents plugin.',
+    desc: 'Release notes for the phxagents plugin: the current major version and Unreleased changes.',
     url: '/changelog/',
     group: 'docs',
     llmsSection: 'Documentation',
   },
+  // Each earlier major has its own archive page.
+  ...getChangelogArchives().map(
+    (major): PageItem => ({
+      type: 'page',
+      name: `Changelog ${major.label}`,
+      desc: `Archived release notes for phxagents ${major.label}.x, ${changelogSpan(major)}.`,
+      url: major.url,
+      group: 'docs',
+      llmsSection: 'Documentation',
+    })
+  ),
   {
     type: 'page',
     name: origin.name,

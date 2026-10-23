@@ -1,0 +1,179 @@
+---
+import DocPage from '../layouts/DocPage.astro';
+import {
+  changelogDateModified,
+  changelogSpan,
+  getChangelogMajors,
+  renderChangelog,
+  type ChangelogMajor,
+} from '../lib/changelog';
+
+/**
+ * One changelog page: the current major at /changelog/, or an archived major at
+ * /changelog/v<n>/. Every page links every other major, so nothing that used to
+ * be on the single long page is more than one click away.
+ */
+interface Props {
+  major: ChangelogMajor;
+  title: string;
+  seoTitle?: string;
+  description: string;
+  /** Rendered above the release list (the current page's preamble). */
+  introMarkdown?: string;
+}
+
+const { major, title, seoTitle, description, introMarkdown } = Astro.props;
+const majors = getChangelogMajors();
+const others = majors.filter((m) => m.major !== major.major);
+const html = await renderChangelog(major.releases.map((r) => r.markdown).join('\n'));
+const intro = introMarkdown ? await renderChangelog(introMarkdown) : '';
+const site = 'https://phxagents.dev';
+const pageUrl = `${site}${major.url}`;
+const released = major.releases.filter((r) => r.date).length;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}#page`,
+      url: pageUrl,
+      name: seoTitle ?? title,
+      description,
+      dateModified: changelogDateModified(major),
+      isPartOf: { '@id': `${site}/#website` },
+    },
+    // /changelog/ itself gets its trail from Default.astro.
+    ...(major.url === '/changelog/'
+      ? []
+      : [
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'phxagents', item: `${site}/` },
+              { '@type': 'ListItem', position: 2, name: 'Changelog', item: `${site}/changelog/` },
+              { '@type': 'ListItem', position: 3, name: major.label, item: pageUrl },
+            ],
+          },
+        ]),
+  ],
+};
+---
+
+<DocPage title={title} seoTitle={seoTitle} description={description} active="changelog">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <div class="page-head">
+    <h1>{title}</h1>
+    <p class="lede"><slot name="lede" /></p>
+    <nav class="majors" aria-label="Changelog by major version">
+      <span class="majors-label">Major versions</span>
+      <ul>
+        {majors.map((m) => (
+          <li>
+            <a href={m.url} aria-current={m.major === major.major ? 'page' : undefined}>
+              <span class="majors-v">{m.label}</span>
+              <span class="majors-span">{changelogSpan(m, ' – ')}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+  {intro && <div class="docs-body changelog-intro" set:html={intro} />}
+  <article class="docs-body changelog-body" set:html={html}></article>
+  {others.length > 0 && (
+    <nav class="changelog-more" aria-label="Other major versions">
+      <p>
+        {`${released} ${released === 1 ? 'release' : 'releases'} in ${major.label}. Other majors: `}
+        {others.map((m, i) => (
+          <>{i > 0 && ', '}<a href={m.url}>{m.label}</a></>
+        ))}.
+      </p>
+    </nav>
+  )}
+</DocPage>
+
+<style>
+  .page-head h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .page-head .lede {
+    margin: 0 0 18px;
+    color: var(--fg-soft);
+    font-size: 15px;
+    line-height: 1.55;
+    max-width: 640px;
+  }
+  .docs-body :global(h2) {
+    margin: 40px 0 14px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(h3) {
+    margin: 24px 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .docs-body :global(p) {
+    margin: 0 0 14px;
+    color: var(--fg-soft);
+    line-height: 1.65;
+    font-size: 14.5px;
+  }
+  .docs-body :global(ul), .docs-body :global(ol) {
+    margin: 0 0 16px 0;
+    padding-left: 22px;
+    color: var(--fg-soft);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .docs-body :global(li) { margin: 4px 0; }
+  .docs-body :global(a) {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+  .docs-body :global(pre) {
+    margin: 14px 0 22px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 12.5px;
+    overflow-x: auto;
+  }
+  .majors { margin: 0 0 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .majors-label { font-size: 13px; color: var(--muted); }
+  .majors ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .majors a {
+    display: inline-flex; align-items: baseline; gap: 8px;
+    min-height: 44px; box-sizing: border-box; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--fg-soft); text-decoration: none; font-size: 14px;
+  }
+  .majors a:hover { border-color: var(--fg-soft); color: var(--fg); }
+  .majors a[aria-current='page'] { border-color: var(--accent); color: var(--fg); }
+  .majors-v { font-family: var(--font-mono); font-weight: 600; }
+  .majors-span { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .changelog-intro :global(p) { font-size: 14px; }
+  /* The switcher already draws the rule above the first release. */
+  .page-head + .changelog-body > :global(h2:first-child) { margin-top: 0; padding-top: 0; border-top: 0; }
+  /* Long identifiers and paths in release notes must wrap, not widen the page. */
+  .docs-body { min-width: 0; overflow-wrap: anywhere; }
+  .changelog-more { margin: 40px 0 0; padding-top: 24px; border-top: 1px solid var(--border); color: var(--fg-soft); font-size: 14.5px; }
+  .changelog-more a {
+    color: var(--accent-fg);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  }
+</style>

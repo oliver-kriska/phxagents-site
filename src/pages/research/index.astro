@@ -46,7 +46,7 @@ const jsonLd = {
 };
 ---
 
-<Default title={title} description={description} active="docs">
+<Default title={title} description={description} dateModified={researchReports.map((r) => r.datePublished).sort().at(-1)} active="docs">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <main class="rx">

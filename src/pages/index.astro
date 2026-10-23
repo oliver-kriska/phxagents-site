@@ -16,7 +16,8 @@ const releaseTag = `v${stats.version}`;
 const releaseMatchesManifest = release?.tag_name === releaseTag;
 const releaseUrl = releaseMatchesManifest ? release!.html_url : '/changelog/';
 const adaptedWorkflows = getPortableWorkflowNames().length;
-const metaDescription = `phxagents v3 brings one canonical Elixir and Phoenix skill set to ${runtimeNames}, with ${adaptedWorkflows} workflows adapted for every runtime.`;
+// Kept under ~160 characters so a search result shows it whole.
+const metaDescription = `phxagents v3: one Elixir and Phoenix skill set for ${runtimeNames}, with ${adaptedWorkflows} workflows adapted to each.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
